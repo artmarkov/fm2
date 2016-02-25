@@ -34,11 +34,11 @@ var loadConfigFile = function (type) {
 			var url = './scripts/' + $.urlParam('config');
 			userconfig = $.urlParam('config');
 		} else {
-			var url = './scripts/filemanager.config.js';
-			userconfig = 'filemanager.config.js';
+			var url = './scripts/filemanager.config.json';
+			userconfig = 'filemanager.config.json';
 		}
 	} else {
-		var url = './scripts/filemanager.config.default.js';
+		var url = './scripts/filemanager.config.default.json';
 	}
     
     $.ajax({
@@ -1487,7 +1487,11 @@ var getFolderInfo = function(path) {
 		if($('#fileinfo').data('view') == 'grid') {
 			$('#fileinfo').find('#contents li').click(function(){
 				var path = $(this).find('img').attr('data-path');
-				getDetailView(path);
+				if(config.options.quickSelect && data[path]['File Type'] != 'dir' && $(this).hasClass('cap_select')) {
+					selectItem(data[path]);
+				} else {
+					getDetailView(path);
+				}
 			}).each(function() {
 				$(this).contextMenu(
 					{ menu: getContextMenuOptions($(this)) },
@@ -1500,7 +1504,11 @@ var getFolderInfo = function(path) {
 		} else {
 			$('#fileinfo tbody tr').click(function(){
 				var path = $('td:first-child', this).attr('data-path');
-				getDetailView(path);		
+				if(config.options.quickSelect && data[path]['File Type'] != 'dir' && $(this).hasClass('cap_select')) {
+					selectItem(data[path]);
+				} else {
+					getDetailView(path);
+				}		
 			}).each(function() {
 				$(this).contextMenu(
 					{ menu: getContextMenuOptions($(this)) },

@@ -35,7 +35,7 @@ class Filemanager {
 	public function __construct($extraConfig = '') {
 		
 		// getting default config file
-		$content = file_get_contents("../../scripts/filemanager.config.js.default");
+		$content = file_get_contents("../../scripts/filemanager.config.default.json");
 		$config_default = json_decode($content, true);
 		
 		// getting user config file
@@ -49,7 +49,7 @@ class Filemanager {
 				$this->error("Given config file (".basename($this->get['config']).") does not exist !");
 			}
 		}	else {
-			$content = file_get_contents("../../scripts/filemanager.config.js");
+			$content = file_get_contents("../../scripts/filemanager.config.json");
 		}
 		$config = json_decode($content, true);
 		
@@ -410,7 +410,7 @@ class Filemanager {
 		$new_file = $this->getFullPath($path . '/' . $this->get['new']). $suffix;
 		$old_file = $this->getFullPath($this->get['old']) . $suffix;
 
-		if(!$this->has_permission('rename') || !$this->is_valid_path($old_file)) {
+		if(!$this->has_permission('rename') || !$this->is_valid_path($old_file) || !$this->is_valid_path($new_file)) {
 			$this->error("No way.");
 		}
 		
@@ -934,6 +934,9 @@ class Filemanager {
 	public function preview($thumbnail) {
 			
 		$current_path = $this->getFullPath();
+		
+		if(!$this->is_valid_path($current_path)) $this->error("No way.");
+		
 			
 		if(isset($this->get['path']) && file_exists($current_path)) {
 			
@@ -1199,10 +1202,20 @@ private function is_valid_path($path) {
 	
 	// return $this->startsWith($givenpath, $rootpath);
 	
-	$this->__log('substr path_to_files : ' . substr(realpath($path) . DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files)) . DIRECTORY_SEPARATOR);
-	$this->__log('path_to_files : ' . realpath($this->path_to_files) . DIRECTORY_SEPARATOR);
-	
-	return (substr(realpath($path) . DIRECTORY_SEPARATOR, 0, strlen(realpath($this->path_to_files))) . DIRECTORY_SEPARATOR) == (realpath($this->path_to_files) . DIRECTORY_SEPARATOR);
+	// handle better symlinks & network path
+	$patt = array('/\\\\+/','/\/+/');
+	$repl = array('\\\\','/');
+
+	$substrpath = substr(realpath($path) . DIRECTORY_SEPARATOR, 0, strlen($this->path_to_files)) . DIRECTORY_SEPARATOR;
+	$substrpath = preg_replace($patt,$repl,$substrpath); // removing double slash
+
+	$rpath = realpath($this->path_to_files)  . DIRECTORY_SEPARATOR;
+	$rpath = preg_replace($patt,$repl,$rpath); // removing double slash
+
+	$this->__log('substr path : ' . $substrpath);
+	$this->__log('real path : ' . $rpath);
+
+  return ($substrpath == $rpath);
 	
 	
 }
