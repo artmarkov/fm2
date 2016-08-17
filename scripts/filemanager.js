@@ -24,16 +24,16 @@
     fileConnector, fileRoot, fileSizeLimit, fileTree, file_size_limit,
     file_too_big, files, find, fn, folderCallback, foldername, gb, get,
     getElementById, getIconUrl, getImageData, getJSON, getMilliseconds,
-    getParams, getQueuedFiles, getRejectedFiles, getTime, getUploadingFiles,
-    getValue, getWindowArg, grid_view, hasClass, hasOwnProperty, height,
-    help_move, hide, host, href, html, icons, images, imagesExt, imagesOnly,
-    inArray, indexOf, init, innerHTML, items, join, kb, lang, lastIndexOf,
-    left, length, listFiles, list_view, liveUpdate, load, loading_data,
-    location, log, logger, mCustomScrollbar, maxFiles, maxFilesize, mb, menu,
-    minLeft, minRight, mode, modified, move, msie, multiFolder, multiple, name,
+    getParams, getQueuedFiles, getRejectedFiles, getUploadingFiles, getValue,
+    getWindowArg, grid_view, hasClass, hasOwnProperty, height, help_move, hide,
+    host, href, html, icons, images, imagesExt, imagesOnly, inArray, indexOf,
+    init, innerHTML, input, items, join, kb, lang, lastIndexOf, left, length,
+    listFiles, list_view, liveUpdate, load, loading_data, location, log,
+    logger, mCustomScrollbar, maxFiles, maxFilesize, mb, menu, minLeft,
+    minRight, mode, modified, move, msie, multiFolder, multiple, name, new,
     new_filename, new_folder, next, no, no_foldername, now, number, offset,
-    onInit, opacity, opener, options, overlayspeed, parallelUploads, paramName,
-    parent, parentfolder, parseJSON, path, pathname, pdfs, pdfsExt,
+    old, onInit, opacity, opener, options, overlayspeed, parallelUploads,
+    paramName, parent, parentfolder, parseJSON, path, pathname, pdfs, pdfsExt,
     pdfsReaderHeight, pdfsReaderWidth, persistent, pop, prepend, prev,
     processQueue, prompt, prompt_foldername, protocol, push, quickSelect,
     quit_editor, remove, removeAttr, removeClass, removeFile, rename, replace,
@@ -52,6 +52,8 @@
     version, videos, videosExt, videosPlayerHeight, videosPlayerWidth, width,
     windowManager, wrapInner, yes
 */
+/*global FileReader*/
+
 /**
  *    Filemanager JS core
  *
@@ -229,6 +231,8 @@
                 + "?mode=" + options.mode
                 + "&path=" + options.path
                 + "&config=" + _$.userconfig
+                + "&old=" + options.old
+                + "&new=" + options.new
                 + "&name=" + encodeURIComponent(options.foldername)
                 + "&time=" + Date.now();
 
@@ -254,7 +258,7 @@
         if (config.options.getParams) {
             $.extend(ajaxOptions, config.options.getParams);
         }
-        console.log("ajaxOptions after -> ", ajaxOptions);
+        //console.log("ajaxOptions after -> ", ajaxOptions);
 
         $.ajax(ajaxOptions);
     };
@@ -318,7 +322,7 @@
         async: false,
         dataType: "json",
         success: function (json) {
-            console.log("load language -> ", json);
+            //console.log("load language -> ", json);
             lg = json;
         }
     });
@@ -749,9 +753,7 @@
                                 props = data[key].Properties;
                                 cap_classes = "";
                                 for (cap in capabilities) {
-                                    if (capabilities
-                                        .hasOwnProperty(cap) &&
-                                        has_capability(data[key], capabilities[cap])) {
+                                    if (capabilities.hasOwnProperty(cap) && has_capability(data[key], capabilities[cap])) {
                                         cap_classes += " cap_" + capabilities[cap];
                                     }
                                 }
@@ -899,20 +901,18 @@
                 if ($("#fileinfo").data("view") === "grid") {
                     $("#fileinfo")
                         .find("#contents li")
-                        .click(function() {
+                        .click(function () {
                             path = $(this).find("img").attr("data-path");
-                            if (config.options.quickSelect &&
-                                data[path]["File Type"] !== "dir" &&
-                                $(this).hasClass("cap_select")) {
+                            if (config.options.quickSelect && data[path]["File Type"] !== "dir" && $(this).hasClass("cap_select")) {
                                 selectItem(data[path]);
                             } else {
                                 getDetailView(path);
                             }
                         })
-                        .each(function() {
+                        .each(function () {
                             $(this)
                                 .contextMenu(
-                                    { menu: getContextMenuOptions($(this)) },
+                                    {menu: getContextMenuOptions($(this))},
                                     function(action, el) {
                                         path = $(el).find("img").attr("data-path");
                                         setMenus(action, path);
@@ -923,19 +923,17 @@
                     $("#fileinfo tbody tr")
                         .click(function() {
                             path = $("td:first-child", this).attr("data-path");
-                            if (config.options.quickSelect &&
-                                data[path]["File Type"] !== "dir" &&
-                                $(this).hasClass("cap_select")) {
+                            if (config.options.quickSelect && data[path]["File Type"] !== "dir" && $(this).hasClass("cap_select")) {
                                 selectItem(data[path]);
                             } else {
                                 getDetailView(path);
                             }
                         })
-                        .each(function() {
+                        .each(function () {
                             $(this)
                                 .contextMenu(
-                                    { menu: getContextMenuOptions($(this)) },
-                                    function(action, el) {
+                                    {menu: getContextMenuOptions($(this))},
+                                    function (action, el) {
                                         path = $("td:first-child", el).attr("data-path");
                                         setMenus(action, path);
                                     }
@@ -956,10 +954,9 @@
                     // to get icons from filteree
                     // Necessary to fix bug #170
                     // https://github.com/simogeo/Filemanager/issues/170
-                    var timer = setInterval(function() {
-                            display_icons(timer);
-                        },
-                        300);
+                    var timer = setInterval(function () {
+                        display_icons(timer);
+                    }, 300);
                 }
             }
         });
@@ -969,18 +966,18 @@
     // specified parent node. Called after a new folder is
     // successfully created.
     function addFolder(parent, name) {
-        var newNode = '<li class="directory collapsed"><a data-path="' + parent + name
-            + '/" href="#">' + name + '</a><ul class="jqueryFileTree" style="display: block;"></ul></li>';
-        var parentNode = $("#filetree").find('a[data-path="' + parent + '"]');
+        var newNode = "<li class='directory collapsed'><a data-path='" + parent + name
+                + "/' href='#'>" + name + "</a><ul class='jqueryFileTree' style='display: block;'></ul></li>";
+        var parentNode = $("#filetree").find("a[data-path='" + parent + "']");
         if (parent !== fileRoot) {
             parentNode.next("ul").prepend(newNode).prev("a").click().click();
         } else {
             $("#filetree ul.jqueryFileTree").prepend(newNode);
-            $("#filetree").find('li a[data-path="' + parent + name + '/"]').attr("class", "cap_rename cap_delete").click(function () {
+            $("#filetree").find("li a[data-path='" + parent + name + "/']").attr("class", "cap_rename cap_delete").click(function () {
                 getFolderInfo(parent + name + "/");
             }).each(function () {
                 $(this).contextMenu(
-                    { menu: getContextMenuOptions($(this)) },
+                    {menu: getContextMenuOptions($(this))},
                     function (action, el) {
                         var path = $(el).attr("data-path");
                         setMenus(action, path);
@@ -1006,26 +1003,28 @@
                 msg = lg.prompt_foldername + " : <input id='fname' name='fname' type='text' value='" + foldername + "' />";
 
             var getFolderName = function (v, m) {
-                if (v !== 1) {
+                if (!v) {
                     return false;
                 }
                 var fname = m.children("#fname").val();
 
                 if (fname !== "") {
                     foldername = cleanString(fname);
-                    var d = new Date(); // to prevent IE cache issues
-                    $.getJSON(fileConnector + "?mode=addfolder&path=" + $("#currentpath").val()
-                            + "&config=" + userconfig
-                            + "&name=" + encodeURIComponent(foldername)
-                            + "&time=" + d.getMilliseconds(), function (result) {
-                        if (result.Code === 0) {
-                            addFolder(result.Parent, result.Name);
-                            getFolderInfo(result.Parent);
+                    _$.apiGet({
+                        mode: "addfolder",
+                        foldername: foldername,
+                        path: $("#currentpath").val(),
+                        success: function (result) {
+                            console.log("addfolder result -> ", result);
+                            if (result.Code === 0) {
+                                addFolder(result.Parent, result.Name);
+                                getFolderInfo(result.Parent);
 
-                            // seems to be necessary when dealing w/ files located on s3 (need to look into a cleaner solution going forward)
-                            $("#filetree").find("a[data-path='" + result.Parent + "/']").click().click();
-                        } else {
-                            $.prompt(result.Error);
+                                // seems to be necessary when dealing w/ files located on s3 (need to look into a cleaner solution going forward)
+                                $("#filetree").find("a[data-path='" + result.Parent + "/']").click().click();
+                            } else {
+                                $.prompt(result.Error);
+                            }
                         }
                     });
                 } else {
@@ -1134,7 +1133,7 @@
             root: fileRoot,
             datafunc: populateFileTree,
             multiFolder: false,
-            folderCallback: function(path) {
+            folderCallback: function (path) {
                 getFolderInfo(path);
             },
             expandedFolder: fullexpandedFolder,
@@ -1248,10 +1247,10 @@
         var fileName = config.security.allowChangeExtensions
             ? data.Filename
             : getFilename(data.Filename);
-        var msg = lg.new_filename + " : <input id='rname' name='rname' type='text' value='" + fileName + " />";
+        var msg = lg.new_filename + " : <input id='rname' name='rname' type='text' value='" + fileName + "' />";
 
         var getNewName = function (v, m) {
-            if (v !== 1) {
+            if (!v) {
                 return false;
             }
             rname = m.children("#rname").val();
@@ -1268,7 +1267,7 @@
                 }
 
                  // File only - Check if file extension is allowed
-                if (data.Path.charAt(data.Path.length - 1) !== "/"  && !isAuthorizedFile(givenName)) {
+                if (!data.IsDirectory  && !isAuthorizedFile(givenName)) {
                     var str = "<p>" + lg.INVALID_FILE_TYPE + "</p>";
                     if (config.security.uploadPolicy === "DISALLOW_ALL") {
                         str += "<p>" + lg.ALLOWED_FILE_TYPE + config.security.uploadRestrictions.join(", ") + ".</p>";
@@ -1282,13 +1281,12 @@
                 }
 
                 //var oldPath = data.Path;
-                var connectString = fileConnector + "?mode=rename&old=" + encodeURIComponent(data.Path) + "&new=" + encodeURIComponent(givenName) + "&config=" + userconfig;
+                //var connectString = fileConnector + "?mode=rename&old=" + encodeURIComponent(data.Path) + "&new=" + encodeURIComponent(givenName) + "&config=" + userconfig;
 
-                $.ajax({
-                    type: "GET",
-                    url: connectString,
-                    dataType: "json",
-                    async: false,
+                _$.apiGet({
+                    mode: "rename",
+                    old: data.Path,
+                    new: givenName,
                     success: function (result) {
                         if (result.Code === 0) {
                             var newPath = result["New Path"];
@@ -1447,25 +1445,24 @@
     function moveItem(data) {
         var finalName = "",
             rname;
-        var msg = lg.move + " : <input id='rname' name='rname' type='text' value='' />";
+        var msg = lg.move + " : <input id='rname' name='rname' type='text' value='" + data.Path + "' />";
         msg += "<div class='prompt-info'>" + lg.help_move + "</div>";
 
         var doMove = function (v, m) {
-            if (v !== 1) {
+            if (!v) {
                 return false;
             }
             rname = m.children("#rname").val();
 
             if (rname !== "") {
-                var givenName = rname,
+                var givenName = rname;
                     //oldPath = data.Path,
-                    connectString = fileConnector + "?mode=move&old=" + encodeURIComponent(data.Path) + "&new=" + encodeURIComponent(givenName) + "&root=" + encodeURIComponent(fileRoot) + "&config=" + userconfig;
+                   // connectString = fileConnector + "?mode=move&old=" + encodeURIComponent(data.Path) + "&new=" + encodeURIComponent(givenName) + "&root=" + encodeURIComponent(fileRoot) + "&config=" + userconfig;
 
-                $.ajax({
-                    type: "GET",
-                    url: connectString,
-                    dataType: "json",
-                    async: false,
+                _$.apiGet({
+                    mode: "move",
+                    old: data.Path,
+                    new: givenName,
                     success: function (result) {
                         var newPath,
                             newName;
@@ -1509,23 +1506,23 @@
     // Called by clicking the "Delete" button in detail views
     // or choosing the "Delete contextual menu item in list views.
     function deleteItem(data) {
-        var isDeleted = false;
-        var msg = lg.confirmation_delete;
+        var isDeleted = false,
+            msg = lg.confirmation_delete,
+            parent;
 
         var doDelete = function (v) {
-            if (v !== 1) {
+            if (!v) {
                 return false;
             }
-            var d = new Date(), // to prevent IE cache issues
-                connectString = fileConnector + "?mode=delete&path=" + encodeURIComponent(data.Path) + "&time=" + d.getMilliseconds() + "&config=" + userconfig,
-                parent = data.Path.split("/").reverse().slice(1).reverse().join("/") + "/";
+            //var d = new Date(), // to prevent IE cache issues
+                //connectString = fileConnector + "?mode=delete&path=" + encodeURIComponent(data.Path) + "&time=" + d.getMilliseconds() + "&config=" + userconfig,
+            parent = data.Path.split("/").reverse().slice(1).reverse().join("/") + "/";
 
-            $.ajax({
-                type: "GET",
-                url: connectString,
-                dataType: "json",
-                async: false,
+            _$.apiGet({
+                mode: "delete",
+                path: data.Path,
                 success: function (result) {
+                    //console.log("delete result -> ", result);
                     if (result.Code === 0) {
                         removeNode(result.Path);
                         // if the actual view is the deleted folder, we display parent folder
@@ -1536,7 +1533,7 @@
                         //}
                         // remove fileinfo when item to remove is currently selected
                         if ($("#preview").length) {
-                            getFolderInfo(result.path.substr(0, result.path.lastIndexOf("/") + 1));
+                            getFolderInfo(result.Path.substr(0, result.Path.lastIndexOf("/") + 1));
                         }
                         var rootpath = result.Path.substring(0, result.Path.length - 1); // removing the last slash
                         rootpath = rootpath.substr(0, rootpath.lastIndexOf("/") + 1);
@@ -1783,71 +1780,77 @@
         // Retrieve the data & populate the template.
         var d = new Date(); // to prevent IE cache issues
 
-        $.getJSON(fileConnector + "?mode=getinfo&path=" + encodeURIComponent(file) + "&config=" + userconfig + "&time=" + d.getMilliseconds(), function (data) {
-            var url;
-            if (data.Code === 0) {
-                $("#fileinfo").find("h1").text(data.Filename).attr("title", file);
+        // $.getJSON(fileConnector + "?mode=getinfo&path=" + encodeURIComponent(file) + "&config=" + userconfig + "&time=" + d.getMilliseconds(), function (data) {
+        _$.apiGet({
+            mode: "getinfo",
+            path: encodeURIComponent(file),
+            success: function (data) {
+                //console.log("getinfo", data);
+                var url;
+                if (data.Code === 0) {
+                    $("#fileinfo").find("h1").text(data.Filename).attr("title", file);
 
-                $("#fileinfo").find("img").attr("src", _$.getIconUrl(data));
-                if (isVideoFile(data.Filename) && config.videos.showVideoPlayer === true) {
-                    getVideoPlayer(data);
-                }
-                if (isAudioFile(data.Filename) && config.audios.showAudioPlayer === true) {
-                    getAudioPlayer(data);
-                }
-                //Pdf
-                if (isPdfFile(data.Filename) && config.pdfs.showPdfReader === true) {
-                    getPdfReader(data);
-                }
-                if (isEditableFile(data.Filename) && config.edit.enabled === true && data.Protected === 0) {
-                    editItem(data);
-                }
+                    $("#fileinfo").find("img").attr("src", _$.getIconUrl(data));
+                    if (isVideoFile(data.Filename) && config.videos.showVideoPlayer === true) {
+                        getVideoPlayer(data);
+                    }
+                    if (isAudioFile(data.Filename) && config.audios.showAudioPlayer === true) {
+                        getAudioPlayer(data);
+                    }
+                    //Pdf
+                    if (isPdfFile(data.Filename) && config.pdfs.showPdfReader === true) {
+                        getPdfReader(data);
+                    }
+                    if (isEditableFile(data.Filename) && config.edit.enabled === true && data.Protected === 0) {
+                        editItem(data);
+                    }
 
-                // copy URL instructions - zeroclipboard
-                d = new Date(); // to prevent IE cache issues
+                    // copy URL instructions - zeroclipboard
+                    d = new Date(); // to prevent IE cache issues
 
-                if (config.options.baseUrl !== false) {
-                    url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
-                } else {
-                    url = data.Path;
-                }
-                if (data.Protected === 0) {
-                    $("#fileinfo").find("div#tools").append(" <a id='copy-button' data-clipboard-text='" + url + "' title='" + lg.copy_to_clipboard + "' href='#'><span>" + lg.copy_to_clipboard + "</span></a>");
-                    // loading zeroClipboard code
+                    if (config.options.baseUrl !== false) {
+                        url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
+                    } else {
+                        url = data.Path;
+                    }
+                    if (data.Protected === 0) {
+                        $("#fileinfo").find("div#tools").append(" <a id='copy-button' data-clipboard-text='" + url + "' title='" + lg.copy_to_clipboard + "' href='#'><span>" + lg.copy_to_clipboard + "</span></a>");
+                        // loading zeroClipboard code
 
-                    loadJS("./scripts/zeroclipboard/copy.js?d" + d.getMilliseconds());
-                    $("#copy-button").click(function () {
-                        $("#fileinfo").find("div#tools").append("<span id='copied'>" + lg.copied + "</span>");
-                        $("#copied").delay(500).fadeOut(1000, function() {
-                            $(this).remove();
+                        loadJS("./scripts/zeroclipboard/copy.js?d" + d.getMilliseconds());
+                        $("#copy-button").click(function () {
+                            $("#fileinfo").find("div#tools").append("<span id='copied'>" + lg.copied + "</span>");
+                            $("#copied").delay(500).fadeOut(1000, function() {
+                                $(this).remove();
+                            });
                         });
-                    });
-                }
+                    }
 
-                var properties = "";
+                    var properties = "";
 
-                if (data.Properties.Width && data.Properties.Width !== "") {
-                    properties += "<dt>" + lg.dimensions + "</dt><dd>" + data.Properties.Width + "x" + data.Properties.Height + "</dd>";
-                }
-                if (data.Properties["Date Created"] && data.Properties["Date Created"] !== "") {
-                    properties += "<dt>" + lg.created + "</dt><dd>" + data.Properties["Date Created"] + "</dd>";
-                }
-                if (data.Properties["Date Modified"] && data.Properties["Date Modified"] !== "") {
-                    properties += "<dt>" + lg.modified + "</dt><dd>" + data.Properties["Date Modified"] + "</dd>";
-                }
-                if (data.Properties.Size || parseInt(data.Properties.Size, 10) === 0) {
-                    properties += "<dt>" + lg.size + "</dt><dd>" + formatBytes(data.Properties.Size) + "</dd>";
-                }
-                $("#fileinfo").find("dl").html(properties);
+                    if (data.Properties.Width && data.Properties.Width !== "") {
+                        properties += "<dt>" + lg.dimensions + "</dt><dd>" + data.Properties.Width + "x" + data.Properties.Height + "</dd>";
+                    }
+                    if (data.Properties["Date Created"] && data.Properties["Date Created"] !== "") {
+                        properties += "<dt>" + lg.created + "</dt><dd>" + data.Properties["Date Created"] + "</dd>";
+                    }
+                    if (data.Properties["Date Modified"] && data.Properties["Date Modified"] !== "") {
+                        properties += "<dt>" + lg.modified + "</dt><dd>" + data.Properties["Date Modified"] + "</dd>";
+                    }
+                    if (data.Properties.Size || parseInt(data.Properties.Size, 10) === 0) {
+                        properties += "<dt>" + lg.size + "</dt><dd>" + formatBytes(data.Properties.Size) + "</dd>";
+                    }
+                    $("#fileinfo").find("dl").html(properties);
 
-                // Bind toolbar functions.
-                bindToolbar(data);
+                    // Bind toolbar functions.
+                    bindToolbar(data);
 
-            } else {
-                $.prompt(data.Error);
-            }
-        });
-    }
+                } else {
+                    $.prompt(data.Error);
+                }
+            }//success
+        });//apiGet
+    }//getFileInfo
 
     // Retrieve data (file/folder listing) for jqueryFileTree and pass the data back
     // to the callback function in jqueryFileTree
@@ -1860,9 +1863,9 @@
 
         _$.apiGet({
             mode: "getfolder",
-            path: encodeURIComponent(path),
+            path: encodeURIComponent(path.input || path),
             success: function (data) {
-                console.log("populateFileTree data -> ", data);
+                //console.log("populateFileTree data -> ", data);
                 var result = "",
                     extraclass,
                     key,
@@ -2067,7 +2070,7 @@
         });
 
         // Set buttons to switch between grid and list views.
-        $("#grid").click(function() {
+        $("#grid").click(function () {
             setViewButtonsFor("grid");
             $("#fileinfo").data("view", "grid");
             getFolderInfo($("#currentpath").val());
