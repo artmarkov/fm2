@@ -2,8 +2,13 @@
   "name": "filemanager-2.0",
   "version": "2.0.1",
   "description": "FM2 is an open-source file manager released under MIT license.",
-  "main": "main.js",
+  "main": "scripts/filemanager2.js",
   "dependencies": {
+    "jQuery-Impromptu": "git+https://github.com/trentrichardson/jQuery-Impromptu.git",
+    "jquery": "^3.1.0",
+    "jquery-migrate": "^3.0.0",
+    "jquery.splitter": "^0.23.0",
+    "jqueryfiletree": "git+https://github.com/jqueryfiletree/jqueryfiletree.git",
     "requirejs": "^2.2.0"
   },
   "devDependencies": {},

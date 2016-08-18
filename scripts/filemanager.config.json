@@ -21,6 +21,7 @@
     "charsLatinOnly": false,
     "splitterWidth": 200,
     "splitterMinWidth": 200,
+    "splitPercentage": 80,
     "dateFormat": "d M Y H:i",
     "serverRoot": false,
     "fileRoot": "/",
@@ -174,7 +175,7 @@
         ]
     },
     "customScrollbar": {
-    	"enabled": true,
+    	"enabled": false,
     	"theme": "flat-turquoise",
     	"button": true
     },
