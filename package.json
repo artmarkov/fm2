@@ -1,0 +1,23 @@
+{
+  "name": "filemanager-2.0",
+  "version": "2.0.1",
+  "description": "FM2 is an open-source file manager released under MIT license.",
+  "main": "main.js",
+  "dependencies": {
+    "requirejs": "^2.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlaustill/Filemanager-2.0.git"
+  },
+  "author": "jlaustill",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jlaustill/Filemanager-2.0/issues"
+  },
+  "homepage": "https://github.com/jlaustill/Filemanager-2.0#readme"
+}
