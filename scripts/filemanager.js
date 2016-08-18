@@ -76,7 +76,10 @@ require.config({
         "jqueryFileTree": "scripts/jquery.filetree/jqueryFileTree",
         "jqueryImpromptu": "node_modules/jQuery-Impromptu/dist/jquery-impromptu",
         "jquerySplitter": "node_modules/jquery.splitter/js/jquery.splitter",
-        "jqueryMCustomScrollbar": "node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar"
+        "jqueryMCustomScrollbar": "node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar",
+        "knockout": "node_modules/knockout/build/output/knockout-latest.debug",
+        "knockoutPunches": "node_modules/knockout-punches/knockout.punches",
+        "text": "node_modules/text/text"
     },
     "shim": {
         "jquery": {
@@ -86,7 +89,8 @@ require.config({
         "jqueryFileTree": ["jquery"],
         "jqueryImpromptu": ["jquery"],
         "jquerySplitter": ["jquery"],
-        "jqueryMCustomScrollbar": ["jquery"]
+        "jqueryMCustomScrollbar": ["jquery"],
+        "knockoutPunches": ["knockout"]
     },
     map: {
         '*': {
@@ -102,6 +106,8 @@ define(function (require) {
     require("css!node_modules/jQuery-Impromptu/dist/jquery-impromptu.min");
     require("css!node_modules/jquery.splitter/css/jquery.splitter");
     require("css!scripts/jquery.contextmenu/jquery.contextMenu-1.01");
+
+    //load jquery and related
     require("jquery");
     require("jqueryContextMenu");
     require("jqueryImpromptu");
@@ -109,6 +115,17 @@ define(function (require) {
     require("jquerySplitter");
     require("jqueryMCustomScrollbar");
 
+    //load knockout and related
+    var ko = require("knockout");
+    require("knockoutPunches");
+
+    //load knockout punches, here goes the magic :)
+    ko.punches.enableAll();
+
+    //load our viewmodels
+    var AppViewModel = require("app/app.viewmodel");
+    var appVM = new AppViewModel();
+    ko.applyBindings(appVM);
 
     var _$ = {},
         userconfig = "",
@@ -264,8 +281,8 @@ define(function (require) {
         return rvalue;
     }
 
-    // Sets paths to connectors based on language selection.
-    fileConnector = config.options.fileConnector || "connectors/" + config.options.lang + "/filemanager." + config.options.lang;
+    // Sets paths to the api.  FM2 will only support api's, not connectors.
+    fileConnector = config.options.fileConnector;
 
     // Handle ajax request error.
     var handleAjaxError = function (err) {

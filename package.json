@@ -9,9 +9,12 @@
     "jquery-migrate": "^3.0.0",
     "jquery.splitter": "^0.23.0",
     "jqueryfiletree": "git+https://github.com/jqueryfiletree/jqueryfiletree.git",
+    "knockout": "^3.4.0",
+    "knockout-punches": "^0.5.1",
     "malihu-custom-scrollbar-plugin": "^3.1.5",
     "require-css": "^0.1.8",
-    "requirejs": "^2.2.0"
+    "requirejs": "^2.2.0",
+    "text": "requirejs/text"
   },
   "devDependencies": {},
   "scripts": {
