@@ -164,7 +164,7 @@
         "docsReaderHeight": "480"
     },
     "edit": {
-        "enabled": true,
+        "enabled": false,
         "lineNumbers": true,
         "lineWrapping": true,
         "codeHighlight": false,
@@ -175,8 +175,8 @@
         ]
     },
     "customScrollbar": {
-    	"enabled": false,
-    	"theme": "flat-turquoise",
+    	"enabled": true,
+    	"theme": "minimal",
     	"button": true
     },
     "extras": {

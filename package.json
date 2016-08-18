@@ -9,6 +9,8 @@
     "jquery-migrate": "^3.0.0",
     "jquery.splitter": "^0.23.0",
     "jqueryfiletree": "git+https://github.com/jqueryfiletree/jqueryfiletree.git",
+    "malihu-custom-scrollbar-plugin": "^3.1.5",
+    "require-css": "^0.1.8",
     "requirejs": "^2.2.0"
   },
   "devDependencies": {},
