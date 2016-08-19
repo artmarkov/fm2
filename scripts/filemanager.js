@@ -81,7 +81,8 @@ require.config({
         "knockout": "node_modules/knockout/build/output/knockout-latest.debug",
         "knockoutPunches": "node_modules/knockout-punches/knockout.punches",
         "livesearch": "scripts/filemanager.liveSearch.min",
-        "text": "node_modules/text/text"
+        "text": "node_modules/text/text",
+        "toastr": "node_modules/toastr/build/toastr.min"
     },
     "shim": {
         // "clipboard": ["jquery"],
@@ -94,7 +95,10 @@ require.config({
         "jquerySplitter": ["jquery"],
         "jqueryMCustomScrollbar": ["jquery"],
         "knockoutPunches": ["knockout"],
-        "livesearch": ["jquery"]
+        "livesearch": ["jquery"],
+        "toastr": {
+            exports: "toastr"
+        }
     },
     map: {
         '*': {
@@ -111,6 +115,7 @@ define(function (require) {
     require("css!node_modules/jquery.splitter/css/jquery.splitter");
     require("css!scripts/jquery.contextmenu/jquery.contextMenu-1.01");
     require("css!scripts/dropzone/downloads/css/dropzone.css");
+    require("css!node_modules/toastr/build/toastr.css");
 
     //load jquery and related
     require("jquery");
@@ -137,7 +142,7 @@ define(function (require) {
     var appVM = new AppViewModel();
     ko.applyBindings(appVM);
 
-    var _$ = {},
+    var _$ = appVM._$,
         userconfig = "",
         // HEAD_included_files,
         codeMirrorEditor,
@@ -151,15 +156,6 @@ define(function (require) {
         config = appVM.config, //temporary until ko conversion done
         // configd,
         $fileinfo = $("#fileinfo");
-
-    // function to retrieve GET params
-    _$.urlParameters = function (name) {
-        var results = new RegExp("[\\?&]" + name + "=([^&#]*)").exec(window.location.href);
-        if (results) {
-            return results[1];
-        }
-        return 0;
-    };
 
     /*---------------------------------------------------------
      Setup, Layout, and Status Functions
@@ -201,66 +197,6 @@ define(function (require) {
 
     // Sets paths to the api.  FM2 will only support api's, not connectors.
     fileConnector = config.options.fileConnector;
-
-    // Handle ajax request error.
-    var handleAjaxError = function (err) {
-        $.each(err, function (ignore, e) {
-            console.log("e -> ", e);
-            $.prompt(e.title + "<br> code: " + e.code + ": " + e.detail);
-        });
-    };
-
-    // This is our main access point for the api, everything should pass through this call that is a GET
-    _$.apiGet = function (options) {
-        var url = fileConnector
-            + "?mode=" + options.mode
-            + "&path=" + options.path
-            + "&config=" + _$.userconfig
-            + "&old=" + options.old
-            + "&new=" + options.new
-            + "&name=" + encodeURIComponent(options.foldername)
-            + "&time=" + Date.now();
-
-
-        var ajaxOptions = {
-            "url": url,
-            "dataType": options.dataType || "json",
-            "success": function (data) {
-                if (data.errors) {
-                    handleAjaxError(data.errors);
-                } else {
-                    options.success(data.data);
-                }
-            },
-            "error": function (err) {
-                if (options.error) {
-                    options.error(err);
-                } else {
-                    handleAjaxError(err);
-                }
-            }
-        };
-
-        // console.log("config -> ", config.options.getParams);
-        // console.log("ajaxOptions before -> ", ajaxOptions);
-        if (config.options.getParams) {
-            $.extend(ajaxOptions, config.options.getParams);
-        }
-        //console.log("ajaxOptions after -> ", ajaxOptions);
-
-        $.ajax(ajaxOptions);
-    };
-
-    _$.getIconUrl = function (file) {
-        var url = config.icons.path;
-        if (file.IsDirectory) {
-            url += config.icons.directory;
-        } else {
-            url += file["File Type"] + ".png";
-        }
-
-        return url;
-    };
 
     // Read capabilities from config files if exists
     // else apply default settings
@@ -795,8 +731,6 @@ define(function (require) {
             if (!v) {
                 return false;
             }
-            //var d = new Date(), // to prevent IE cache issues
-            //connectString = fileConnector + "?mode=delete&path=" + encodeURIComponent(data.Path) + "&time=" + d.getMilliseconds() + "&config=" + userconfig,
             parent = data.Path.split("/").reverse().slice(1).reverse().join("/") + "/";
 
             _$.apiGet({

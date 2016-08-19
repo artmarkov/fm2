@@ -12,11 +12,11 @@ define(function (require) {
     return function () {
         var self = this;
         self.config = config;
-        var _$ = new Utility(self.config);
-        self.language = _$.getLanguage();
+        self._$ = new Utility(self.config);
+        self.language = self._$.getLanguage();
 
-        _$.loadTheme();
-        _$.loadIeFix();
+        self._$.loadTheme();
+        self._$.loadIeFix();
 
         // console.log("app.viewmodel version -> ", self.config);
     };
