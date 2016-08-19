@@ -7,7 +7,7 @@ Support
 -------
 
 Filemanager is under free license. If you want to support the filemanager development or just thank its main maintainer by paying a beer, you can make a donation by clicking the following button : 
-[![Donate](https://www.paypal.com/en_US/i/btn/x-click-but21.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=2M5GWH9NLNEZL) 
+[![Donate](https://www.paypal.com/en_US/i/btn/x-click-but21.gif)](http://paypal.me/jlaustill) 
 
 
 
