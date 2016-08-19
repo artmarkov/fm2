@@ -10,8 +10,9 @@ define(function (require) {
 
     return function () {
         var self = this;
-        self.version = ko.observable(config.version);
+        self.version = config.version;
+        self.config = config;
 
-        console.log("app.viewmodel version -> ", self.version());
+        console.log("app.viewmodel version -> ", self.config);
     };
 });
