@@ -111,7 +111,6 @@ require.config({
 
 define(function (require) {
     "use strict";
-    require("css!node_modules/bootstrap/dist/css/bootstrap");
     require("css!styles/reset.css");
     require("css!node_modules/jqueryfiletree/dist/jQueryFileTree.min");
     require("css!node_modules/jQuery-Impromptu/dist/jquery-impromptu.min");
@@ -119,6 +118,7 @@ define(function (require) {
     require("css!scripts/jquery.contextmenu/jquery.contextMenu-1.01");
     require("css!scripts/dropzone/downloads/css/dropzone.css");
     require("css!node_modules/toastr/build/toastr.css");
+    require("css!node_modules/bootstrap/dist/css/bootstrap");
 
 
     //load jquery and related
@@ -701,7 +701,7 @@ define(function (require) {
                         fullexpandedFolder = newPath;
 
                         createFileTree();
-                        getFolderInfo(newPath); // update list in main window
+                        // getFolderInfo(newPath); // update list in main window
 
                         if (config.options.showConfirmation) {
                             $.prompt(lg.successful_moved);
@@ -752,7 +752,7 @@ define(function (require) {
                     //}
                     // remove fileinfo when item to remove is currently selected
                     if ($("#preview").length) {
-                        getFolderInfo(result.Path.substr(0, result.Path.lastIndexOf("/") + 1));
+                        // getFolderInfo(result.Path.substr(0, result.Path.lastIndexOf("/") + 1));
                     }
                     var rootpath = result.Path.substring(0, result.Path.length - 1); // removing the last slash
                     rootpath = rootpath.substr(0, rootpath.lastIndexOf("/") + 1);
@@ -989,255 +989,255 @@ define(function (require) {
     // creates a list view. Binds contextual menu options.
     // TODO: consider stylesheet switching to switch between grid
     // and list views with sorting options.
-    function getFolderInfo(path) {
-        // Update location for status, upload, & new folder functions.
-        setUploader(path);
-
-        // Display an activity indicator.
-        var loading = '<img id="activity" src="themes/' + config.options.theme + '/images/wait30trans.gif" width="30" height="30" />';
-
-        // test if scrollbar plugin is enabled
-        if ($fileinfo.find(".mCSB_container").length > 0) {
-            $fileinfo.find(".mCSB_container").html(loading);
-        } else {
-            $fileinfo.html(loading);
-        }
-
-        //$("#loading-wrap").fadeOut(800); // we remove loading screen div
-
-        _$.apiGet({
-            mode: "getfolder",
-            path: encodeURIComponent(path),
-            success: function (data) {
-                var result = "",
-                    cap,
-                    props,
-                    cap_classes,
-                    scaledWidth,
-                    actualWidth,
-                    title,
-                    counter = 0,
-                    totalSize = 0,
-                    key;
-
-                setDimensions(); //fix dimensions before all images load
-
-                if (data) {
-                    if ($fileinfo.data("view") === "grid") {
-                        result += '<ul id="contents" class="grid">';
-
-                        for (key in data) {
-                            if (data.hasOwnProperty(key)) {
-                                counter++;
-                                props = data[key].Properties;
-                                cap_classes = "";
-                                for (cap in capabilities) {
-                                    if (capabilities.hasOwnProperty(cap) && has_capability(data[key], capabilities[cap])) {
-                                        cap_classes += " cap_" + capabilities[cap];
-                                    }
-                                }
-
-                                scaledWidth = 64;
-                                actualWidth = props.Width;
-                                if (actualWidth > 1 && actualWidth < scaledWidth) {
-                                    scaledWidth = actualWidth;
-                                }
-
-                                if (config.options.showTitleAttr) {
-                                    title = ' title="' + data[key].Path + '"';
-                                } else {
-                                    title = "";
-                                }
-
-                                result += '<li class="' +
-                                    cap_classes +
-                                    '"' +
-                                    title +
-                                    '"><div class="clip"><img src="' +
-                                    _$.getIconUrl(data[key]) +
-                                    '" width="' +
-                                    scaledWidth +
-                                    '" alt="' +
-                                    data[key].Path +
-                                    '" data-path="' +
-                                    data[key].Path +
-                                    '" /></div><p>' +
-                                    data[key].Filename +
-                                    "</p>";
-                                if (props.Width && props.Width !== "") {
-                                    result += '<span class="meta dimensions">' +
-                                        props.Width +
-                                        "x" +
-                                        props.Height +
-                                        "</span>";
-                                }
-                                if (props.Size && props.Size !== "") {
-                                    result += '<span class="meta size">' + props.Size + "</span>";
-                                }
-                                if (props.Size && props.Size !== "") {
-                                    totalSize += props.Size;
-                                }
-                                if (props["Date Created"] && props["Date Created"] !== "") {
-                                    result += '<span class="meta created">' + props["Date Created"] + "</span>";
-                                }
-                                if (props["Date Modified"] && props["Date Modified"] !== "") {
-                                    result += '<span class="meta modified">' + props["Date Modified"] + "</span>";
-                                }
-                                result += "</li>";
-                            } //if hasOwnProperty
-                        } //for key in data
-
-                        result += "</ul>";
-                    } else {
-                        result += '<table id="contents" class="list">';
-                        result += '<thead><tr><th class="headerSortDown"><span>' +
-                            lg.name +
-                            "</span></th><th><span>" +
-                            lg.dimensions +
-                            "</span></th><th><span>" +
-                            lg.size +
-                            "</span></th><th><span>" +
-                            lg.modified +
-                            "</span></th></tr></thead>";
-                        result += "<tbody>";
-
-                        for (key in data) {
-                            if (data.hasOwnProperty(key)) {
-                                counter++;
-                                path = data[key].Path;
-                                props = data[key].Properties;
-                                cap_classes = "";
-                                if (config.options.showTitleAttr) {
-                                    title = ' title="' + data[key].Path + '"';
-                                } else {
-                                    title = "";
-                                }
-
-                                for (cap in capabilities) {
-                                    if (capabilities.hasOwnProperty(cap) && has_capability(data[key], capabilities[cap])) {
-                                        cap_classes += " cap_" + capabilities[cap];
-                                    }
-                                }
-                                result += '<tr class="' + cap_classes + '">';
-                                result += '<td data-path="' +
-                                    data[key].Path +
-                                    '"' +
-                                    title +
-                                    '">' +
-                                    data[key].Filename +
-                                    "</td>";
-
-                                if (props.Width && props.Width !== "") {
-                                    result += ("<td>" + props.Width + "x" + props.Height + "</td>");
-                                } else {
-                                    result += "<td></td>";
-                                }
-
-                                if (props.Size && props.Size !== "") {
-                                    result += '<td><abbr title="' +
-                                        props.Size +
-                                        '">' +
-                                        formatBytes(props.Size) +
-                                        "</abbr></td>";
-                                    totalSize += props.Size;
-                                } else {
-                                    result += "<td></td>";
-                                }
-
-                                if (props["Date Modified"] && props["Date Modified"] !== "") {
-                                    result += "<td>" + props["Date Modified"] + "</td>";
-                                } else {
-                                    result += "<td></td>";
-                                }
-
-                                result += "</tr>";
-                            }
-                        }
-
-                        result += "</tbody>";
-                        result += "</table>";
-                    }
-                } else {
-                    result += "<h1>" + lg.could_not_retrieve_folder + "</h1>";
-                }
-
-                // Add the new markup to the DOM.
-                // test if scrollbar plugin is enabled
-                if ($fileinfo.find(".mCSB_container").length > 0) {
-                    $fileinfo.find(".mCSB_container").html(result);
-                } else {
-                    $fileinfo.html(result);
-                }
-
-                // update #folder-info
-                $("#items-counter").text(counter);
-                $("#items-size").text(Math.round(totalSize / 1024 / 1024 * 100) / 100);
-
-                // Bind click events to create detail views and add
-                // contextual menu options.
-                if ($fileinfo.data("view") === "grid") {
-                    $fileinfo
-                        .find("#contents li")
-                        .click(function () {
-                            path = $(this).find("img").attr("data-path");
-                            if (config.options.quickSelect && data[path]["File Type"] !== "dir" && $(this).hasClass("cap_select")) {
-                                selectItem(data[path]);
-                            } else {
-                                getDetailView(path);
-                            }
-                        })
-                        .each(function () {
-                            $(this)
-                                .contextMenu(
-                                    {menu: getContextMenuOptions($(this))},
-                                    function (action, el) {
-                                        path = $(el).find("img").attr("data-path");
-                                        setMenus(action, path);
-                                    }
-                                );
-                        });
-                } else {
-                    $fileinfo.find("tbody tr")
-                        .click(function () {
-                            path = $("td:first-child", this).attr("data-path");
-                            if (config.options.quickSelect && data[path]["File Type"] !== "dir" && $(this).hasClass("cap_select")) {
-                                selectItem(data[path]);
-                            } else {
-                                getDetailView(path);
-                            }
-                        })
-                        .each(function () {
-                            $(this)
-                                .contextMenu(
-                                    {menu: getContextMenuOptions($(this))},
-                                    function (action, el) {
-                                        path = $("td:first-child", el).attr("data-path");
-                                        setMenus(action, path);
-                                    }
-                                );
-                        });
-
-                    $fileinfo
-                        .find("table")
-                        .tablesorter({
-                            textExtraction: function (node) {
-                                if ($(node).find("abbr").size()) {
-                                    return $(node).find("abbr").attr("title");
-                                }
-                                return node.innerHTML;
-                            }
-                        });
-                    // Calling display_icons() function
-                    // to get icons from filteree
-                    // Necessary to fix bug #170
-                    // https://github.com/simogeo/Filemanager/issues/170
-                    var timer = setInterval(function () {
-                        display_icons(timer);
-                    }, 300);
-                }
-            }
-        });
-    }
+    // function getFolderInfo(path) {
+    //     // Update location for status, upload, & new folder functions.
+    //     setUploader(path);
+    //
+    //     // Display an activity indicator.
+    //     var loading = '<img id="activity" src="themes/' + config.options.theme + '/images/wait30trans.gif" width="30" height="30" />';
+    //
+    //     // test if scrollbar plugin is enabled
+    //     if ($fileinfo.find(".mCSB_container").length > 0) {
+    //         $fileinfo.find(".mCSB_container").html(loading);
+    //     } else {
+    //         $fileinfo.html(loading);
+    //     }
+    //
+    //     //$("#loading-wrap").fadeOut(800); // we remove loading screen div
+    //
+    //     _$.apiGet({
+    //         mode: "getfolder",
+    //         path: encodeURIComponent(path),
+    //         success: function (data) {
+    //             var result = "",
+    //                 cap,
+    //                 props,
+    //                 cap_classes,
+    //                 scaledWidth,
+    //                 actualWidth,
+    //                 title,
+    //                 counter = 0,
+    //                 totalSize = 0,
+    //                 key;
+    //
+    //             setDimensions(); //fix dimensions before all images load
+    //
+    //             if (data) {
+    //                 if ($fileinfo.data("view") === "grid") {
+    //                     result += '<ul id="contents" class="grid">';
+    //
+    //                     for (key in data) {
+    //                         if (data.hasOwnProperty(key)) {
+    //                             counter++;
+    //                             props = data[key].Properties;
+    //                             cap_classes = "";
+    //                             for (cap in capabilities) {
+    //                                 if (capabilities.hasOwnProperty(cap) && has_capability(data[key], capabilities[cap])) {
+    //                                     cap_classes += " cap_" + capabilities[cap];
+    //                                 }
+    //                             }
+    //
+    //                             scaledWidth = 64;
+    //                             actualWidth = props.Width;
+    //                             if (actualWidth > 1 && actualWidth < scaledWidth) {
+    //                                 scaledWidth = actualWidth;
+    //                             }
+    //
+    //                             if (config.options.showTitleAttr) {
+    //                                 title = ' title="' + data[key].Path + '"';
+    //                             } else {
+    //                                 title = "";
+    //                             }
+    //
+    //                             result += '<li class="' +
+    //                                 cap_classes +
+    //                                 '"' +
+    //                                 title +
+    //                                 '"><div class="clip"><img src="' +
+    //                                 _$.getIconUrl(data[key]) +
+    //                                 '" width="' +
+    //                                 scaledWidth +
+    //                                 '" alt="' +
+    //                                 data[key].Path +
+    //                                 '" data-path="' +
+    //                                 data[key].Path +
+    //                                 '" /></div><p>' +
+    //                                 data[key].Filename +
+    //                                 "</p>";
+    //                             if (props.Width && props.Width !== "") {
+    //                                 result += '<span class="meta dimensions">' +
+    //                                     props.Width +
+    //                                     "x" +
+    //                                     props.Height +
+    //                                     "</span>";
+    //                             }
+    //                             if (props.Size && props.Size !== "") {
+    //                                 result += '<span class="meta size">' + props.Size + "</span>";
+    //                             }
+    //                             if (props.Size && props.Size !== "") {
+    //                                 totalSize += props.Size;
+    //                             }
+    //                             if (props["Date Created"] && props["Date Created"] !== "") {
+    //                                 result += '<span class="meta created">' + props["Date Created"] + "</span>";
+    //                             }
+    //                             if (props["Date Modified"] && props["Date Modified"] !== "") {
+    //                                 result += '<span class="meta modified">' + props["Date Modified"] + "</span>";
+    //                             }
+    //                             result += "</li>";
+    //                         } //if hasOwnProperty
+    //                     } //for key in data
+    //
+    //                     result += "</ul>";
+    //                 } else {
+    //                     result += '<table id="contents" class="list">';
+    //                     result += '<thead><tr><th class="headerSortDown"><span>' +
+    //                         lg.name +
+    //                         "</span></th><th><span>" +
+    //                         lg.dimensions +
+    //                         "</span></th><th><span>" +
+    //                         lg.size +
+    //                         "</span></th><th><span>" +
+    //                         lg.modified +
+    //                         "</span></th></tr></thead>";
+    //                     result += "<tbody>";
+    //
+    //                     for (key in data) {
+    //                         if (data.hasOwnProperty(key)) {
+    //                             counter++;
+    //                             path = data[key].Path;
+    //                             props = data[key].Properties;
+    //                             cap_classes = "";
+    //                             if (config.options.showTitleAttr) {
+    //                                 title = ' title="' + data[key].Path + '"';
+    //                             } else {
+    //                                 title = "";
+    //                             }
+    //
+    //                             for (cap in capabilities) {
+    //                                 if (capabilities.hasOwnProperty(cap) && has_capability(data[key], capabilities[cap])) {
+    //                                     cap_classes += " cap_" + capabilities[cap];
+    //                                 }
+    //                             }
+    //                             result += '<tr class="' + cap_classes + '">';
+    //                             result += '<td data-path="' +
+    //                                 data[key].Path +
+    //                                 '"' +
+    //                                 title +
+    //                                 '">' +
+    //                                 data[key].Filename +
+    //                                 "</td>";
+    //
+    //                             if (props.Width && props.Width !== "") {
+    //                                 result += ("<td>" + props.Width + "x" + props.Height + "</td>");
+    //                             } else {
+    //                                 result += "<td></td>";
+    //                             }
+    //
+    //                             if (props.Size && props.Size !== "") {
+    //                                 result += '<td><abbr title="' +
+    //                                     props.Size +
+    //                                     '">' +
+    //                                     formatBytes(props.Size) +
+    //                                     "</abbr></td>";
+    //                                 totalSize += props.Size;
+    //                             } else {
+    //                                 result += "<td></td>";
+    //                             }
+    //
+    //                             if (props["Date Modified"] && props["Date Modified"] !== "") {
+    //                                 result += "<td>" + props["Date Modified"] + "</td>";
+    //                             } else {
+    //                                 result += "<td></td>";
+    //                             }
+    //
+    //                             result += "</tr>";
+    //                         }
+    //                     }
+    //
+    //                     result += "</tbody>";
+    //                     result += "</table>";
+    //                 }
+    //             } else {
+    //                 result += "<h1>" + lg.could_not_retrieve_folder + "</h1>";
+    //             }
+    //
+    //             // Add the new markup to the DOM.
+    //             // test if scrollbar plugin is enabled
+    //             if ($fileinfo.find(".mCSB_container").length > 0) {
+    //                 $fileinfo.find(".mCSB_container").html(result);
+    //             } else {
+    //                 $fileinfo.html(result);
+    //             }
+    //
+    //             // update #folder-info
+    //             $("#items-counter").text(counter);
+    //             $("#items-size").text(Math.round(totalSize / 1024 / 1024 * 100) / 100);
+    //
+    //             // Bind click events to create detail views and add
+    //             // contextual menu options.
+    //             if ($fileinfo.data("view") === "grid") {
+    //                 $fileinfo
+    //                     .find("#contents li")
+    //                     .click(function () {
+    //                         path = $(this).find("img").attr("data-path");
+    //                         if (config.options.quickSelect && data[path]["File Type"] !== "dir" && $(this).hasClass("cap_select")) {
+    //                             selectItem(data[path]);
+    //                         } else {
+    //                             getDetailView(path);
+    //                         }
+    //                     })
+    //                     .each(function () {
+    //                         $(this)
+    //                             .contextMenu(
+    //                                 {menu: getContextMenuOptions($(this))},
+    //                                 function (action, el) {
+    //                                     path = $(el).find("img").attr("data-path");
+    //                                     setMenus(action, path);
+    //                                 }
+    //                             );
+    //                     });
+    //             } else {
+    //                 $fileinfo.find("tbody tr")
+    //                     .click(function () {
+    //                         path = $("td:first-child", this).attr("data-path");
+    //                         if (config.options.quickSelect && data[path]["File Type"] !== "dir" && $(this).hasClass("cap_select")) {
+    //                             selectItem(data[path]);
+    //                         } else {
+    //                             getDetailView(path);
+    //                         }
+    //                     })
+    //                     .each(function () {
+    //                         $(this)
+    //                             .contextMenu(
+    //                                 {menu: getContextMenuOptions($(this))},
+    //                                 function (action, el) {
+    //                                     path = $("td:first-child", el).attr("data-path");
+    //                                     setMenus(action, path);
+    //                                 }
+    //                             );
+    //                     });
+    //
+    //                 $fileinfo
+    //                     .find("table")
+    //                     .tablesorter({
+    //                         textExtraction: function (node) {
+    //                             if ($(node).find("abbr").size()) {
+    //                                 return $(node).find("abbr").attr("title");
+    //                             }
+    //                             return node.innerHTML;
+    //                         }
+    //                     });
+    //                 // Calling display_icons() function
+    //                 // to get icons from filteree
+    //                 // Necessary to fix bug #170
+    //                 // https://github.com/simogeo/Filemanager/issues/170
+    //                 var timer = setInterval(function () {
+    //                     display_icons(timer);
+    //                 }, 300);
+    //             }
+    //         }
+    //     });
+    // }
 
     // Adds a new folder as the first item beneath the
     // specified parent node. Called after a new folder is
@@ -1296,7 +1296,7 @@ define(function (require) {
                         success: function (result) {
                             console.log("addfolder result -> ", result);
                             addFolder(result.Parent, result.Name);
-                            getFolderInfo(result.Parent);
+                            // getFolderInfo(result.Parent);
 
                             // seems to be necessary when dealing w/ files located on s3 (need to look into a cleaner solution going forward)
                             $("#filetree").find("a[data-path='" + result.Parent + "/']").click().click();
@@ -1508,7 +1508,7 @@ define(function (require) {
                     });
 
                     // we instantiate codeMirror according to config options
-                    codeMirrorEditor = instantiateCodeMirror(getExtension(data.Path), config);
+//                    codeMirrorEditor = instantiateCodeMirror(getExtension(data.Path), config);
                     // } else {
                     //     isEdited = false;
                     //     $.prompt(result.Error);
@@ -1527,144 +1527,144 @@ define(function (require) {
 
     // Decides whether to retrieve file or folder info based on
     // the path provided.
-    function getDetailView(path) {
-        if (path.lastIndexOf("/") === path.length - 1) {
-            getFolderInfo(path);
-            $("#filetree").find("a[data-path='" + path + "']").click();
-        } else {
-            getFileInfo(path);
-        }
-    }
+    // function getDetailView(path) {
+    //     if (path.lastIndexOf("/") === path.length - 1) {
+    //         // getFolderInfo(path);
+    //         $("#filetree").find("a[data-path='" + path + "']").click();
+    //     } else {
+    //         getFileInfo(path);
+    //     }
+    // }
 
-    function getContextMenuOptions(elem) {
-        var optionsID = elem.attr("class").replace(/\ /g, "_");
-        if (optionsID === "") {
-            return "itemOptions";
-        }
-        if (!($("#" + optionsID).length)) {
-            // Create a clone to itemOptions with menus specific to this element
-            var iop = $("#itemOptions");
-            var newOptions = iop.clone().attr("id", optionsID);
-            if (!elem.hasClass("cap_select")) {
-                $(".select", newOptions).remove();
-            }
-            if (!elem.hasClass("cap_download")) {
-                $(".download", newOptions).remove();
-            }
-            if (!elem.hasClass("cap_rename")) {
-                $(".rename", newOptions).remove();
-            }
-            if (!elem.hasClass("cap_move")) {
-                $(".move", newOptions).remove();
-                $(".replace", newOptions).remove(); // we remove replace since it is not implemented on Opera + Chrome and works only if #preview panel is on on FF
-            }
-            if (!elem.hasClass("cap_delete")) {
-                $(".delete", newOptions).remove();
-            }
-            iop.after(newOptions);
-        }
-        return optionsID;
-    }
+    // function getContextMenuOptions(elem) {
+    //     var optionsID = elem.attr("class").replace(/\ /g, "_");
+    //     if (optionsID === "") {
+    //         return "itemOptions";
+    //     }
+    //     if (!($("#" + optionsID).length)) {
+    //         // Create a clone to itemOptions with menus specific to this element
+    //         var iop = $("#itemOptions");
+    //         var newOptions = iop.clone().attr("id", optionsID);
+    //         if (!elem.hasClass("cap_select")) {
+    //             $(".select", newOptions).remove();
+    //         }
+    //         if (!elem.hasClass("cap_download")) {
+    //             $(".download", newOptions).remove();
+    //         }
+    //         if (!elem.hasClass("cap_rename")) {
+    //             $(".rename", newOptions).remove();
+    //         }
+    //         if (!elem.hasClass("cap_move")) {
+    //             $(".move", newOptions).remove();
+    //             $(".replace", newOptions).remove(); // we remove replace since it is not implemented on Opera + Chrome and works only if #preview panel is on on FF
+    //         }
+    //         if (!elem.hasClass("cap_delete")) {
+    //             $(".delete", newOptions).remove();
+    //         }
+    //         iop.after(newOptions);
+    //     }
+    //     return optionsID;
+    // }
 
     // Retrieves information about the specified file as a JSON
     // object and uses that data to populate a template for
     // detail views. Binds the toolbar for that detail view to
     // enable specific actions. Called whenever an item is
     // clicked in the file tree or list views.
-    function getFileInfo(file) {
-        //Hide context menu
-        $(".contextMenu").hide();
-
-        // Update location for status, upload, & new folder functions.
-        var currentpath = file.substr(0, file.lastIndexOf("/") + 1);
-        setUploader(currentpath);
-
-        // Include the template.
-        var template = "<div id='preview'><img /><div id='main-title'><h1></h1><div id='tools'></div></div><dl></dl></div>";
-        template += "<form id='toolbar'>";
-        template += "<button id='parentfolder'>" + lg.parentfolder + "</button>";
-        if ($.inArray("select", capabilities) !== -1 && (_$.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || _$.urlParameters("field_name"))) {
-            template += "<button id='select' name='select' type='button' value='Select'>" + lg.select + "</button>";
-        }
-        if ($.inArray("download", capabilities) !== -1) {
-            template += "<button id='download' name='download' type='button' value='Download'>" + lg.download + "</button>";
-        }
-        if ($.inArray("rename", capabilities) !== -1 && config.options.browseOnly !== true) {
-            template += "<button id='rename' name='rename' type='button' value='Rename'>" + lg.rename + "</button>";
-        }
-        if ($.inArray("move", capabilities) !== -1 && config.options.browseOnly !== true) {
-            template += "<button id='move' name='move' type='button' value='Move'>" + lg.move + "</button>";
-        }
-        if ($.inArray("delete", capabilities) !== -1 && config.options.browseOnly !== true) {
-            template += "<button id='delete' name='delete' type='button' value='Delete'>" + lg.del + "</button>";
-        }
-        if ($.inArray("replace", capabilities) !== -1 && config.options.browseOnly !== true) {
-            template += "<button id='replace' name='replace' type='button' value='Replace'>" + lg.replace + "</button>";
-            template += "<div class='hidden-file-input'><input id='fileR' name='fileR' type='file' /></div>";
-            template += "<input id='mode' name='mode' type='hidden' value='replace' /> ";
-            template += "<input id='newfilepath' name='newfilepath' type='hidden' />";
-        }
-        template += "</form>";
-
-        // test if scrollbar plugin is enabled
-        if ($fileinfo.find(".mCSB_container").length > 0) {
-            $fileinfo.find(".mCSB_container").html(template);
-        } else {
-            $fileinfo.html(template);
-        }
-
-        $("#parentfolder").click(function () {
-            getFolderInfo(currentpath);
-        });
-
-        _$.apiGet({
-            mode: "getinfo",
-            path: encodeURIComponent(file),
-            success: function (data) {
-                //console.log("getinfo", data);
-                // if (data.Code === 0) {
-                $fileinfo.find("h1").text(data.Filename).attr("title", file);
-
-                $fileinfo.find("img").attr("src", _$.getIconUrl(data));
-                if (isVideoFile(data.Filename) && config.videos.showVideoPlayer === true) {
-                    getVideoPlayer(data);
-                }
-                if (isAudioFile(data.Filename) && config.audios.showAudioPlayer === true) {
-                    getAudioPlayer(data);
-                }
-                //Pdf
-                if (isPdfFile(data.Filename) && config.pdfs.showPdfReader === true) {
-                    getPdfReader(data);
-                }
-                if (isEditableFile(data.Filename) && config.edit.enabled === true && data.Protected === 0) {
-                    editItem(data);
-                }
-
-                var properties = "";
-
-                if (data.Properties.Width && data.Properties.Width !== "") {
-                    properties += "<dt>" + lg.dimensions + "</dt><dd>" + data.Properties.Width + "x" + data.Properties.Height + "</dd>";
-                }
-                if (data.Properties["Date Created"] && data.Properties["Date Created"] !== "") {
-                    properties += "<dt>" + lg.created + "</dt><dd>" + data.Properties["Date Created"] + "</dd>";
-                }
-                if (data.Properties["Date Modified"] && data.Properties["Date Modified"] !== "") {
-                    properties += "<dt>" + lg.modified + "</dt><dd>" + data.Properties["Date Modified"] + "</dd>";
-                }
-                if (data.Properties.Size || parseInt(data.Properties.Size, 10) === 0) {
-                    properties += "<dt>" + lg.size + "</dt><dd>" + formatBytes(data.Properties.Size) + "</dd>";
-                }
-                $fileinfo.find("dl").html(properties);
-
-                // Bind toolbar functions.
-                bindToolbar(data);
-
-                // } else {
-                //     $.prompt(data.Error);
-                // }
-            }//success
-        });//apiGet
-    }//getFileInfo
+    // function getFileInfo(file) {
+    //     //Hide context menu
+    //     $(".contextMenu").hide();
+    //
+    //     // Update location for status, upload, & new folder functions.
+    //     var currentpath = file.substr(0, file.lastIndexOf("/") + 1);
+    //     setUploader(currentpath);
+    //
+    //     // Include the template.
+    //     var template = "<div id='preview'><img /><div id='main-title'><h1></h1><div id='tools'></div></div><dl></dl></div>";
+    //     template += "<form id='toolbar'>";
+    //     template += "<button id='parentfolder'>" + lg.parentfolder + "</button>";
+    //     if ($.inArray("select", capabilities) !== -1 && (_$.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || _$.urlParameters("field_name"))) {
+    //         template += "<button id='select' name='select' type='button' value='Select'>" + lg.select + "</button>";
+    //     }
+    //     if ($.inArray("download", capabilities) !== -1) {
+    //         template += "<button id='download' name='download' type='button' value='Download'>" + lg.download + "</button>";
+    //     }
+    //     if ($.inArray("rename", capabilities) !== -1 && config.options.browseOnly !== true) {
+    //         template += "<button id='rename' name='rename' type='button' value='Rename'>" + lg.rename + "</button>";
+    //     }
+    //     if ($.inArray("move", capabilities) !== -1 && config.options.browseOnly !== true) {
+    //         template += "<button id='move' name='move' type='button' value='Move'>" + lg.move + "</button>";
+    //     }
+    //     if ($.inArray("delete", capabilities) !== -1 && config.options.browseOnly !== true) {
+    //         template += "<button id='delete' name='delete' type='button' value='Delete'>" + lg.del + "</button>";
+    //     }
+    //     if ($.inArray("replace", capabilities) !== -1 && config.options.browseOnly !== true) {
+    //         template += "<button id='replace' name='replace' type='button' value='Replace'>" + lg.replace + "</button>";
+    //         template += "<div class='hidden-file-input'><input id='fileR' name='fileR' type='file' /></div>";
+    //         template += "<input id='mode' name='mode' type='hidden' value='replace' /> ";
+    //         template += "<input id='newfilepath' name='newfilepath' type='hidden' />";
+    //     }
+    //     template += "</form>";
+    //
+    //     // test if scrollbar plugin is enabled
+    //     if ($fileinfo.find(".mCSB_container").length > 0) {
+    //         $fileinfo.find(".mCSB_container").html(template);
+    //     } else {
+    //         $fileinfo.html(template);
+    //     }
+    //
+    //     $("#parentfolder").click(function () {
+    //         // getFolderInfo(currentpath);
+    //     });
+    //
+    //     _$.apiGet({
+    //         mode: "getinfo",
+    //         path: encodeURIComponent(file),
+    //         success: function (data) {
+    //             //console.log("getinfo", data);
+    //             // if (data.Code === 0) {
+    //             $fileinfo.find("h1").text(data.Filename).attr("title", file);
+    //
+    //             $fileinfo.find("img").attr("src", _$.getIconUrl(data));
+    //             if (isVideoFile(data.Filename) && config.videos.showVideoPlayer === true) {
+    //                 getVideoPlayer(data);
+    //             }
+    //             if (isAudioFile(data.Filename) && config.audios.showAudioPlayer === true) {
+    //                 getAudioPlayer(data);
+    //             }
+    //             //Pdf
+    //             if (isPdfFile(data.Filename) && config.pdfs.showPdfReader === true) {
+    //                 getPdfReader(data);
+    //             }
+    //             if (isEditableFile(data.Filename) && config.edit.enabled === true && data.Protected === 0) {
+    //                 editItem(data);
+    //             }
+    //
+    //             var properties = "";
+    //
+    //             if (data.Properties.Width && data.Properties.Width !== "") {
+    //                 properties += "<dt>" + lg.dimensions + "</dt><dd>" + data.Properties.Width + "x" + data.Properties.Height + "</dd>";
+    //             }
+    //             if (data.Properties["Date Created"] && data.Properties["Date Created"] !== "") {
+    //                 properties += "<dt>" + lg.created + "</dt><dd>" + data.Properties["Date Created"] + "</dd>";
+    //             }
+    //             if (data.Properties["Date Modified"] && data.Properties["Date Modified"] !== "") {
+    //                 properties += "<dt>" + lg.modified + "</dt><dd>" + data.Properties["Date Modified"] + "</dd>";
+    //             }
+    //             if (data.Properties.Size || parseInt(data.Properties.Size, 10) === 0) {
+    //                 properties += "<dt>" + lg.size + "</dt><dd>" + formatBytes(data.Properties.Size) + "</dd>";
+    //             }
+    //             $fileinfo.find("dl").html(properties);
+    //
+    //             // Bind toolbar functions.
+    //             bindToolbar(data);
+    //
+    //             // } else {
+    //             //     $.prompt(data.Error);
+    //             // }
+    //         }//success
+    //     });//apiGet
+    // }//getFileInfo
 
     // Retrieve data (file/folder listing) for jqueryFileTree and pass the data back
     // to the callback function in jqueryFileTree
@@ -1812,33 +1812,33 @@ define(function (require) {
         // });
 
         // cosmetic tweak for buttons
-        $("button").wrapInner("<span></span>");
+        //$("button").wrapInner("<span></span>");
 
         // Set initial view state.
-        $fileinfo.data("view", config.options.defaultViewMode);
+        // $fileinfo.data("view", config.options.defaultViewMode);
         setViewButtonsFor(config.options.defaultViewMode);
 
-        $("#home").click(function () {
-            var currentViewMode = $fileinfo.data("view");
-            $fileinfo.data("view", currentViewMode);
-            $("#filetree ul.jqueryFileTree > li.expanded > a").trigger("click");
-            getFolderInfo(fileRoot);
-        });
+        // $("#home").click(function () {
+        //     var currentViewMode = $fileinfo.data("view");
+        //     $fileinfo.data("view", currentViewMode);
+        //     $("#filetree ul.jqueryFileTree > li.expanded > a").trigger("click");
+        //     // getFolderInfo(fileRoot);
+        // });
 
-        $("#level-up").click(function () {
-            var cpath = $("#uploader h1").attr("data-path"), // get path
-                iparent;
-            // console.log(' cpath : ' + cpath + ' - fileRoot : ' + fileRoot ); // @todo remove
-            if (cpath !== fileRoot) {
-                // we get the parent folder - cpath.slice(0, - 1) removes last slash
-                iparent = cpath.substring(0, cpath.slice(0, -1).lastIndexOf("/")) + "/";
-                // console.log(' parent : ' + parent); // @todo remove
-                var currentViewMode = $fileinfo.data("view");
-                $fileinfo.data("view", currentViewMode);
-                $fileinfo.find("a[data-path='" + cpath + "']").click(); // we close the previous folder
-                getFolderInfo(iparent);
-            }
-        });
+        // $("#level-up").click(function () {
+        //     var cpath = $("#uploader h1").attr("data-path"), // get path
+        //         iparent;
+        //     // console.log(' cpath : ' + cpath + ' - fileRoot : ' + fileRoot ); // @todo remove
+        //     if (cpath !== fileRoot) {
+        //         // we get the parent folder - cpath.slice(0, - 1) removes last slash
+        //         iparent = cpath.substring(0, cpath.slice(0, -1).lastIndexOf("/")) + "/";
+        //         // console.log(' parent : ' + parent); // @todo remove
+        //         var currentViewMode = $fileinfo.data("view");
+        //         $fileinfo.data("view", currentViewMode);
+        //         $fileinfo.find("a[data-path='" + cpath + "']").click(); // we close the previous folder
+        //         // getFolderInfo(iparent);
+        //     }
+        // });
 
         // Set buttons to switch between grid and list views.
         // $("#grid").click(function () {
@@ -1942,7 +1942,7 @@ define(function (require) {
                     },
                     success: function (file, response) {
                         //$("#uploadresponse").empty().html(response);
-                        var data = $.parseJSON($("#uploadresponse").find("textarea").text());
+                        // var data = $.parseJSON($("#uploadresponse").find("textarea").text());
 
                         // if (data.Code === 0) {
                         this.removeFile(file);
@@ -1963,9 +1963,9 @@ define(function (require) {
                                     $.prompt.close();
                                 }, 800);
                             }
-                            getFolderInfo(path);
+                            // getFolderInfo(path);
                             if (path === fileRoot) {
-                                createFileTree();
+                                // createFileTree();
                             }
                             $("#filetree").find("a[data-path='" + path + "']").click().click();
                             if (config.options.showConfirmation) {
@@ -2044,7 +2044,7 @@ define(function (require) {
                         createFileTree();
                     }
 
-                    getFolderInfo(data.Path); // update list in main window
+                    // getFolderInfo(data.Path); // update list in main window
                     $("#filepath, #newfile").val("");
                     // IE can not empty input='file'. A fix consist to replace the element (see github issue #215)
                     if ($.browser.msie) {
@@ -2148,4 +2148,6 @@ define(function (require) {
     $(window).on("load", function () {
         $fileinfo.css({"left": $("#splitter").find(".vsplitbar").width() + $("#filetree").width()});
     });
+
+    setTimeout(setDimensions, 0);
 });

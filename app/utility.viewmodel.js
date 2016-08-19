@@ -7,7 +7,7 @@ define(function (require) {
     "use strict";
     var $ = require("jquery");
     var toastr = require("toastr");
-    //var ko = require("knockout");
+    // var ko = require("knockout");
 
     return function (config) {
         var self = this;
@@ -82,7 +82,7 @@ define(function (require) {
 
         // Handle ajax request error.
         var handleAjaxError = function (err) {
-            console.log("handle it?")
+            console.log("handle it?");
             $.each(err, function (ignore, e) {
                 console.log("e -> ", e);
                 toastr.error(e.title + ": " + e.code, e.detail, {"positionClass": "toast-bottom-right"});
@@ -128,23 +128,5 @@ define(function (require) {
 
             $.ajax(ajaxOptions);
         };//apiGet
-
-        self.getIconUrl = function (file) {
-            var url = config.icons.path;
-            if (file.isDirectory) {
-                url += config.icons.directory;
-            } else {
-                url += file.fileType + ".png";
-            }
-
-            return url;
-        };//getIconUrl
-
-        self.getDownloadUrl = function (path) {
-            return config.options.fileConnector
-                + "?mode=download"
-                + "&path=" + path
-                + "&time=" + Date.now();
-        };//getDownloadUrl
     };//function
 });//define

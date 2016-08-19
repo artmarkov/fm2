@@ -81,11 +81,11 @@ video, audio {
 	background: #3F3F3B url(../../../scripts/jquery.splitter/vgrabber.gif) no-repeat center;
 }
 
-#fileinfo {
+/*#fileinfo {
 	text-align: center;
 	padding:0;
 	margin:0;
-}
+}*/
 
 #fileinfo * {
 	font-size: 12px;
@@ -175,14 +175,14 @@ button:hover {
 	background-color:#C3D2F7;
 }
 
-button span {
+/*button span {
 	display: block;
 	padding-left: 20px;
 	background-position: left center;
 	background-repeat: no-repeat;
 	background-color: transparent;
 	white-space: nowrap;
-}
+}*/
 
 button:active,
 button:focus {
