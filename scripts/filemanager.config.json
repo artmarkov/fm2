@@ -23,7 +23,6 @@
     "splitterMinWidth": 200,
     "splitPercentage": 80,
     "dateFormat": "d M Y H:i",
-    "serverRoot": false,
     "fileRoot": "/",
     "fileRootSizeLimit": false,
     "baseUrl": false,

@@ -1,8 +1,8 @@
 #!/usr/bin/python2.6
 
 
-# Generate lang files with en.js file as reference
-# if key does not exist in json file, the key and value are added from reference file (en.js)
+# Generate lang files with en.json file as reference
+# if key does not exist in json file, the key and value are added from reference file (en.json)
 # Usage : $ python ./utils/generate-lang.py
 
 
@@ -35,19 +35,19 @@ print bcolors.HEADER + "\nFiles to translate :"
 print "-------------------------------------------\n" + bcolors.ENDC
 
 for files in os.listdir("."):
-    # we exclude 'en.js' file
-    if files.endswith(".js") and files != 'en.js':
+    # we exclude 'en.json' file
+    if files.endswith(".js") and files != 'en.json':
         filesList.append(files) # we populate filesList
         print bcolors.OKBLUE + files+ bcolors.ENDC # display file names
 
 print bcolors.HEADER + "-------------------------------------------\n" + bcolors.ENDC
 
 
-with open(fmRootFolder + "scripts/languages/" + 'en.js') as f:
+with open(fmRootFolder + "scripts/languages/" + 'en.json') as f:
     default_json = json.load(f)
 
 # we loop on JS languages files
-# if key does not exist in json file, the key and value are added from reference file (en.js)
+# if key does not exist in json file, the key and value are added from reference file (en.json)
 for index, item in enumerate(filesList):
         # print index, item
         with open(fmRootFolder + "scripts/languages/" + item) as f:

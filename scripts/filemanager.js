@@ -39,7 +39,7 @@
     quit_editor, remove, removeAttr, removeClass, removeFile, rename, replace,
     replaceWith, resize, reverse, root, round, save, scrollButtons, search,
     searchBox, search_reset, security, select, select_from_left, sending,
-    serializeArray, serverRoot, setAttribute, setDefaults, show,
+    serializeArray, setAttribute, setDefaults, show,
     showAudioPlayer, showConfirmation, showFullPath, showPdfReader,
     showPreviewImage, showTitleAttr, showVideoPlayer, size, sizeLeft, slice,
     split, splitter, splitterMinWidth, submit, substr, substring, success,
@@ -71,6 +71,7 @@
 require.config({
     "baseUrl": "",
     "paths": {
+        // "clipboard": "scripts/zeroclipboard/copy",
         "jquery": "node_modules/jquery/dist/jquery",
         "jqueryContextMenu": "scripts/jquery.contextmenu/jquery.contextMenu-1.01",
         "jqueryFileTree": "scripts/jquery.filetree/jqueryFileTree",
@@ -79,9 +80,11 @@ require.config({
         "jqueryMCustomScrollbar": "node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar",
         "knockout": "node_modules/knockout/build/output/knockout-latest.debug",
         "knockoutPunches": "node_modules/knockout-punches/knockout.punches",
+        "livesearch": "scripts/filemanager.liveSearch.min",
         "text": "node_modules/text/text"
     },
     "shim": {
+        // "clipboard": ["jquery"],
         "jquery": {
             exports: "$"
         },
@@ -90,7 +93,8 @@ require.config({
         "jqueryImpromptu": ["jquery"],
         "jquerySplitter": ["jquery"],
         "jqueryMCustomScrollbar": ["jquery"],
-        "knockoutPunches": ["knockout"]
+        "knockoutPunches": ["knockout"],
+        "livesearch": ["jquery"]
     },
     map: {
         '*': {
@@ -106,6 +110,7 @@ define(function (require) {
     require("css!node_modules/jQuery-Impromptu/dist/jquery-impromptu.min");
     require("css!node_modules/jquery.splitter/css/jquery.splitter");
     require("css!scripts/jquery.contextmenu/jquery.contextMenu-1.01");
+    require("css!scripts/dropzone/downloads/css/dropzone.css");
 
     //load jquery and related
     require("jquery");
@@ -114,6 +119,11 @@ define(function (require) {
     require("jqueryFileTree");
     require("jquerySplitter");
     require("jqueryMCustomScrollbar");
+
+    //load libraries
+    require("scripts/dropzone/downloads/dropzone");
+    require("livesearch");
+    // require("clipboard");
 
     //load knockout and related
     var ko = require("knockout");
@@ -129,18 +139,19 @@ define(function (require) {
 
     var _$ = {},
         userconfig = "",
-        HEAD_included_files,
+        // HEAD_included_files,
         codeMirrorEditor,
         fileConnector,
-        fileRoot,
+        fileRoot = appVM.config.options.fileRoot,
         baseUrl,
         capabilities,
         start,
-        lg = [],
+        lg = appVM.language, //temporary until ko conversion done
         fullexpandedFolder,
-        config,
-        configd,
+        config = appVM.config, //temporary until ko conversion done
+        // configd,
         $fileinfo = $("#fileinfo");
+
     // function to retrieve GET params
     _$.urlParameters = function (name) {
         var results = new RegExp("[\\?&]" + name + "=([^&#]*)").exec(window.location.href);
@@ -154,102 +165,9 @@ define(function (require) {
      Setup, Layout, and Status Functions
      ---------------------------------------------------------*/
 
-    // We retrieve config settings from filemanager.config.js
-    var loadConfigFile = function (type) {
-        var json = null,
-            url;
-        type = (type === undefined)
-            ? "user"
-            : type;
-
-        if (type === "user") {
-            if (_$.urlParameters("config") !== 0) {
-                url = "./scripts/" + _$.urlParameters("config");
-                _$.userconfig = _$.urlParameters("config");
-            } else {
-                url = "./scripts/filemanager.config.json";
-                _$.userconfig = "filemanager.config.json";
-            }
-        } else {
-            url = "./scripts/filemanager.config.default.json";
-        }
-
-        // WORKING 20160817 jlaustill
-        $.ajax({
-            "async": false,
-            "url": url,
-            "dataType": "json",
-            "cache": false,
-            "success": function (data) {
-                //console.log("data -> ", data);
-                json = data;
-            }
-        });
-        return json;
-    };
-
-    // loading default configuration file
-    configd = loadConfigFile("default");
-    // loading user configuration file
-    config = loadConfigFile();
-    // we remove version from user config file
-    if (config !== null) {
-        delete config.version;
-    }
-
-
-    if (!config.options.fileRoot) {
-        fileRoot = "/" + document.location.pathname.substring(1, document.location.pathname.lastIndexOf("/") + 1) + "userfiles/";
-    } else {
-        if (!config.options.serverRoot) {
-            fileRoot = config.options.fileRoot;
-        } else {
-            fileRoot = "/" + config.options.fileRoot;
-        }
-        // we remove double slashes - can happen when using PHP SetFileRoot() function with fileRoot = '/' value
-        fileRoot = fileRoot.replace(/\/\//g, "\/");
-    }
-
-    // we merge default config and user config file
-    config = $.extend({}, configd, config);
-
     //noinspection JSUnresolvedVariable
     if (config.options.logger) {
         start = Date.now();
-    }
-
-    // <head> included files collector
-    HEAD_included_files = [];
-
-
-    /**
-     * function to load a given css file into header
-     * if not already included
-     */
-    function loadCSS(href) {
-        // we check if already included
-        if ($.inArray(href, HEAD_included_files) === -1) {
-            var cssLink = $("<link rel='stylesheet' type='text/css' href='" + href + "'>");
-            $("head").append(cssLink);
-            HEAD_included_files.push(href);
-        }
-    }
-
-    // Load our theme css
-    loadCSS("./themes/" + config.options.theme + "/styles/filemanager.css");
-    loadCSS("./themes/" + config.options.theme + "/styles/ie.css");
-
-    /**
-     * function to load a given js file into header
-     * if not already included
-     */
-    function loadJS(src) {
-        // we check if already included
-        if ($.inArray(src, HEAD_included_files) === -1) {
-            var jsLink = $("<script type='text/javascript' src='" + src + "'>");
-            $("head").append(jsLink);
-            HEAD_included_files.push(src);
-        }
     }
 
     /**
@@ -350,25 +268,6 @@ define(function (require) {
 
     // Test if a given url exists
     function file_exists() {
-        // http://kevin.vanzonneveld.net
-        // +   original by: Enrique Gonzalez
-        // +      input by: Jani Hartikainen
-        // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-        // %        note 1: This function uses XmlHttpRequest and cannot retrieve resource from different domain.
-        // %        note 1: Synchronous so may lock up browser, mainly here for study purposes.
-        // *     example 1: file_exists('http://kevin.vanzonneveld.net/pj_test_supportfile_1.htm');
-        // *     returns 1: '123'
-        // var req = this.window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        // if (!req) {
-        //     throw new Error('XMLHttpRequest not supported');
-        // }
-        //
-        // // HEAD Results are usually shorter (faster) than GET
-        // req.open('HEAD', url, false);
-        // req.send(null);
-        // if (req.status === 200) {
-        //     return true;
-        // }
 
         return true;
     }
@@ -385,17 +284,6 @@ define(function (require) {
             }
         }
     }
-
-    // WORKING 20160817 jlaustill
-    $.ajax({
-        url: "scripts/languages/" + config.options.culture + ".js",
-        async: false,
-        dataType: "json",
-        success: function (json) {
-            //console.log("load language -> ", json);
-            lg = json;
-        }
-    });
 
     // Options for alert, prompt, and confirm dialogues.
     $.prompt.setDefaults({
@@ -526,15 +414,6 @@ define(function (require) {
         }
     }
 
-    // Handle Error. Freeze interactive buttons and display
-    // error message. Also called when auth() function return false (Code == "-1")
-    // function handleError(errMsg) {
-    //     $("#fileinfo").html("<h1>" + errMsg + "</h1>");
-    //     $("#newfile").attr("disabled", "disabled");
-    //     $("#upload").attr("disabled", "disabled");
-    //     $("#newfolder").attr("disabled", "disabled");
-    // }
-
     // Test if Data structure has the 'cap' capability
     // 'cap' is one of 'select', 'rename', 'delete', 'download', move
     function has_capability(data, cap) {
@@ -578,16 +457,6 @@ define(function (require) {
         }
         return false;
     }
-
-    // from http://phpjs.org/functions/basename:360
-    // function basename(path, suffix) {
-    //     var b = path.replace(/^.*[\/\\]/g, '');
-    //
-    //     if (typeof suffix === 'string' && b.substr(b.length - suffix.length) === suffix) {
-    //         b = b.substr(0, b.length - suffix.length);
-    //     }
-    //     return b;
-    // }
 
     // return filename without extension {
     function getFilename(filename) {
@@ -874,8 +743,6 @@ define(function (require) {
 
             if (rname !== "") {
                 var givenName = rname;
-                //oldPath = data.Path,
-                // connectString = fileConnector + "?mode=move&old=" + encodeURIComponent(data.Path) + "&new=" + encodeURIComponent(givenName) + "&root=" + encodeURIComponent(fileRoot) + "&config=" + userconfig;
 
                 _$.apiGet({
                     mode: "move",
@@ -1092,9 +959,6 @@ define(function (require) {
                     return false;
                 }
 
-                //var oldPath = data.Path;
-                //var connectString = fileConnector + "?mode=rename&old=" + encodeURIComponent(data.Path) + "&new=" + encodeURIComponent(givenName) + "&config=" + userconfig;
-
                 _$.apiGet({
                     mode: "rename",
                     old: data.Path,
@@ -1158,11 +1022,6 @@ define(function (require) {
     function setMenus(action, path) {
         var d = new Date(); // to prevent IE cache issues
         $.getJSON(fileConnector + "?mode=getinfo&path=" + encodeURIComponent(path) + "&config=" + userconfig + "&time=" + d.getMilliseconds(), function (data) {
-            // if ($('#fileinfo').data('view') === 'grid') {
-            //     var item = $('#fileinfo').find('img[data-path="' + data.Path + '"]').parent();
-            // } else {
-            //     var item = $('#fileinfo').find('td[data-path="' + data.Path + '"]').parent();
-            // }
 
             switch (action) {
             case "select":
@@ -1207,12 +1066,6 @@ define(function (require) {
 
         $("#loading-wrap").fadeOut(800); // we remove loading screen div
 
-        // Retrieve the data and generate the markup.
-        //var d = new Date(); // to prevent IE cache issues
-        //var url = fileConnector + "?path=" + encodeURIComponent(path) + "&config=" + userconfig + "&mode=getfolder&showThumbs=" + config.options.showThumbs + "&time=" + d.getMilliseconds();
-        //if (_$.urlParameters("type")) {
-        //    url += "&type=" + _$.urlParameters("type");
-        //}
         _$.apiGet({
             mode: "getfolder",
             path: encodeURIComponent(path),
@@ -1824,16 +1677,11 @@ define(function (require) {
             getFolderInfo(currentpath);
         });
 
-        // Retrieve the data & populate the template.
-        var d = new Date(); // to prevent IE cache issues
-
-        // $.getJSON(fileConnector + "?mode=getinfo&path=" + encodeURIComponent(file) + "&config=" + userconfig + "&time=" + d.getMilliseconds(), function (data) {
         _$.apiGet({
             mode: "getinfo",
             path: encodeURIComponent(file),
             success: function (data) {
                 //console.log("getinfo", data);
-                var url;
                 // if (data.Code === 0) {
                 $fileinfo.find("h1").text(data.Filename).attr("title", file);
 
@@ -1850,27 +1698,6 @@ define(function (require) {
                 }
                 if (isEditableFile(data.Filename) && config.edit.enabled === true && data.Protected === 0) {
                     editItem(data);
-                }
-
-                // copy URL instructions - zeroclipboard
-                d = new Date(); // to prevent IE cache issues
-
-                if (config.options.baseUrl !== false) {
-                    url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
-                } else {
-                    url = data.Path;
-                }
-                if (data.Protected === 0) {
-                    $fileinfo.find("div#tools").append(" <a id='copy-button' data-clipboard-text='" + url + "' title='" + lg.copy_to_clipboard + "' href='#'><span>" + lg.copy_to_clipboard + "</span></a>");
-                    // loading zeroClipboard code
-
-                    loadJS("./scripts/zeroclipboard/copy.js?d" + d.getMilliseconds());
-                    $("#copy-button").click(function () {
-                        $fileinfo.find("div#tools").append("<span id='copied'>" + lg.copied + "</span>");
-                        $("#copied").delay(500).fadeOut(1000, function () {
-                            $(this).remove();
-                        });
-                    });
                 }
 
                 var properties = "";
@@ -1997,31 +1824,6 @@ define(function (require) {
         $("#link-to-project").attr("href", config.url).attr("target", "_blank").attr("title", lg.support_fm + " [" + lg.version + " : " + config.version + "]");
         $("div.version").html(config.version);
 
-        // // Loading theme
-        // loadCSS("./themes/" + config.options.theme + "/styles/filemanager.css");
-        // loadCSS("./themes/" + config.options.theme + "/styles/ie.css");
-        // $.ajax({
-        //     url: "./themes/" + config.options.theme + "/styles/ie.css",
-        //     async: false,
-        //     success: function (data) {
-        //         $("head").append(data);
-        //     }
-        // });
-
-        // loading zeroClipboard
-        // loadJS("./scripts/zeroclipboard/dist/ZeroClipboard.js");
-
-        // Loading CodeMirror if enabled for online edition
-        if (config.edit.enabled) {
-            // loadCSS("./scripts/CodeMirror/lib/codemirror.css");
-            // loadCSS("./scripts/CodeMirror/theme/" + config.edit.theme + ".css");
-            // loadJS("./scripts/CodeMirror/lib/codemirror.js");
-            // loadJS("./scripts/CodeMirror/addon/selection/active-line.js");
-            // loadCSS("./scripts/CodeMirror/addon/display/fullscreen.css");
-            // loadJS("./scripts/CodeMirror/addon/display/fullscreen.js");
-            // loadJS("./scripts/CodeMirror/dynamic-mode.js");
-        }
-
         if (config.options.baseUrl === false) {
             baseUrl = window.location.protocol + "//" + window.location.host;
         } else {
@@ -2080,13 +1882,6 @@ define(function (require) {
             $("#filepath").val($(this).val().replace(/.+[\\\/]/, ""));
         });
 
-        /** load searchbox */
-        if (config.options.searchBox === true) {
-            loadJS("./scripts/filemanager.liveSearch.min.js");
-        } else {
-            $("#search").remove();
-        }
-
         // cosmetic tweak for buttons
         $("button").wrapInner("<span></span>");
 
@@ -2137,8 +1932,8 @@ define(function (require) {
         // Multiple Uploads
         if (config.upload.multiple) {
             // we load dropzone library
-            loadCSS("./scripts/dropzone/downloads/css/dropzone.css");
-            loadJS("./scripts/dropzone/downloads/dropzone.js");
+            // loadCSS("./scripts/dropzone/downloads/css/dropzone.css");
+            // loadJS("./scripts/dropzone/downloads/dropzone.js");
             //Dropzone.autoDiscover = false;
 
             // we remove simple file upload element
