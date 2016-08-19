@@ -21,12 +21,11 @@
 <!-- CSS dynamically added using 'config.options.theme' defined in config file -->
 </head>
 <body>
-<div id="loading-wrap"><!-- loading wrapper / removed when loaded --></div>
+<div id="loading-wrap" data-bind="visible: loading"><!-- loading wrapper / removed when loaded --></div>
 <div>
 <form id="uploader" method="post">
-	<h1></h1>
+	<h1 data-bind="text: 'Current Folder: ' + currentPath()"></h1>
 	<div id="uploadresponse"></div>
-	<div id="nopers">{{config.version}}</div>
 	<button id="level-up" name="level-up" type="button" value="LevelUp">&nbsp;</button>
 	<button id="home" name="home" type="button" value="Home">&nbsp;</button>
 	<input id="mode" name="mode" type="hidden" value="add" /> 
@@ -39,14 +38,13 @@
 	</div>
 	<button id="upload" name="upload" type="submit" value="Upload" class="em"></button>
 	<button id="newfolder" name="newfolder" type="button" value="New Folder" class="em"></button>
-	<button id="grid" class="ON" type="button">&nbsp;</button>
-	<button id="list" type="button">&nbsp;</button>
+	<button type="button" data-bind="title: language.list_view, click: switchViews, css: viewButtonClass" class="btn"></button>
 </form>
 <div id="splitter">
 	<div id="filetree">
 	</div>
 	<div id="fileinfo">
-	<h1></h1>
+	<div data-bind="template: {name: 'grid-template', data: currentFolder}, visible: currentView() === 'grid'"></div>
 	</div>
 </div>
 <div id="footer">
@@ -57,20 +55,32 @@
 			<span class="q-inactive"></span>
 		</div> 
 </form>
-<a href="" id="link-to-project"></a>
-<div id="folder-info"></div>
+    <a data-bind="attr: {href: config.url}" id="link-to-project"></a>
+    <p data-bind="text: 'v:' + config.version" style="float: right; margin: 1em"></p>
+    <div id="folder-info"></div>
+
 </div>
 
-<ul id="itemOptions" class="contextMenu">
-	<li class="select"><a href="#select"></a></li>
-	<li class="download"><a href="#download"></a></li>
-	<li class="rename"><a href="#rename"></a></li>
-	<li class="move"><a href="#move"></a></li>
-	<li class="replace"><a href="#replace"></a></li>
-	<li class="delete separator"><a href="#delete"></a></li>
-</ul>
+    <ul id="itemOptions" class="contextMenu">
+        <li class="select"><a href="#select"></a></li>
+        <li class="download"><a href="#download"></a></li>
+        <li class="rename"><a href="#rename"></a></li>
+        <li class="move"><a href="#move"></a></li>
+        <li class="replace"><a href="#replace"></a></li>
+        <li class="delete separator"><a href="#delete"></a></li>
+    </ul>
 
-<!--<script type="text/javascript" src="scripts/jquery-1.11.3.min.js"></script>-->
+    <script type="text/html" id="grid-template">
+        <ul id="contents" class="grid" data-bind="foreach: {data: $data, as: 'item'}">
+            <li class="cap_select cap_download cap_rename cap_delete cap_replace">
+                <div class="clip"><img width="64" data-bind="attr: {src: $root._$.getIconUrl(item), alt: $root._$.getIconUrl(item), dataPath: $root._$.getIconUrl(item)}" />
+                </div>
+                <p data-bind="text: item.filename"></p>
+            </li>
+        </ul>
+    </script>
+
+    <!--<script type="text/javascript" src="scripts/jquery-1.11.3.min.js"></script>-->
 <!--<script type="text/javascript" src="scripts/jquery-browser.js"></script>-->
 <!--<script type="text/javascript" src="scripts/jquery.form-3.24.js"></script>-->
 <!--<script type="text/javascript" src="scripts/jquery.splitter/jquery.splitter-1.5.1.js"></script>-->

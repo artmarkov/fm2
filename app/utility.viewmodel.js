@@ -131,13 +131,20 @@ define(function (require) {
 
         self.getIconUrl = function (file) {
             var url = config.icons.path;
-            if (file.IsDirectory) {
+            if (file.isDirectory) {
                 url += config.icons.directory;
             } else {
-                url += file["File Type"] + ".png";
+                url += file.fileType + ".png";
             }
 
             return url;
         };//getIconUrl
+
+        self.getDownloadUrl = function (path) {
+            return config.options.fileConnector
+                + "?mode=download"
+                + "&path=" + path
+                + "&time=" + Date.now();
+        };//getDownloadUrl
     };//function
 });//define

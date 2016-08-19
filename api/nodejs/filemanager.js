@@ -105,19 +105,19 @@ module.exports = function () {
     // adheres to the DRY principle
     function fileInfo(pp, callback) {
         var result = {
-            "Path": pp.uiPath,
-            "Preview": pp.uiPath,
-            "Filename": pp.filename,
-            "File Type": paths.parse(pp.osFullPath).ext.toLowerCase().replace(".", ""),
-            "IsDirectory": false,
-            "Thumbnail": "images/fileicons/" + paths.parse(pp.osFullPath).ext.toLowerCase().replace(".", "") + ".png",
-            "Properties": {
-                "Date Created": pp.stats.birthtime,
-                "Date Modified": pp.stats.mtime,
+            "path": pp.uiPath,
+            "preview": pp.uiPath,
+            "filename": pp.filename,
+            "fileType": paths.parse(pp.osFullPath).ext.toLowerCase().replace(".", ""),
+            "isDirectory": false,
+            "thumbnail": "images/fileicons/" + paths.parse(pp.osFullPath).ext.toLowerCase().replace(".", "") + ".png",
+            "properties": {
+                "dateCreated": pp.stats.birthtime,
+                "dateModified": pp.stats.mtime,
                 "filemtime": pp.stats.mtime,
-                "Height": 0,
-                "Width": 0,
-                "Size": 0
+                "height": 0,
+                "width": 0,
+                "size": 0
             }
         };//result
         callback(result);
@@ -127,19 +127,19 @@ module.exports = function () {
     // adheres to the DRY principle
     function directoryInfo(pp, callback) {
         var result = {
-            "Path": pp.uiPath,
-            "Preview": pp.uiPath,
-            "Filename": pp.filename,
-            "File Type": "dir",
-            "IsDirectory": true,
-            "Thumbnail": "images/fileicons/_Open.png",
-            "Properties": {
-                "Date Created": pp.stats.birthtime,
-                "Date Modified": pp.stats.mtime,
+            "path": pp.uiPath,
+            "preview": pp.uiPath,
+            "filename": pp.filename,
+            "fileType": "dir",
+            "isDirectory": true,
+            "thumbnail": "images/fileicons/_Open.png",
+            "properties": {
+                "dateCreated": pp.stats.birthtime,
+                "dateModified": pp.stats.mtime,
                 "filemtime": pp.stats.mtime,
-                "Height": 0,
-                "Width": 0,
-                "Size": 0
+                "height": 0,
+                "width": 0,
+                "size": 0
             }
         };//result
         callback(result);

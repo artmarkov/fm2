@@ -25,7 +25,6 @@
     "dateFormat": "d M Y H:i",
     "fileRoot": "/",
     "fileRootSizeLimit": false,
-    "baseUrl": false,
     "capabilities": [ "select", "upload", "download", "rename", "move", "replace", "delete" ],
     "logger": true,
     "plugins": [ ],
@@ -177,10 +176,6 @@
     	"enabled": true,
     	"theme": "minimal",
     	"button": true
-    },
-    "extras": {
-        "extra_js": [],
-        "extra_js_async": true
     },
     "icons": {
         "path": "images/fileicons/",
