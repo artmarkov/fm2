@@ -45,19 +45,24 @@
         <div id="filetree">
         </div>
         <div id="fileinfo">
-            <div data-bind="visible: (currentView() === 'grid')">
-                <div data-bind="template: {name: 'grid-template', data: currentFolder}">
+
+            <div class="container">
+                <div class="row">
+                    <div data-bind="visible: (currentView() === 'grid')">
+                        <div data-bind="template: {name: 'grid-template', data: currentFolder}">
+                        </div>
+                    </div>
+                    <div data-bind="template: {name: 'list-template', data: currentFolder}, visible: (currentView() === 'list')">
+
+                    </div>
+                    <div data-bind="visible: (currentView() === 'details')">
+                        <div data-bind="template: {name: 'details-template', data: currentItem}">
+                        </div>
+                    </div>
+
                 </div>
             </div>
-            <div data-bind="template: {name: 'list-template', data: currentFolder}, visible: (currentView() === 'list')">
-
             </div>
-            <div data-bind="visible: (currentView() === 'details')">
-                <div data-bind="template: {name: 'details-template', data: currentItem}">
-                </div>
-            </div>
-
-        </div>
     </div>
 
 <div id="footer">
@@ -105,7 +110,7 @@
             </thead>
             <tbody data-bind="foreach: {data: $data, as: 'item'}">
             <tr class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.goToItem">
-                <td><span data-bind="css: item.isDirectory ? 'glyphicon glyphicon-folder-close' : 'glyphicon glyphicon-file'">  {{item.filename}}</span> </td>
+                <td><span data-bind="css: item.isDirectory() ? 'glyphicon glyphicon-folder-close' : 'glyphicon glyphicon-file'">  {{item.filename}}</span> </td>
                 <td>{{item.properties().height}}x{{item.properties().width}}</td>
                 <td>{{item.properties().size}}kb</td>
                 <td>{{item.properties().dateModified}}</td>
@@ -115,11 +120,11 @@
     </script>
 
     <script type="text/html" id="details-template">
-        <div id="preview">
-            <img data-bind="attr: {src: getDownloadUrl, alt: getDownloadUrl}">
-            <div id="main-title">
-                <h1 title="/Scripts/filemanager/userfiles/computer_programmer.gif">{{filename}}</h1>
-                <div id="tools"></div>
+        <div class="center-block">
+            <img data-bind="attr: {src: getDownloadUrl, alt: getDownloadUrl}" class="img-thumbnail center-block">
+            <div class="center-block">
+                <h1 title="/Scripts/filemanager/userfiles/computer_programmer.gif" class="h1 center-block">{{filename}}</h1>
+                <!--<div id="tools"></div>-->
             </div>
             <dl>
                 <dt>Dimensions</dt>
