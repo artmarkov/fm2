@@ -673,59 +673,59 @@ define(function (require) {
     // Called by clicking the "Move" button in detail views
     // or choosing the "Move" contextual menu option in
     // list views.
-    function moveItem(data) {
-        var finalName = "",
-            rname;
-        var msg = lg.move + " : <input id='rname' name='rname' type='text' value='" + data.Path + "' />";
-        msg += "<div class='prompt-info'>" + lg.help_move + "</div>";
-
-        var doMove = function (v, m) {
-            if (!v) {
-                return false;
-            }
-            rname = m.children("#rname").val();
-
-            if (rname !== "") {
-                var givenName = rname;
-
-                _$.apiGet({
-                    mode: "move",
-                    old: data.Path,
-                    new: givenName,
-                    success: function (result) {
-                        var newPath,
-                            newName;
-                        // fullexpandedFolder;
-                        newPath = result["New Path"];
-                        newName = result["New Name"];
-
-                        // we set fullexpandedFolder value to automatically open file in
-                        // filetree when calling createFileTree() function
-                        fullexpandedFolder = newPath;
-
-                        createFileTree();
-                        // getFolderInfo(newPath); // update list in main window
-
-                        if (config.options.showConfirmation) {
-                            $.prompt(lg.successful_moved);
-                        }
-
-                        finalName = newPath + newName;
-                    }
-                });
-            }
-            return false;
-        };
-        var btns = {};
-        btns[lg.move] = true;
-        btns[lg.cancel] = false;
-        $.prompt(msg, {
-            callback: doMove,
-            buttons: btns
-        });
-
-        return finalName;
-    }
+    // function moveItem(data) {
+    //     var finalName = "",
+    //         rname;
+    //     var msg = lg.move + " : <input id='rname' name='rname' type='text' value='" + data.Path + "' />";
+    //     msg += "<div class='prompt-info'>" + lg.help_move + "</div>";
+    //
+    //     var doMove = function (v, m) {
+    //         if (!v) {
+    //             return false;
+    //         }
+    //         rname = m.children("#rname").val();
+    //
+    //         if (rname !== "") {
+    //             var givenName = rname;
+    //
+    //             _$.apiGet({
+    //                 mode: "move",
+    //                 old: data.Path,
+    //                 new: givenName,
+    //                 success: function (result) {
+    //                     var newPath,
+    //                         newName;
+    //                     // fullexpandedFolder;
+    //                     newPath = result["New Path"];
+    //                     newName = result["New Name"];
+    //
+    //                     // we set fullexpandedFolder value to automatically open file in
+    //                     // filetree when calling createFileTree() function
+    //                     fullexpandedFolder = newPath;
+    //
+    //                     createFileTree();
+    //                     // getFolderInfo(newPath); // update list in main window
+    //
+    //                     if (config.options.showConfirmation) {
+    //                         $.prompt(lg.successful_moved);
+    //                     }
+    //
+    //                     finalName = newPath + newName;
+    //                 }
+    //             });
+    //         }
+    //         return false;
+    //     };
+    //     var btns = {};
+    //     btns[lg.move] = true;
+    //     btns[lg.cancel] = false;
+    //     $.prompt(msg, {
+    //         callback: doMove,
+    //         buttons: btns
+    //     });
+    //
+    //     return finalName;
+    // }
 
     // Prompts for confirmation, then deletes the current item.
     // Called by clicking the "Delete" button in detail views
@@ -862,103 +862,103 @@ define(function (require) {
     // Called by clicking the "Rename" button in detail views
     // or choosing the "Rename" contextual menu option in
     // list views.
-    function renameItem(data) {
-        var finalName = "",
-            rname;
-        var fileName = config.security.allowChangeExtensions
-            ? data.Filename
-            : getFilename(data.Filename);
-        var msg = lg.new_filename + " : <input id='rname' name='rname' type='text' value='" + fileName + "' />";
-
-        var getNewName = function (v, m) {
-            if (!v) {
-                return false;
-            }
-            rname = m.children("#rname").val();
-
-            if (rname !== "") {
-                var givenName = rname;
-
-                if (!config.security.allowChangeExtensions) {
-                    givenName = nameFormat(rname);
-                    var suffix = getExtension(data.Filename);
-                    if (suffix.length > 0) {
-                        givenName = givenName + "." + suffix;
-                    }
-                }
-
-                // File only - Check if file extension is allowed
-                if (!data.IsDirectory && !isAuthorizedFile(givenName)) {
-                    var str = "<p>" + lg.INVALID_FILE_TYPE + "</p>";
-                    if (config.security.uploadPolicy === "DISALLOW_ALL") {
-                        str += "<p>" + lg.ALLOWED_FILE_TYPE + config.security.uploadRestrictions.join(", ") + ".</p>";
-                    }
-                    if (config.security.uploadPolicy === "ALLOW_ALL") {
-                        str += "<p>" + lg.DISALLOWED_FILE_TYPE + config.security.uploadRestrictions.join(", ") + ".</p>";
-                    }
-                    $("#filepath").val("");
-                    $.prompt(str);
-                    return false;
-                }
-
-                _$.apiGet({
-                    mode: "rename",
-                    old: data.Path,
-                    new: givenName,
-                    success: function (result) {
-                        var newPath = result["New Path"];
-                        var newName = result["New Name"];
-                        var oldPath = result["Old Path"];
-                        var preview = $("#preview");
-
-                        var needcreateFileTree = updateNode(oldPath, newPath, newName);
-                        if (needcreateFileTree) {
-                            createFileTree();
-                        }
-
-                        var title = preview.find("h1").attr("title");
-
-                        if (title !== undefined && title === oldPath) {
-                            preview.find("h1").text(newName);
-                        }
-
-                        if ($fileinfo.data("view") === "grid") {
-                            $fileinfo.find("img[data-path='" + oldPath + "']").parent().next("p").text(newName);
-                            $fileinfo.find("img[data-path='" + oldPath + "']").attr("data-path", newPath);
-                        } else {
-                            $fileinfo.find("td[data-path='" + oldPath + "']").text(newName);
-                            $fileinfo.find("td[data-path='" + oldPath + "']").attr("data-path", newPath);
-                        }
-                        preview.find("h1").html(newName);
-
-                        // actualized data for binding
-                        data.Path = newPath;
-                        data.Filename = newName;
-
-                        // Bind toolbar functions.
-                        $fileinfo.find("button#rename, button#delete, button#download").unbind();
-                        bindToolbar(data);
-
-                        if (config.options.showConfirmation) {
-                            $.prompt(lg.successful_rename);
-                        }
-
-                        finalName = result["New Name"];
-                    }
-                });
-            }
-            return false;
-        };
-        var btns = {};
-        btns[lg.rename] = true;
-        btns[lg.cancel] = false;
-        $.prompt(msg, {
-            callback: getNewName,
-            buttons: btns
-        });
-
-        return finalName;
-    }
+    // function renameItem(data) {
+    //     var finalName = "",
+    //         rname;
+    //     var fileName = config.security.allowChangeExtensions
+    //         ? data.Filename
+    //         : getFilename(data.Filename);
+    //     var msg = lg.new_filename + " : <input id='rname' name='rname' type='text' value='" + fileName + "' />";
+    //
+    //     var getNewName = function (v, m) {
+    //         if (!v) {
+    //             return false;
+    //         }
+    //         rname = m.children("#rname").val();
+    //
+    //         if (rname !== "") {
+    //             var givenName = rname;
+    //
+    //             if (!config.security.allowChangeExtensions) {
+    //                 givenName = nameFormat(rname);
+    //                 var suffix = getExtension(data.Filename);
+    //                 if (suffix.length > 0) {
+    //                     givenName = givenName + "." + suffix;
+    //                 }
+    //             }
+    //
+    //             // File only - Check if file extension is allowed
+    //             if (!data.IsDirectory && !isAuthorizedFile(givenName)) {
+    //                 var str = "<p>" + lg.INVALID_FILE_TYPE + "</p>";
+    //                 if (config.security.uploadPolicy === "DISALLOW_ALL") {
+    //                     str += "<p>" + lg.ALLOWED_FILE_TYPE + config.security.uploadRestrictions.join(", ") + ".</p>";
+    //                 }
+    //                 if (config.security.uploadPolicy === "ALLOW_ALL") {
+    //                     str += "<p>" + lg.DISALLOWED_FILE_TYPE + config.security.uploadRestrictions.join(", ") + ".</p>";
+    //                 }
+    //                 $("#filepath").val("");
+    //                 $.prompt(str);
+    //                 return false;
+    //             }
+    //
+    //             _$.apiGet({
+    //                 mode: "rename",
+    //                 old: data.Path,
+    //                 new: givenName,
+    //                 success: function (result) {
+    //                     var newPath = result["New Path"];
+    //                     var newName = result["New Name"];
+    //                     var oldPath = result["Old Path"];
+    //                     var preview = $("#preview");
+    //
+    //                     var needcreateFileTree = updateNode(oldPath, newPath, newName);
+    //                     if (needcreateFileTree) {
+    //                         createFileTree();
+    //                     }
+    //
+    //                     var title = preview.find("h1").attr("title");
+    //
+    //                     if (title !== undefined && title === oldPath) {
+    //                         preview.find("h1").text(newName);
+    //                     }
+    //
+    //                     if ($fileinfo.data("view") === "grid") {
+    //                         $fileinfo.find("img[data-path='" + oldPath + "']").parent().next("p").text(newName);
+    //                         $fileinfo.find("img[data-path='" + oldPath + "']").attr("data-path", newPath);
+    //                     } else {
+    //                         $fileinfo.find("td[data-path='" + oldPath + "']").text(newName);
+    //                         $fileinfo.find("td[data-path='" + oldPath + "']").attr("data-path", newPath);
+    //                     }
+    //                     preview.find("h1").html(newName);
+    //
+    //                     // actualized data for binding
+    //                     data.Path = newPath;
+    //                     data.Filename = newName;
+    //
+    //                     // Bind toolbar functions.
+    //                     $fileinfo.find("button#rename, button#delete, button#download").unbind();
+    //                     bindToolbar(data);
+    //
+    //                     if (config.options.showConfirmation) {
+    //                         $.prompt(lg.successful_rename);
+    //                     }
+    //
+    //                     finalName = result["New Name"];
+    //                 }
+    //             });
+    //         }
+    //         return false;
+    //     };
+    //     var btns = {};
+    //     btns[lg.rename] = true;
+    //     btns[lg.cancel] = false;
+    //     $.prompt(msg, {
+    //         callback: getNewName,
+    //         buttons: btns
+    //     });
+    //
+    //     return finalName;
+    // }
 
     // Binds contextual menus to items in list and grid views.
     // function setMenus(action, path) {

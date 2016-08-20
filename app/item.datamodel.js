@@ -36,6 +36,30 @@ define(function (require) {
             size: filesize(parseInt(item.properties.size || 0, 10))
         });//self.properties
 
+        self.reloadSelf = function () {
+            self._$.apiGet({
+                mode: "getinfo",
+                path: self.path(),
+                success: function (item) {
+                    console.log("reloadSelf item -> ", item);
+                    self.filename(item.filename);
+                    self.fileType(item.fileType);
+                    self.isDirectory(item.isDirectory);
+                    self.path(item.path);
+                    self.preview(item.preview);
+                    self.thumbnail(item.thumbnail);
+                    self.properties({
+                        dateCreated: item.properties.dateCreated,
+                        dateModified: item.properties.dateModified,
+                        filemtime: item.properties.filemtime,
+                        height: item.properties.height,
+                        width: item.properties.width,
+                        size: filesize(parseInt(item.properties.size || 0, 10))
+                    });
+                }//success
+            });//apiGet
+        };//reloadSelf
+
         self.getIconUrl = ko.pureComputed(function () {
             var url = self.config.icons.path;
             if (self.isDirectory()) {
@@ -141,17 +165,48 @@ define(function (require) {
                         swal.showInputError(self.config.language.INVALID_DIRECTORY_OR_FILE);
                         return false;
                     }
-                    //console.log("new folder will be ", inputValue);
                     self._$.apiGet({
                         mode: "rename",
                         new: inputValue,
                         old: self.path(),
-                        success: function () {
-                            self.filename(inputValue);
-                            toastr.success(self.config.language.successful_rename, inputValue, {"positionClass": "toast-bottom-right"});
+                        success: function (result) {
+                            self.path(result.newPath);
+                            self.reloadSelf();
+                            toastr.success(self.config.language.successful_rename, result.newName, {"positionClass": "toast-bottom-right"});
                         }
                     });//apiGet
                 });//swal
         };//rename
+
+        self.move = function () {
+            swal({
+                title: self.config.language.move,
+                text: self.config.language.prompt_foldername,
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: true,
+                animation: "slide-from-top",
+                inputPlaceholder: "Write something"
+            },
+                function (inputValue) {
+                    if (inputValue === false) {
+                        return false;
+                    }
+                    if (inputValue === "") {
+                        swal.showInputError(self.config.language.help_move);
+                        return false;
+                    }
+                    self._$.apiGet({
+                        mode: "move",
+                        new: inputValue,
+                        old: self.path(),
+                        success: function (result) {
+                            self.path(result.newPath);
+                            self.reloadSelf();
+                            toastr.success(self.config.language.successful_moved, result.newName, {"positionClass": "toast-bottom-right"});
+                        }
+                    });//apiGet
+                });//swal
+        };//move
     };//Item
 });//define

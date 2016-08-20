@@ -126,7 +126,7 @@
                 <button class="btn" data-bind="visible: $root.hasCapability('select')">Select</button>
                 <button class="btn" data-bind="click: download, visible: $root.hasCapability('download')">Download</button>
                 <button class="btn" data-bind="click: rename, visible: $root.hasCapability('rename')">Rename</button>
-                <button class="btn" data-bind="visible: $root.hasCapability('move')">Move</button>
+                <button class="btn" data-bind="click: move, visible: $root.hasCapability('move')">Move</button>
                 <button class="btn" data-bind="visible: $root.hasCapability('delete')">Delete</button>
                 <button class="btn" data-bind="visible: $root.hasCapability('replace')">Replace</button>
                 <h1 title="/Scripts/filemanager/userfiles/computer_programmer.gif" class="h1 center-block">{{filename}}</h1>
