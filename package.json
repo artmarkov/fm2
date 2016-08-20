@@ -5,6 +5,7 @@
   "main": "scripts/filemanager2.js",
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "dropzone": "^4.3.0",
     "filesize": "^3.3.0",
     "jQuery-Impromptu": "git+https://github.com/trentrichardson/jQuery-Impromptu.git",
     "jquery": "^3.1.0",

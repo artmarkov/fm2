@@ -72,6 +72,7 @@ require.config({
     "baseUrl": "",
     "paths": {
         "bootstrap": "node_modules/bootstrap/dist/js/bootstrap",
+        "dropzone": "node_modules/dropzone/dist/dropzone-amd-module",
         // "clipboard": "scripts/zeroclipboard/copy",
         "filesize": "node_modules/filesize/lib/filesize",
         "jquery": "node_modules/jquery/dist/jquery",
@@ -118,7 +119,8 @@ define(function (require) {
     require("css!node_modules/jQuery-Impromptu/dist/jquery-impromptu.min");
     require("css!node_modules/jquery.splitter/css/jquery.splitter");
     require("css!scripts/jquery.contextmenu/jquery.contextMenu-1.01");
-    require("css!scripts/dropzone/downloads/css/dropzone.css");
+    // require("css!scripts/dropzone/downloads/css/dropzone.css");
+    require("css!node_modules/dropzone/dist/dropzone.css");
     require("css!node_modules/toastr/build/toastr.css");
     require("css!node_modules/bootstrap/dist/css/bootstrap");
     require("css!node_modules/sweetalert/dist/sweetalert.css")
@@ -133,7 +135,8 @@ define(function (require) {
     require("jqueryMCustomScrollbar"); //currently disabled
 
     //load libraries
-    require("scripts/dropzone/downloads/dropzone");
+    // require("scripts/dropzone/downloads/dropzone");
+    require("dropzone");
     require("livesearch");
     require("bootstrap");
     // require("clipboard");
@@ -475,17 +478,7 @@ define(function (require) {
     // Display icons on list view
     // retrieving them from filetree
     // Called using SetInterval
-    // function display_icons(timer) {
-    //     $fileinfo.find("td:first-child").each(function () {
-    //         var path = $(this).attr("data-path"),
-    //             treenode = $("#filetree").find("a[data-path='" + path + "']").parent();
-    //
-    //         if (treenode.css("background-image") !== undefined) {
-    //             $(this).css("background-image", treenode.css("background-image"));
-    //             window.clearInterval(timer);
-    //         }
-    //     });
-    // }
+
 
 
     /*---------------------------------------------------------
@@ -1862,208 +1855,208 @@ define(function (require) {
         // Handling File upload
 
         // Multiple Uploads
-        if (config.upload.multiple) {
-            // we load dropzone library
-            // loadCSS("./scripts/dropzone/downloads/css/dropzone.css");
-            // loadJS("./scripts/dropzone/downloads/dropzone.js");
-            //Dropzone.autoDiscover = false;
+        // if (config.upload.multiple) {
+        //     // we load dropzone library
+        //     // loadCSS("./scripts/dropzone/downloads/css/dropzone.css");
+        //     // loadJS("./scripts/dropzone/downloads/dropzone.js");
+        //     //Dropzone.autoDiscover = false;
+        //
+        //     // we remove simple file upload element
+        //     $("#file-input-container").remove();
+        //
+        //     // we add multiple-files upload button using upload button
+        //     // $('#upload').prop('type', 'button');
+        //     // replaced by code below because og Chrome 18 bug https://github.com/simogeo/Filemanager/issues/304
+        //     // and it may also be safer for IE (see http://stackoverflow.com/questions/1544317/change-type-of-input-field-with-jquery
+        //     $("#upload").remove();
+        //     $("#newfolder").before("<button value='Upload' type='button' name='upload' id='upload' class='em'><span>" + lg.upload + "</span></button> ");
 
-            // we remove simple file upload element
-            $("#file-input-container").remove();
-
-            // we add multiple-files upload button using upload button
-            // $('#upload').prop('type', 'button');
-            // replaced by code below because og Chrome 18 bug https://github.com/simogeo/Filemanager/issues/304
-            // and it may also be safer for IE (see http://stackoverflow.com/questions/1544317/change-type-of-input-field-with-jquery
-            $("#upload").remove();
-            $("#newfolder").before("<button value='Upload' type='button' name='upload' id='upload' class='em'><span>" + lg.upload + "</span></button> ");
-
-            $("#upload").unbind().click(function () {
-                var allowedFiles;
-                // we create prompt
-                var msg = "<div id='dropzone-container'><h2>" + lg.current_folder + $("#uploader").find("h1").attr("title") + "</h2><div id='multiple-uploads' class='dropzone'></div>";
-                msg += "<div id='total-progress'><div data-dz-uploadprogress=''' style='width:0%;' class='progress-bar'></div></div>";
-                msg += "<div class='prompt-info'>" + lg.dz_dictMaxFilesExceeded.replace("%s", config.upload.number) + lg.file_size_limit + config.upload.fileSizeLimit + " " + lg.mb + ".</div>";
-                msg += "<button id='process-upload'>" + lg.upload + "</button></div>";
-
-                var error_flag = false;
-                var path = $("#currentpath").val();
-
-                var fileSize = (config.upload.fileSizeLimit !== "auto")
-                    ? config.upload.fileSizeLimit
-                    : 256; // default dropzone value
-
-                if (config.security.uploadPolicy === "DISALLOW_ALL") {
-                    allowedFiles = "." + config.security.uploadRestrictions.join(",.");
-                } else {
-                    // we allow any extension since we have no easy way to handle the the built-in `acceptedFiles` params
-                    // Would be handled later by the connector
-                    allowedFiles = null;
-                }
-
-                if (_$.urlParameters("type").toString().toLowerCase() === "images" || config.upload.imagesOnly) {
-                    allowedFiles = "." + config.images.imagesExt.join(",.");
-                }
-
-                var btns = {};
-                btns[lg.close] = false;
-                $.prompt(msg, {
-                    buttons: btns
-                });
-
-                $("div#multiple-uploads").dropzone({
-                    paramName: "newfile",
-                    url: fileConnector + "?config=" + userconfig,
-                    maxFilesize: fileSize,
-                    maxFiles: config.upload.number,
-                    addRemoveLinks: true,
-                    parallelUploads: config.upload.number,
-                    dictCancelUpload: lg.cancel,
-                    dictRemoveFile: lg.del,
-                    dictMaxFilesExceeded: lg.dz_dictMaxFilesExceeded.replace("%s", config.upload.number),
-                    dictDefaultMessage: lg.dz_dictDefaultMessage,
-                    dictInvalidFileType: lg.dz_dictInvalidFileType,
-                    dictFileTooBig: lg.file_too_big + " " + lg.file_size_limit + config.upload.fileSizeLimit + " " + lg.mb,
-                    acceptedFiles: allowedFiles,
-                    autoProcessQueue: false,
-                    init: function () {
-                        // for accessing dropzone : https://github.com/enyo/dropzone/issues/180
-                        var dropzone = this;
-                        $("#process-upload").click(function () {
-                            // to proceed full queue parallelUploads ust be equal or > to maxFileSize
-                            // https://github.com/enyo/dropzone/issues/462
-                            dropzone.processQueue();
-                        });
-                    },
-                    totaluploadprogress: function (progress) {
-                        $("#total-progress").find(".progress-bar").css("width", progress + "%");
-                    },
-                    sending: function (file, xhr, formData) {
-                        console.log(file, xhr);
-                        formData.append("mode", "add");
-                        formData.append("currentpath", path);
-                    },
-                    success: function (file, response) {
-                        //$("#uploadresponse").empty().html(response);
-                        // var data = $.parseJSON($("#uploadresponse").find("textarea").text());
-
-                        // if (data.Code === 0) {
-                        this.removeFile(file);
-                        // } else {
-                        //     // this.removeAllFiles();
-                        //     getFolderInfo(path);
-                        //     $("#filetree").find("a[data-path='" + path + "']").click();
-                        //     $.prompt(data.Error);
-                        //     error_flag = true;
-                        //
-                        // }
-                    },
-                    complete: function () {
-                        if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
-                            $("#total-progress").find(".progress-bar").css("width", "0");
-                            if (this.getRejectedFiles().length === 0 && error_flag === false) {
-                                setTimeout(function () {
-                                    $.prompt.close();
-                                }, 800);
-                            }
-                            // getFolderInfo(path);
-                            if (path === fileRoot) {
-                                // createFileTree();
-                            }
-                            $("#filetree").find("a[data-path='" + path + "']").click().click();
-                            if (config.options.showConfirmation) {
-                                $.prompt(lg.successful_added_file);
-                            }
-                        }
-                    }
-                });
-
-            });
-
-            // Simple Upload
-        } else {
-
-            $("#uploader").attr("action", fileConnector + "?config=" + userconfig);
-
-            $("#uploader").ajaxForm({
-                target: "#uploadresponse",
-                beforeSubmit: function (ignore, form) {
-                    var key;
-                    // Test if a value is given
-                    if ($("#newfile", form).val() === "") {
-                        return false;
-                    }
-                    // Check if file extension is allowed
-                    if (!isAuthorizedFile($("#newfile", form).val())) {
-                        var str = "<p>" + lg.INVALID_FILE_TYPE + "</p>";
-                        if (config.security.uploadPolicy === "DISALLOW_ALL") {
-                            str += "<p>" + lg.ALLOWED_FILE_TYPE + config.security.uploadRestrictions.join(", ") + ".</p>";
-                        }
-                        if (config.security.uploadPolicy === "ALLOW_ALL") {
-                            str += "<p>" + lg.DISALLOWED_FILE_TYPE + config.security.uploadRestrictions.join(", ") + ".</p>";
-                        }
-                        $("#filepath").val("");
-                        $.prompt(str);
-                        return false;
-                    }
-                    $("#upload").attr("disabled", true);
-                    $("#upload").find("span").addClass("loading").text(lg.loading_data);
-                    if (_$.urlParameters("type").toString().toLowerCase() === "images") {
-                        // Test if uploaded file extension is in valid image extensions
-                        var newfileSplitted = $("#newfile", form).val().toLowerCase().split(".");
-                        var found = false;
-                        for (key in config.images.imagesExt) {
-                            if (config.images.imagesExt.hasOwnProperty(key) && config.images.imagesExt[key] === newfileSplitted[newfileSplitted.length - 1]) {
-                                found = true;
-                            }
-                        }
-                        if (found === false) {
-                            $.prompt(lg.UPLOAD_IMAGES_ONLY);
-                            $("#upload").removeAttr("disabled").find("span").removeClass("loading").text(lg.upload);
-                            return false;
-                        }
-                    }
-                    // if config.upload.fileSizeLimit == auto we delegate size test to connector
-                    if (FileReader !== undefined && config.upload.fileSizeLimit !== "auto") {
-                        // Check file size using html5 FileReader API
-                        var size = $("#newfile", form).get(0).files[0].size;
-                        if (size > config.upload.fileSizeLimit * 1024 * 1024) {
-                            $.prompt("<p>" + lg.file_too_big + "</p><p>" + lg.file_size_limit + config.upload.fileSizeLimit + " " + lg.mb + ".</p>");
-                            $("#upload").removeAttr("disabled").find("span").removeClass("loading").text(lg.upload);
-                            return false;
-                        }
-                    }
-                    return false;
-                },
-                error: function () {//(jqXHR, textStatus, errorThrown)
-                    $("#upload").removeAttr("disabled").find("span").removeClass("loading").text(lg.upload);
-                    $.prompt(lg.ERROR_UPLOADING_FILE);
-                },
-                success: function () {
-                    var data = $.parseJSON($("#uploadresponse").find("textarea").text());
-                    // if (data.Code === 0) {
-                    var needs = addNode(data.Path, data.Name);
-                    if (needs) {
-                        createFileTree();
-                    }
-
-                    // getFolderInfo(data.Path); // update list in main window
-                    $("#filepath, #newfile").val("");
-                    // IE can not empty input='file'. A fix consist to replace the element (see github issue #215)
-                    if ($.browser.msie) {
-                        $("#newfile").replaceWith($("#newfile").clone(true));
-                    }
-                    // seems to be necessary when dealing w/ files located on s3 (need to look into a cleaner solution going forward)
-                    $("#filetree").find("a[data-path='" + data.Path + "/']").click().click();
-                    // } else {
-                    //     $.prompt(data.Error);
-                    // }
-                    $("#upload").removeAttr("disabled");
-                    $("#upload").find("span").removeClass("loading").text(lg.upload);
-                    $("#filepath").val("");
-                }
-            });
-        }
+        //     $("#upload").unbind().click(function () {
+        //         var allowedFiles;
+        //         // we create prompt
+        //         var msg = "<div id='dropzone-container'><h2>" + lg.current_folder + $("#uploader").find("h1").attr("title") + "</h2><div id='multiple-uploads' class='dropzone'></div>";
+        //         msg += "<div id='total-progress'><div data-dz-uploadprogress=''' style='width:0%;' class='progress-bar'></div></div>";
+        //         msg += "<div class='prompt-info'>" + lg.dz_dictMaxFilesExceeded.replace("%s", config.upload.number) + lg.file_size_limit + config.upload.fileSizeLimit + " " + lg.mb + ".</div>";
+        //         msg += "<button id='process-upload'>" + lg.upload + "</button></div>";
+        //
+        //         var error_flag = false;
+        //         var path = $("#currentpath").val();
+        //
+        //         var fileSize = (config.upload.fileSizeLimit !== "auto")
+        //             ? config.upload.fileSizeLimit
+        //             : 256; // default dropzone value
+        //
+        //         if (config.security.uploadPolicy === "DISALLOW_ALL") {
+        //             allowedFiles = "." + config.security.uploadRestrictions.join(",.");
+        //         } else {
+        //             // we allow any extension since we have no easy way to handle the the built-in `acceptedFiles` params
+        //             // Would be handled later by the connector
+        //             allowedFiles = null;
+        //         }
+        //
+        //         if (_$.urlParameters("type").toString().toLowerCase() === "images" || config.upload.imagesOnly) {
+        //             allowedFiles = "." + config.images.imagesExt.join(",.");
+        //         }
+        //
+        //         var btns = {};
+        //         btns[lg.close] = false;
+        //         $.prompt(msg, {
+        //             buttons: btns
+        //         });
+        //
+        //         $("div#multiple-uploads").dropzone({
+        //             paramName: "newfile",
+        //             url: fileConnector + "?config=" + userconfig,
+        //             maxFilesize: fileSize,
+        //             maxFiles: config.upload.number,
+        //             addRemoveLinks: true,
+        //             parallelUploads: config.upload.number,
+        //             dictCancelUpload: lg.cancel,
+        //             dictRemoveFile: lg.del,
+        //             dictMaxFilesExceeded: lg.dz_dictMaxFilesExceeded.replace("%s", config.upload.number),
+        //             dictDefaultMessage: lg.dz_dictDefaultMessage,
+        //             dictInvalidFileType: lg.dz_dictInvalidFileType,
+        //             dictFileTooBig: lg.file_too_big + " " + lg.file_size_limit + config.upload.fileSizeLimit + " " + lg.mb,
+        //             acceptedFiles: allowedFiles,
+        //             autoProcessQueue: false,
+        //             init: function () {
+        //                 // for accessing dropzone : https://github.com/enyo/dropzone/issues/180
+        //                 var dropzone = this;
+        //                 $("#process-upload").click(function () {
+        //                     // to proceed full queue parallelUploads ust be equal or > to maxFileSize
+        //                     // https://github.com/enyo/dropzone/issues/462
+        //                     dropzone.processQueue();
+        //                 });
+        //             },
+        //             totaluploadprogress: function (progress) {
+        //                 $("#total-progress").find(".progress-bar").css("width", progress + "%");
+        //             },
+        //             sending: function (file, xhr, formData) {
+        //                 console.log(file, xhr);
+        //                 formData.append("mode", "add");
+        //                 formData.append("currentpath", path);
+        //             },
+        //             success: function (file, response) {
+        //                 //$("#uploadresponse").empty().html(response);
+        //                 // var data = $.parseJSON($("#uploadresponse").find("textarea").text());
+        //
+        //                 // if (data.Code === 0) {
+        //                 this.removeFile(file);
+        //                 // } else {
+        //                 //     // this.removeAllFiles();
+        //                 //     getFolderInfo(path);
+        //                 //     $("#filetree").find("a[data-path='" + path + "']").click();
+        //                 //     $.prompt(data.Error);
+        //                 //     error_flag = true;
+        //                 //
+        //                 // }
+        //             },
+        //             complete: function () {
+        //                 if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+        //                     $("#total-progress").find(".progress-bar").css("width", "0");
+        //                     if (this.getRejectedFiles().length === 0 && error_flag === false) {
+        //                         setTimeout(function () {
+        //                             $.prompt.close();
+        //                         }, 800);
+        //                     }
+        //                     // getFolderInfo(path);
+        //                     if (path === fileRoot) {
+        //                         // createFileTree();
+        //                     }
+        //                     $("#filetree").find("a[data-path='" + path + "']").click().click();
+        //                     if (config.options.showConfirmation) {
+        //                         $.prompt(lg.successful_added_file);
+        //                     }
+        //                 }
+        //             }
+        //         });
+        //
+        //     });
+        //
+        //     // Simple Upload
+        // } else {
+        //
+        //     $("#uploader").attr("action", fileConnector + "?config=" + userconfig);
+        //
+        //     $("#uploader").ajaxForm({
+        //         target: "#uploadresponse",
+        //         beforeSubmit: function (ignore, form) {
+        //             var key;
+        //             // Test if a value is given
+        //             if ($("#newfile", form).val() === "") {
+        //                 return false;
+        //             }
+        //             // Check if file extension is allowed
+        //             if (!isAuthorizedFile($("#newfile", form).val())) {
+        //                 var str = "<p>" + lg.INVALID_FILE_TYPE + "</p>";
+        //                 if (config.security.uploadPolicy === "DISALLOW_ALL") {
+        //                     str += "<p>" + lg.ALLOWED_FILE_TYPE + config.security.uploadRestrictions.join(", ") + ".</p>";
+        //                 }
+        //                 if (config.security.uploadPolicy === "ALLOW_ALL") {
+        //                     str += "<p>" + lg.DISALLOWED_FILE_TYPE + config.security.uploadRestrictions.join(", ") + ".</p>";
+        //                 }
+        //                 $("#filepath").val("");
+        //                 $.prompt(str);
+        //                 return false;
+        //             }
+        //             $("#upload").attr("disabled", true);
+        //             $("#upload").find("span").addClass("loading").text(lg.loading_data);
+        //             if (_$.urlParameters("type").toString().toLowerCase() === "images") {
+        //                 // Test if uploaded file extension is in valid image extensions
+        //                 var newfileSplitted = $("#newfile", form).val().toLowerCase().split(".");
+        //                 var found = false;
+        //                 for (key in config.images.imagesExt) {
+        //                     if (config.images.imagesExt.hasOwnProperty(key) && config.images.imagesExt[key] === newfileSplitted[newfileSplitted.length - 1]) {
+        //                         found = true;
+        //                     }
+        //                 }
+        //                 if (found === false) {
+        //                     $.prompt(lg.UPLOAD_IMAGES_ONLY);
+        //                     $("#upload").removeAttr("disabled").find("span").removeClass("loading").text(lg.upload);
+        //                     return false;
+        //                 }
+        //             }
+        //             // if config.upload.fileSizeLimit == auto we delegate size test to connector
+        //             if (FileReader !== undefined && config.upload.fileSizeLimit !== "auto") {
+        //                 // Check file size using html5 FileReader API
+        //                 var size = $("#newfile", form).get(0).files[0].size;
+        //                 if (size > config.upload.fileSizeLimit * 1024 * 1024) {
+        //                     $.prompt("<p>" + lg.file_too_big + "</p><p>" + lg.file_size_limit + config.upload.fileSizeLimit + " " + lg.mb + ".</p>");
+        //                     $("#upload").removeAttr("disabled").find("span").removeClass("loading").text(lg.upload);
+        //                     return false;
+        //                 }
+        //             }
+        //             return false;
+        //         },
+        //         error: function () {//(jqXHR, textStatus, errorThrown)
+        //             $("#upload").removeAttr("disabled").find("span").removeClass("loading").text(lg.upload);
+        //             $.prompt(lg.ERROR_UPLOADING_FILE);
+        //         },
+        //         success: function () {
+        //             var data = $.parseJSON($("#uploadresponse").find("textarea").text());
+        //             // if (data.Code === 0) {
+        //             var needs = addNode(data.Path, data.Name);
+        //             if (needs) {
+        //                 createFileTree();
+        //             }
+        //
+        //             // getFolderInfo(data.Path); // update list in main window
+        //             $("#filepath, #newfile").val("");
+        //             // IE can not empty input='file'. A fix consist to replace the element (see github issue #215)
+        //             if ($.browser.msie) {
+        //                 $("#newfile").replaceWith($("#newfile").clone(true));
+        //             }
+        //             // seems to be necessary when dealing w/ files located on s3 (need to look into a cleaner solution going forward)
+        //             $("#filetree").find("a[data-path='" + data.Path + "/']").click().click();
+        //             // } else {
+        //             //     $.prompt(data.Error);
+        //             // }
+        //             $("#upload").removeAttr("disabled");
+        //             $("#upload").find("span").removeClass("loading").text(lg.upload);
+        //             $("#filepath").val("");
+        //         }
+        //     });
+        // }
 
         // Loading CustomScrollbar if enabled
         // Important, the script should be called after calling createFileTree() to prevent bug

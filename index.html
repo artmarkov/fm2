@@ -28,15 +28,15 @@
         <div id="uploadresponse"></div>
         <button type="button" class="btn" data-bind="click: goLevelUp, visible: currentPath() !== config.options.fileRoot || currentView() === 'details'"><span class="glyphicon glyphicon-level-up"></span></button>
         <button type="button" class="btn" data-bind="click: goHome, visible: notHome"><span class="glyphicon glyphicon-home"></span></button>
-        <input id="mode" name="mode" type="hidden" value="add"/>
-        <input id="currentpath" name="currentpath" type="hidden"/>
+        <!--<input id="mode" name="mode" type="hidden" value="add"/>-->
+        <!--<input id="currentpath" name="currentpath" type="hidden"/>-->
         <!--<div id="file-input-container">-->
             <!--<div id="alt-fileinput">-->
                 <!--<input id="filepath" name="filepath" type="text"/><button id="browse" name="browse" type="button" value="Browse"></button>-->
             <!--</div>-->
             <!--<input id="newfile" name="newfile" type="file"/>-->
         <!--</div>-->
-        <button type="submit" class="btn" data-bind="visible: function () {hasCapability('upload')}"><span class="glyphicon glyphicon-upload"> Upload</span></button>
+        <button type="button" class="btn" data-bind="click: function (){currentView('uploads');}, visible: function () {hasCapability('upload')}"><span class="glyphicon glyphicon-upload"> Upload</span></button>
         <button type="button" class="btn" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> New Folder</button>
         <button type="button" data-bind="title: language.list_view, click: switchViews, css: viewButtonClass" class="btn"></button>
     </form>
@@ -48,16 +48,7 @@
 
             <div class="container">
                 <div class="row">
-                    <div data-bind="visible: (currentView() === 'grid')">
-                        <div data-bind="template: {name: 'grid-template', data: currentFolder}">
-                        </div>
-                    </div>
-                    <div data-bind="template: {name: 'list-template', data: currentFolder}, visible: (currentView() === 'list')">
-
-                    </div>
-                    <div data-bind="visible: (currentView() === 'details')">
-                        <div data-bind="template: {name: 'detailsTemplate', data: currentItem}">
-                        </div>
+                    <div data-bind="template: {name: templateName, afterRender: afterRender}">
                     </div>
 
                 </div>
@@ -88,8 +79,15 @@
         <li class="delete separator"><a href="#delete"></a></li>
     </ul>
 
+    <script type="text/html" id="uploads-template">
+    <p> Let us upload some filuz :)</p>
+        <form action="/file-upload"
+          class="dropzone"
+          id="my-awesome-dropzone"></form>
+    </script>
+
     <script type="text/html" id="grid-template">
-        <ul id="contents" class="grid" data-bind="foreach: {data: $data, as: 'item'}">
+        <ul id="contents" class="grid" data-bind="foreach: {data: currentFolder, as: 'item'}">
             <li class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.goToItem">
                 <div class="clip"><img width="64" data-bind="attr: {src: getIconUrl, alt: getIconUrl, dataPath: getIconUrl}"/>
                 </div>
@@ -108,7 +106,7 @@
                 <th>{{$root.language.modified}}</th>
             </tr>
             </thead>
-            <tbody data-bind="foreach: {data: $data, as: 'item'}">
+            <tbody data-bind="foreach: {data: currentFolder, as: 'item'}">
             <tr class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.goToItem">
                 <td><span data-bind="css: item.isDirectory() ? 'glyphicon glyphicon-folder-close' : 'glyphicon glyphicon-file'">  {{item.filename}}</span> </td>
                 <td>{{item.properties().height}}x{{item.properties().width}}</td>
@@ -119,8 +117,8 @@
         </table>
     </script>
 
-    <script type="text/html" id="detailsTemplate">
-        <div class="center-block">
+    <script type="text/html" id="details-template">
+        <div class="center-block" data-bind="with: currentItem">
             <div data-bind="template: {name: templateName}"></div>
             <div class="center-block">
                 <button class="btn" data-bind="visible: function () {$root.hasCapability('select')}">Select</button>

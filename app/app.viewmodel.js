@@ -42,6 +42,44 @@ define(function (require) {
         self.currentItem = ko.observable(new Item(self));
         self.loading = ko.observable(true);
 
+        self.templateName = function () {
+            if (self.config) {
+                if (self.currentView() === "grid") {
+                    return "grid-template";
+                }
+                if (self.currentView() === "list") {
+                    return "list-template";
+                }
+                if (self.currentView() === "details") {
+                    return "details-template";
+                }
+            }
+            return "uploads-template";
+        };//templateName
+
+        self.afterRender = function (elements) {
+            if (self.currentView() === "uploads") {
+                $("#my-awesome-dropzone").dropzone({
+                    url: config.options.fileConnector,
+                    params: {mode: "add",  currentPath: self.currentPath()}
+                });
+                // $("#my-awesome-dropzone").on("sending", function(file, xhr, formData) {
+                //     // Will send the filesize along with the file as POST data.
+                //     formData.append("mode", "add");
+                //     formData.append("currentPath", self.currentPath());
+                // });
+
+                // The recommended way from within the init configuration:
+                // Dropzone.options.myAwesomeDropzone = {
+                //     sending: function (file, xhr, formData) {
+                //         // Will send the filesize along with the file as POST data.
+                //         formData.append("mode", "add");
+                //         formData.append("currentPath", self.currentPath());
+                //     }
+                // };
+            }
+        };
+
         self.loadCurrentFolder = function () {
             var newItems = [];
             self._$.apiGet({
@@ -97,7 +135,7 @@ define(function (require) {
         };//goHome
 
         self.notHome = ko.pureComputed(function () {
-            return self.currentPath() !== config.options.fileRoot;
+            return self.currentPath() !== config.options.fileRoot || self.currentView() === "uploads";
         });
 
         self.goToItem = function (data) {
@@ -137,7 +175,7 @@ define(function (require) {
 
         self.switchViews = function () {
             console.log("switchViews start -> ", self.currentView());
-            if (self.currentView() === "details") {
+            if (self.currentView() !== "list" && self.currentView() !== "grid") {
                 self.currentView(self.lastView());
             } else if (self.currentView() === "grid") {
                 self.currentView("list");
