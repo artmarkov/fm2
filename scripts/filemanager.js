@@ -961,32 +961,32 @@ define(function (require) {
     }
 
     // Binds contextual menus to items in list and grid views.
-    function setMenus(action, path) {
-        var d = new Date(); // to prevent IE cache issues
-        $.getJSON(fileConnector + "?mode=getinfo&path=" + encodeURIComponent(path) + "&config=" + userconfig + "&time=" + d.getMilliseconds(), function (data) {
-
-            switch (action) {
-            case "select":
-                selectItem(data);
-                break;
-            case "download": // todo implement javascript method to test if exstension is correct
-                window.location = fileConnector + "?mode=download&path=" + data.Path + "&config=" + userconfig + "&time=" + d.getMilliseconds();
-                break;
-            case "rename":
-                renameItem(data);
-                break;
-            case "replace":
-                replaceItem(data);
-                break;
-            case "move":
-                moveItem(data);
-                break;
-            case "delete":
-                deleteItem(data);
-                break;
-            }
-        });
-    }
+    // function setMenus(action, path) {
+    //     var d = new Date(); // to prevent IE cache issues
+    //     $.getJSON(fileConnector + "?mode=getinfo&path=" + encodeURIComponent(path) + "&config=" + userconfig + "&time=" + d.getMilliseconds(), function (data) {
+    //
+    //         switch (action) {
+    //         case "select":
+    //             selectItem(data);
+    //             break;
+    //         case "download": // todo implement javascript method to test if exstension is correct
+    //             window.location = fileConnector + "?mode=download&path=" + data.Path + "&config=" + userconfig + "&time=" + d.getMilliseconds();
+    //             break;
+    //         case "rename":
+    //             renameItem(data);
+    //             break;
+    //         case "replace":
+    //             replaceItem(data);
+    //             break;
+    //         case "move":
+    //             moveItem(data);
+    //             break;
+    //         case "delete":
+    //             deleteItem(data);
+    //             break;
+    //         }
+    //     });
+    // }
 
     // Retrieves data for all items within the given folder and
     // creates a list view. Binds contextual menu options.
@@ -1245,80 +1245,80 @@ define(function (require) {
     // Adds a new folder as the first item beneath the
     // specified parent node. Called after a new folder is
     // successfully created.
-    function addFolder(parent, name) {
-        var filetree = $("#filetree");
-        var newNode = "<li class='directory collapsed'><a data-path='" + parent + name
-            + "/' href='#'>" + name + "</a><ul class='jqueryFileTree' style='display: block;'></ul></li>";
-        var parentNode = filetree.find("a[data-path='" + parent + "']");
-        if (parent !== fileRoot) {
-            parentNode.next("ul").prepend(newNode).prev("a").click().click();
-        } else {
-            filetree.find("ul.jqueryFileTree").prepend(newNode);
-            filetree.find("li a[data-path='" + parent + name + "/']").attr("class", "cap_rename cap_delete").click(function () {
-                getFolderInfo(parent + name + "/");
-            }).each(function () {
-                $(this).contextMenu(
-                    {menu: getContextMenuOptions($(this))},
-                    function (action, el) {
-                        var path = $(el).attr("data-path");
-                        setMenus(action, path);
-                    }
-                );
-            });
-        }
-
-        if (config.options.showConfirmation) {
-            $.prompt(lg.successful_added_folder);
-        }
-    }
+    // function addFolder(parent, name) {
+    //     var filetree = $("#filetree");
+    //     var newNode = "<li class='directory collapsed'><a data-path='" + parent + name
+    //         + "/' href='#'>" + name + "</a><ul class='jqueryFileTree' style='display: block;'></ul></li>";
+    //     var parentNode = filetree.find("a[data-path='" + parent + "']");
+    //     if (parent !== fileRoot) {
+    //         parentNode.next("ul").prepend(newNode).prev("a").click().click();
+    //     } else {
+    //         filetree.find("ul.jqueryFileTree").prepend(newNode);
+    //         filetree.find("li a[data-path='" + parent + name + "/']").attr("class", "cap_rename cap_delete").click(function () {
+    //             getFolderInfo(parent + name + "/");
+    //         }).each(function () {
+    //             $(this).contextMenu(
+    //                 {menu: getContextMenuOptions($(this))},
+    //                 function (action, el) {
+    //                     var path = $(el).attr("data-path");
+    //                     setMenus(action, path);
+    //                 }
+    //             );
+    //         });
+    //     }
+    //
+    //     if (config.options.showConfirmation) {
+    //         $.prompt(lg.successful_added_folder);
+    //     }
+    // }
 
     // Sets the folder status, upload, and new folder functions
     // to the path specified. Called on initial page load and
     // whenever a new directory is selected.
-    function setUploader(path) {
-        $("#currentpath").val(path);
-        $("#uploader").find("h1").attr("title", displayPath(path, false)).attr("data-path", path);
-        appVM.currentPath(path);
-
-        $("#newfolder").unbind().click(function () {
-            var foldername = lg.default_foldername,
-                msg = lg.prompt_foldername + " : <input id='fname' name='fname' type='text' value='" + foldername + "' />";
-
-            var getFolderName = function (v, m) {
-                if (!v) {
-                    return false;
-                }
-                var fname = m.children("#fname").val();
-
-                if (fname !== "") {
-                    foldername = cleanString(fname);
-                    _$.apiGet({
-                        mode: "addfolder",
-                        foldername: foldername,
-                        path: $("#currentpath").val(),
-                        success: function (result) {
-                            console.log("addfolder result -> ", result);
-                            addFolder(result.Parent, result.Name);
-                            // getFolderInfo(result.Parent);
-
-                            // seems to be necessary when dealing w/ files located on s3 (need to look into a cleaner solution going forward)
-                            $("#filetree").find("a[data-path='" + result.Parent + "/']").click().click();
-                        }
-                    });
-                } else {
-                    $.prompt(lg.no_foldername);
-                }
-                return false;
-            };
-            var btns = {};
-            btns[lg.create_folder] = true;
-            btns[lg.cancel] = false;
-            $.prompt(msg, {
-                callback: getFolderName,
-                buttons: btns
-            });
-        });
-    }
+    // function setUploader(path) {
+    //     $("#currentpath").val(path);
+    //     $("#uploader").find("h1").attr("title", displayPath(path, false)).attr("data-path", path);
+    //     appVM.currentPath(path);
+    //
+    //     $("#newfolder").unbind().click(function () {
+    //         var foldername = lg.default_foldername,
+    //             msg = lg.prompt_foldername + " : <input id='fname' name='fname' type='text' value='" + foldername + "' />";
+    //
+    //         var getFolderName = function (v, m) {
+    //             if (!v) {
+    //                 return false;
+    //             }
+    //             var fname = m.children("#fname").val();
+    //
+    //             if (fname !== "") {
+    //                 foldername = cleanString(fname);
+    //                 _$.apiGet({
+    //                     mode: "addfolder",
+    //                     foldername: foldername,
+    //                     path: $("#currentpath").val(),
+    //                     success: function (result) {
+    //                         console.log("addfolder result -> ", result);
+    //                         addFolder(result.Parent, result.Name);
+    //                         // getFolderInfo(result.Parent);
+    //
+    //                         // seems to be necessary when dealing w/ files located on s3 (need to look into a cleaner solution going forward)
+    //                         $("#filetree").find("a[data-path='" + result.Parent + "/']").click().click();
+    //                     }
+    //                 });
+    //             } else {
+    //                 $.prompt(lg.no_foldername);
+    //             }
+    //             return false;
+    //         };
+    //         var btns = {};
+    //         btns[lg.create_folder] = true;
+    //         btns[lg.cancel] = false;
+    //         $.prompt(msg, {
+    //             callback: getFolderName,
+    //             buttons: btns
+    //         });
+    //     });
+    // }
 
     // Binds specific actions to the toolbar in detail views.
     // Called when detail views are loaded.
@@ -1857,7 +1857,7 @@ define(function (require) {
         // });
 
         // Provide initial values for upload form, status, etc.
-        setUploader(fileRoot);
+        // setUploader(fileRoot);
 
         // Handling File upload
 

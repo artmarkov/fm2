@@ -114,5 +114,9 @@ define(function (require) {
             }
             return "image-template";
         };//templateName
+
+        self.download = function () {
+            window.location = self.getDownloadUrl();
+        };//download
     };//Item
 });//define

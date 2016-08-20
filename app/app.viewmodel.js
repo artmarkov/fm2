@@ -116,7 +116,10 @@ define(function (require) {
 
         self.hasCapability = function (capability) {
             if (self.config) {
-                return $.inArray(capability, self.config.options.capabilities) !== -1;
+                if (capability === "select" && (self._$.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self._$.urlParameters("field_name"))) {
+                    return true;
+                }
+                return $.inArray(capability, self.config.options.capabilities) !== -1 && capability !== "select";
             }
             return false;
         };//hasCapability
