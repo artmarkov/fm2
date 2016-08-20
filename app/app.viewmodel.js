@@ -19,6 +19,7 @@ define(function (require) {
         self.config = config;
         self._$ = new Utility(self.config);
         self.language = self._$.getLanguage();
+        self.config.language = self.language;
 
         self._$.loadTheme();
         self._$.loadIeFix();
@@ -81,7 +82,7 @@ define(function (require) {
                         path: self.currentPath(),
                         success: function () {
                             self.loadCurrentFolder();
-                            toastr.success("Folder '" + inputValue + "' created.", "Success", {"positionClass": "toast-bottom-right"});
+                            toastr.success(self.language.successful_added_folder, inputValue, {"positionClass": "toast-bottom-right"});
                         }
                     });//apiGet
                 });//swal

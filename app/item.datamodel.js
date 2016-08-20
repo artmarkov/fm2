@@ -7,10 +7,14 @@ define(function (require) {
     var ko = require("knockout");
     var $ = require("jquery");
     var filesize = require("filesize");
+    var swal = require("sweetalert");
+    var toastr = require("toastr");
+    var Utility = require("app/utility.viewmodel");
 
     return function (item, config) {
         var self = this;
         self.config = config;
+        self._$ = new Utility(self.config);
         item = item || {};
         item.properties = item.properties || {};
 
@@ -118,5 +122,36 @@ define(function (require) {
         self.download = function () {
             window.location = self.getDownloadUrl();
         };//download
+
+        self.rename = function () {
+            swal({
+                title: self.config.language.rename,
+                text: self.config.language.new_filename,
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: true,
+                animation: "slide-from-top",
+                inputPlaceholder: "Write something"
+            },
+                function (inputValue) {
+                    if (inputValue === false) {
+                        return false;
+                    }
+                    if (inputValue === "") {
+                        swal.showInputError(self.config.language.INVALID_DIRECTORY_OR_FILE);
+                        return false;
+                    }
+                    //console.log("new folder will be ", inputValue);
+                    self._$.apiGet({
+                        mode: "rename",
+                        new: inputValue,
+                        old: self.path(),
+                        success: function () {
+                            self.filename(inputValue);
+                            toastr.success(self.config.language.successful_rename, inputValue, {"positionClass": "toast-bottom-right"});
+                        }
+                    });//apiGet
+                });//swal
+        };//rename
     };//Item
 });//define

@@ -125,7 +125,7 @@
             <div class="center-block">
                 <button class="btn" data-bind="visible: $root.hasCapability('select')">Select</button>
                 <button class="btn" data-bind="click: download, visible: $root.hasCapability('download')">Download</button>
-                <button class="btn" data-bind="visible: $root.hasCapability('rename')">Rename</button>
+                <button class="btn" data-bind="click: rename, visible: $root.hasCapability('rename')">Rename</button>
                 <button class="btn" data-bind="visible: $root.hasCapability('move')">Move</button>
                 <button class="btn" data-bind="visible: $root.hasCapability('delete')">Delete</button>
                 <button class="btn" data-bind="visible: $root.hasCapability('replace')">Replace</button>
