@@ -27,7 +27,7 @@
         <h1 data-bind="text: 'Current Folder: ' + currentPath()"></h1>
         <div id="uploadresponse"></div>
         <button type="button" class="btn" data-bind="click: goLevelUp, visible: currentPath() !== config.options.fileRoot || currentView() === 'details'"><span class="glyphicon glyphicon-level-up"></span></button>
-        <button type="button" class="btn" data-bind="click: goHome"><span class="glyphicon glyphicon-home"></span></button>
+        <button type="button" class="btn" data-bind="click: goHome, visible: notHome"><span class="glyphicon glyphicon-home"></span></button>
         <input id="mode" name="mode" type="hidden" value="add"/>
         <input id="currentpath" name="currentpath" type="hidden"/>
         <!--<div id="file-input-container">-->
@@ -36,7 +36,7 @@
             <!--</div>-->
             <!--<input id="newfile" name="newfile" type="file"/>-->
         <!--</div>-->
-        <button type="submit" class="btn" data-bind="visible: hasCapability('upload')"><span class="glyphicon glyphicon-upload"> Upload</span></button>
+        <button type="submit" class="btn" data-bind="visible: function () {hasCapability('upload')}"><span class="glyphicon glyphicon-upload"> Upload</span></button>
         <button type="button" class="btn" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> New Folder</button>
         <button type="button" data-bind="title: language.list_view, click: switchViews, css: viewButtonClass" class="btn"></button>
     </form>
@@ -56,7 +56,7 @@
 
                     </div>
                     <div data-bind="visible: (currentView() === 'details')">
-                        <div data-bind="template: {name: 'details-template', data: currentItem}">
+                        <div data-bind="template: {name: 'detailsTemplate', data: currentItem}">
                         </div>
                     </div>
 
@@ -119,16 +119,16 @@
         </table>
     </script>
 
-    <script type="text/html" id="details-template">
+    <script type="text/html" id="detailsTemplate">
         <div class="center-block">
             <div data-bind="template: {name: templateName}"></div>
             <div class="center-block">
-                <button class="btn" data-bind="visible: $root.hasCapability('select')">Select</button>
-                <button class="btn" data-bind="click: download, visible: $root.hasCapability('download')">Download</button>
-                <button class="btn" data-bind="click: rename, visible: $root.hasCapability('rename')">Rename</button>
-                <button class="btn" data-bind="click: move, visible: $root.hasCapability('move')">Move</button>
-                <button class="btn" data-bind="visible: $root.hasCapability('delete')">Delete</button>
-                <button class="btn" data-bind="visible: $root.hasCapability('replace')">Replace</button>
+                <button class="btn" data-bind="visible: function () {$root.hasCapability('select')}">Select</button>
+                <button class="btn" data-bind="click: download, visible: function () {$root.hasCapability('download')}">Download</button>
+                <button class="btn" data-bind="click: rename, visible: function () {$root.hasCapability('rename')}">Rename</button>
+                <button class="btn" data-bind="click: move, visible: function () {$root.hasCapability('move')}">Move</button>
+                <button class="btn" data-bind="click: removeMe, visible: function () {$root.hasCapability('move');}">Delete</button>
+                <button class="btn" data-bind="visible: function () {$root.hasCapability('replace')}">Replace</button>
                 <h1 title="/Scripts/filemanager/userfiles/computer_programmer.gif" class="h1 center-block">{{filename}}</h1>
                 <!--<div id="tools"></div>-->
             </div>

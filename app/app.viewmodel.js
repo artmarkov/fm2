@@ -39,7 +39,7 @@ define(function (require) {
             },
             owner: self
         });
-        self.currentItem = ko.observable(new Item(), self.config);
+        self.currentItem = ko.observable(new Item(self));
         self.loading = ko.observable(true);
 
         self.loadCurrentFolder = function () {
@@ -49,7 +49,7 @@ define(function (require) {
                 path: encodeURIComponent(self.currentPath()),
                 success: function (data) {
                     $.each(data, function (i, d) {
-                        newItems.push(new Item(d, self.config));
+                        newItems.push(new Item(self, d));
                     });
                     self.currentFolder(newItems);
                     self.loading(false);
@@ -90,10 +90,18 @@ define(function (require) {
 
         self.goHome = function () {
             self.currentPath(config.options.fileRoot);
+            if (self.currentView() !== "grid" && self.currentView() !== "list") {
+                self.currentView(self.lastView());
+            }
             self.loadCurrentFolder();
         };//goHome
 
+        self.notHome = ko.pureComputed(function () {
+            return self.currentPath() !== config.options.fileRoot;
+        });
+
         self.goToItem = function (data) {
+            console.log("goToItem data -> ", data);
             if (data.isDirectory()) {
                 self.currentPath(data.path());
                 self.loadCurrentFolder();
@@ -104,8 +112,10 @@ define(function (require) {
         };
 
         self.goLevelUp = function () {
+            self.loading(true);
             if (self.currentView() === "details") {
                 self.currentView(self.lastView());
+                self.loadCurrentFolder();
             } else {
                 var cpath = self.currentPath();
                 if (cpath !== config.options.fileRoot) {

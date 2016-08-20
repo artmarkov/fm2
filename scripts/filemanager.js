@@ -475,17 +475,17 @@ define(function (require) {
     // Display icons on list view
     // retrieving them from filetree
     // Called using SetInterval
-    function display_icons(timer) {
-        $fileinfo.find("td:first-child").each(function () {
-            var path = $(this).attr("data-path"),
-                treenode = $("#filetree").find("a[data-path='" + path + "']").parent();
-
-            if (treenode.css("background-image") !== undefined) {
-                $(this).css("background-image", treenode.css("background-image"));
-                window.clearInterval(timer);
-            }
-        });
-    }
+    // function display_icons(timer) {
+    //     $fileinfo.find("td:first-child").each(function () {
+    //         var path = $(this).attr("data-path"),
+    //             treenode = $("#filetree").find("a[data-path='" + path + "']").parent();
+    //
+    //         if (treenode.css("background-image") !== undefined) {
+    //             $(this).css("background-image", treenode.css("background-image"));
+    //             window.clearInterval(timer);
+    //         }
+    //     });
+    // }
 
 
     /*---------------------------------------------------------

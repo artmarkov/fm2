@@ -11,9 +11,9 @@ define(function (require) {
     var toastr = require("toastr");
     var Utility = require("app/utility.viewmodel");
 
-    return function (item, config) {
+    return function (appVM, item) {
         var self = this;
-        self.config = config;
+        self.config = appVM.config;
         self._$ = new Utility(self.config);
         item = item || {};
         item.properties = item.properties || {};
@@ -21,7 +21,7 @@ define(function (require) {
         console.log("item config -> ", self.config);
 
         // Lets make the entire item into observables
-        self.filename = ko.observable(item.filename);
+        self.filename = ko.observable((item.filename));
         self.fileType = ko.observable(item.fileType);
         self.isDirectory = ko.observable(item.isDirectory);
         self.path = ko.observable(item.path);
@@ -42,7 +42,7 @@ define(function (require) {
                 path: self.path(),
                 success: function (item) {
                     console.log("reloadSelf item -> ", item);
-                    self.filename(item.filename);
+                    self.filename((item.filename));
                     self.fileType(item.fileType);
                     self.isDirectory(item.isDirectory);
                     self.path(item.path);
@@ -73,13 +73,13 @@ define(function (require) {
 
         self.getDownloadUrl = ko.pureComputed(function () {
             console.log("getDownloadUrl file -> ", self);
-            if (self.config) {
+            if (self.config && self.path()) {
                 if (self.isDirectory()) {
                     return self.config.icons.path + self.config.icons.directory;
                 }
                 return self.config.options.fileConnector
                     + "?mode=download"
-                    + "&path=" + self.path()
+                    + "&path=" + encodeURIComponent(self.path())
                     + "&time=" + Date.now();
             }
         });//getDownloadUrl
@@ -91,7 +91,7 @@ define(function (require) {
                 }
                 return self.config.options.fileConnector
                     + "?mode=preview"
-                    + "&path=" + self.preview()
+                    + "&path=" + encodeURIComponent(self.preview())
                     + "&time=" + Date.now();
             }
         });//getDownloadUrl
@@ -172,6 +172,7 @@ define(function (require) {
                         success: function (result) {
                             self.path(result.newPath);
                             self.reloadSelf();
+                            appVM.loadCurrentFolder();
                             toastr.success(self.config.language.successful_rename, result.newName, {"positionClass": "toast-bottom-right"});
                         }
                     });//apiGet
@@ -201,12 +202,39 @@ define(function (require) {
                         new: inputValue,
                         old: self.path(),
                         success: function (result) {
+                            console.log("move result -> ", result);
                             self.path(result.newPath);
                             self.reloadSelf();
+                            appVM.currentPath(inputValue);
+                            appVM.loadCurrentFolder();
                             toastr.success(self.config.language.successful_moved, result.newName, {"positionClass": "toast-bottom-right"});
                         }
                     });//apiGet
                 });//swal
         };//move
+
+        //naming this 'delete' breaks knockoutjs, blah
+        self.removeMe = function () {
+            swal({
+                title: self.config.language.del,
+                text: self.config.language.confirmation_delete,
+                type: "warning",
+                showCancelButton: true,
+                closeOnConfirm: true,
+                animation: "slide-from-top",
+                confirmButtonText: self.config.language.yes
+            }, function () {
+                self._$.apiGet({
+                    mode: "delete",
+                    path: self.path(),
+                    success: function (result) {
+                        console.log("delete result -> ", result);
+                        toastr.success(self.config.language.successful_delete, result.path, {"positionClass": "toast-bottom-right"});
+                        appVM.goLevelUp();
+                    }//success
+                });//apiGet
+            });//swal
+        };//delete
+
     };//Item
 });//define
