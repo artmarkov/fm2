@@ -36,7 +36,7 @@
             <!--</div>-->
             <!--<input id="newfile" name="newfile" type="file"/>-->
         <!--</div>-->
-        <button type="submit" class="btn" data-bind="visible: hasCapability('upload$root.')"><span class="glyphicon glyphicon-upload"> Upload</span></button>
+        <button type="submit" class="btn" data-bind="visible: hasCapability('upload')"><span class="glyphicon glyphicon-upload"> Upload</span></button>
         <button type="button" class="btn" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> New Folder</button>
         <button type="button" data-bind="title: language.list_view, click: switchViews, css: viewButtonClass" class="btn"></button>
     </form>
@@ -129,7 +129,7 @@
                 <button class="btn" data-bind="visible: $root.hasCapability('move')">Move</button>
                 <button class="btn" data-bind="visible: $root.hasCapability('delete')">Delete</button>
                 <button class="btn" data-bind="visible: $root.hasCapability('replace')">Replace</button>
-                <h1 title="/Scripts/filemanager/userfiles/computer_programmer.gif" class="h1 center-block">{{filename}} - {{isAudioFile}} - {{fileType}} - {{config.audios.audiosExt}}</h1>
+                <h1 title="/Scripts/filemanager/userfiles/computer_programmer.gif" class="h1 center-block">{{filename}}</h1>
                 <!--<div id="tools"></div>-->
             </div>
             <dl>

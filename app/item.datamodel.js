@@ -101,14 +101,16 @@ define(function (require) {
         });
 
         self.templateName = function () {
-            if (self.isVideoFile()) {
-                return "video-player-template";
-            }
-            if (self.isAudioFile()) {
-                return "audio-player-template";
-            }
-            if (self.isPdfFile()) {
-                return "pdf-viewer-template";
+            if (self.config) {
+                if (self.isVideoFile()) {
+                    return "video-player-template";
+                }
+                if (self.isAudioFile()) {
+                    return "audio-player-template";
+                }
+                if (self.isPdfFile()) {
+                    return "pdf-viewer-template";
+                }
             }
             return "image-template";
         };//templateName
