@@ -73,6 +73,7 @@ require.config({
     "paths": {
         "bootstrap": "node_modules/bootstrap/dist/js/bootstrap",
         // "clipboard": "scripts/zeroclipboard/copy",
+        "filesize": "node_modules/filesize/lib/filesize",
         "jquery": "node_modules/jquery/dist/jquery",
         "jqueryContextMenu": "scripts/jquery.contextmenu/jquery.contextMenu-1.01",
         "jqueryFileTree": "scripts/jquery.filetree/jqueryFileTree",
@@ -82,6 +83,7 @@ require.config({
         "knockout": "node_modules/knockout/build/output/knockout-latest.debug",
         "knockoutPunches": "node_modules/knockout-punches/knockout.punches",
         "livesearch": "scripts/filemanager.liveSearch.min",
+        "sweetalert": "node_modules/sweetalert/dist/sweetalert-dev",
         "text": "node_modules/text/text",
         "toastr": "node_modules/toastr/build/toastr.min"
     },
@@ -119,6 +121,7 @@ define(function (require) {
     require("css!scripts/dropzone/downloads/css/dropzone.css");
     require("css!node_modules/toastr/build/toastr.css");
     require("css!node_modules/bootstrap/dist/css/bootstrap");
+    require("css!node_modules/sweetalert/dist/sweetalert.css")
 
 
     //load jquery and related
@@ -412,62 +415,62 @@ define(function (require) {
         return $.inArray(getExtension(filename), config.edit.editExt) !== -1;
     }
 
-    // Test if is image file
-    // function isImageFile(filename) {
-    //     if ($.inArray(getExtension(filename), config.images.imagesExt) !== -1) {
-    //         return true;
-    //     }
-    //     return false;
+    // // Test if is image file
+    // // function isImageFile(filename) {
+    // //     if ($.inArray(getExtension(filename), config.images.imagesExt) !== -1) {
+    // //         return true;
+    // //     }
+    // //     return false;
+    // // }
+    //
+    // // Test if file is supported web video file
+    // function isVideoFile(filename) {
+    //     return $.inArray(getExtension(filename), config.videos.videosExt) !== -1;
+    // }
+    //
+    // // Test if file is supported web audio file
+    // function isAudioFile(filename) {
+    //     return $.inArray(getExtension(filename), config.audios.audiosExt) !== -1;
+    // }
+    //
+    // // Test if file is pdf file
+    // function isPdfFile(filename) {
+    //     return $.inArray(getExtension(filename), config.pdfs.pdfsExt) !== -1;
     // }
 
-    // Test if file is supported web video file
-    function isVideoFile(filename) {
-        return $.inArray(getExtension(filename), config.videos.videosExt) !== -1;
-    }
-
-    // Test if file is supported web audio file
-    function isAudioFile(filename) {
-        return $.inArray(getExtension(filename), config.audios.audiosExt) !== -1;
-    }
-
-    // Test if file is pdf file
-    function isPdfFile(filename) {
-        return $.inArray(getExtension(filename), config.pdfs.pdfsExt) !== -1;
-    }
-
     // Return HTML video player
-    function getVideoPlayer(data) {
-        var code = "<video width=" + config.videos.videosPlayerWidth
-            + " height=" + config.videos.videosPlayerHeight
-            + " src='" + data.Path + "' controls='controls'>";
-        code += "<img src='" + data.Preview + "' />";
-        code += "</video>";
-
-        $fileinfo.find("img").remove();
-        $fileinfo.find("#preview #main-title").before(code);
-    }
+    // function getVideoPlayer(data) {
+    //     var code = "<video width=" + config.videos.videosPlayerWidth
+    //         + " height=" + config.videos.videosPlayerHeight
+    //         + " src='" + data.Path + "' controls='controls'>";
+    //     code += "<img src='" + data.Preview + "' />";
+    //     code += "</video>";
+    //
+    //     $fileinfo.find("img").remove();
+    //     $fileinfo.find("#preview #main-title").before(code);
+    // }
 
     //Return HTML audio player
-    function getAudioPlayer(data) {
-        var code = "<audio src='" + data.Path
-            + "' controls='controls'>";
-        code += "<img src='" + data.Preview + "' />";
-        code += "</audio>";
-
-        $fileinfo.find("img").remove();
-        $fileinfo.find("#preview #main-title").before(code);
-    }
-
-    //Return PDF Reader
-    function getPdfReader(data) {
-        var code = "<iframe id='fm-pdf-viewer' src = 'scripts/ViewerJS/index.html#" + data.Path
-            + "' width='" + config.pdfs.pdfsReaderWidth
-            + "' height='" + config.pdfs.pdfsReaderHeight
-            + "' allowfullscreen webkitallowfullscreen></iframe>";
-
-        $fileinfo.find("img").remove();
-        $fileinfo.find("#preview #main-title").before(code);
-    }
+    // function getAudioPlayer(data) {
+    //     var code = "<audio src='" + data.Path
+    //         + "' controls='controls'>";
+    //     code += "<img src='" + data.Preview + "' />";
+    //     code += "</audio>";
+    //
+    //     $fileinfo.find("img").remove();
+    //     $fileinfo.find("#preview #main-title").before(code);
+    // }
+    //
+    // //Return PDF Reader
+    // function getPdfReader(data) {
+    //     var code = "<iframe id='fm-pdf-viewer' src = 'scripts/ViewerJS/index.html#" + data.Path
+    //         + "' width='" + config.pdfs.pdfsReaderWidth
+    //         + "' height='" + config.pdfs.pdfsReaderHeight
+    //         + "' allowfullscreen webkitallowfullscreen></iframe>";
+    //
+    //     $fileinfo.find("img").remove();
+    //     $fileinfo.find("#preview #main-title").before(code);
+    // }
 
     // Display icons on list view
     // retrieving them from filetree

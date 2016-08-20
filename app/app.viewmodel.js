@@ -10,6 +10,8 @@ define(function (require) {
     var config = JSON.parse(require("text!scripts/filemanager.config.json"));
     var Utility = require("app/utility.viewmodel");
     var Item = require("app/item.datamodel");
+    var swal = require("sweetalert");
+    var toastr = require("toastr");
 
     return function () {
         var self = this;
@@ -54,6 +56,37 @@ define(function (require) {
             });//apiGet
         };//loadCurrentFolder
 
+        self.createFolder = function () {
+            swal({
+                title: self.language.new_folder,
+                text: self.language.prompt_foldername,
+                type: "input",
+                showCancelButton: true,
+                closeOnConfirm: true,
+                animation: "slide-from-top",
+                inputPlaceholder: "Write something"
+            },
+                function (inputValue) {
+                    if (inputValue === false) {
+                        return false;
+                    }
+                    if (inputValue === "") {
+                        swal.showInputError(self.language.no_foldername);
+                        return false;
+                    }
+                    //console.log("new folder will be ", inputValue);
+                    self._$.apiGet({
+                        mode: "addfolder",
+                        foldername: inputValue,
+                        path: self.currentPath(),
+                        success: function () {
+                            self.loadCurrentFolder();
+                            toastr.success("Folder '" + inputValue + "' created.", "Success", {"positionClass": "toast-bottom-right"});
+                        }
+                    });//apiGet
+                });//swal
+        };//createFolder
+
         self.goHome = function () {
             self.currentPath(config.options.fileRoot);
             self.loadCurrentFolder();
@@ -80,6 +113,13 @@ define(function (require) {
                 }
             }
         };
+
+        self.hasCapability = function (capability) {
+            if (self.config) {
+                return $.inArray(capability, self.config.options.capabilities) !== -1;
+            }
+            return false;
+        };//hasCapability
 
         self.switchViews = function () {
             console.log("switchViews start -> ", self.currentView());
