@@ -254,15 +254,11 @@ define(function (require) {
 
                         toastr.success(self.config.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
                     }
+                },
+                complete: function (file) {
+                    this.removeFile(file);
                 }
             });
-
-            Dropzone.options.myAwesomeDropzone2.on("complete", function (file) {
-                myDropzone.removeFile(file);
-            });
-
-
-
         };//replaceMe
     };//Item
 });//define
