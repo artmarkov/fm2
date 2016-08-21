@@ -138,8 +138,8 @@ define(function (require) {
             return self.currentPath() !== config.options.fileRoot || self.currentView() === "uploads";
         });
 
-        self.goToItem = function (data) {
-            console.log("goToItem data -> ", data);
+        self.browseToItem = function (data) {
+            console.log("browseToItem data -> ", data);
             if (data.isDirectory()) {
                 self.currentPath(data.path());
                 self.loadCurrentFolder();
@@ -147,6 +147,12 @@ define(function (require) {
                 self.currentItem(data);
                 self.currentView("details");
             }
+        };
+
+        self.goToItem = function (data) {
+            console.log("goToItem data -> ", data);
+            self.currentItem(data);
+            self.currentView("details");
         };
 
         self.goLevelUp = function () {

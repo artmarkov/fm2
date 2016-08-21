@@ -88,7 +88,7 @@
 
     <script type="text/html" id="grid-template">
         <ul id="contents" class="grid" data-bind="foreach: {data: currentFolder, as: 'item'}">
-            <li class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.goToItem, contextMenu: menu">
+            <li class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.browseToItem, contextMenu: menu">
                 <div class="clip"><img width="64" data-bind="attr: {src: getIconUrl, alt: getIconUrl, dataPath: getIconUrl}"/>
                 </div>
                 <p data-bind="text: item.filename"></p>
@@ -107,7 +107,7 @@
             </tr>
             </thead>
             <tbody data-bind="foreach: {data: currentFolder, as: 'item'}">
-            <tr class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.goToItem, contextMenu: menu">
+            <tr class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.browseToItem, contextMenu: menu">
                 <td><span data-bind="css: item.isDirectory() ? 'glyphicon glyphicon-folder-close' : 'glyphicon glyphicon-file'">  {{item.filename}}</span> </td>
                 <td>{{item.properties().height}}x{{item.properties().width}}</td>
                 <td>{{item.properties().size}}</td>

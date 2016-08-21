@@ -118,7 +118,7 @@ define(function (require) {
         // Is file in the list of accepted image file formats?
         self.isImageFile = ko.pureComputed(function () {
             if (self.config) {
-                return $.inArray(self.fileType(), self.config.images.imagesExt || []) !== -1;
+                return $.inArray(self.fileType(), self.config.images.imagesExt || []) !== -1 || self.isDirectory();
             }
             return false;
         });
