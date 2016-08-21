@@ -723,58 +723,58 @@ define(function (require) {
     // Prompts for confirmation, then deletes the current item.
     // Called by clicking the "Delete" button in detail views
     // or choosing the "Delete contextual menu item in list views.
-    function deleteItem(data) {
-        var isDeleted = false,
-            msg = lg.confirmation_delete,
-            parent;
+    // function deleteItem(data) {
+    //     var isDeleted = false,
+    //         msg = lg.confirmation_delete,
+    //         parent;
 
-        var doDelete = function (v) {
-            if (!v) {
-                return false;
-            }
-            parent = data.Path.split("/").reverse().slice(1).reverse().join("/") + "/";
-
-            _$.apiGet({
-                mode: "delete",
-                path: data.Path,
-                success: function (result) {
-                    //console.log("delete result -> ", result);
-                    removeNode(result.Path);
-                    // if the actual view is the deleted folder, we display parent folder
-                    //if ($("#uploader h1").attr("data-path") === result.path) {
-                    //    var a = result.path.split("/"),
-                    //        iparent = a.slice(0, length - 2).join("/") + "/";
-                    //    getFolderInfo(iparent);
-                    //}
-                    // remove fileinfo when item to remove is currently selected
-                    if ($("#preview").length) {
-                        // getFolderInfo(result.Path.substr(0, result.Path.lastIndexOf("/") + 1));
-                    }
-                    var rootpath = result.Path.substring(0, result.Path.length - 1); // removing the last slash
-                    rootpath = rootpath.substr(0, rootpath.lastIndexOf("/") + 1);
-                    $("#uploader").find("h1").attr("title", displayPath(rootpath, false)).attr("data-path", rootpath);
-                    isDeleted = true;
-
-                    if (config.options.showConfirmation) {
-                        $.prompt(lg.successful_delete);
-                    }
-
-                    // seems to be necessary when dealing w/ files located on s3 (need to look into a cleaner solution going forward)
-                    $("#filetree").find("a[data-path='" + parent + "/']").click().click();
-                }
-            });
-            return false;
-        };
-        var btns = {};
-        btns[lg.yes] = true;
-        btns[lg.no] = false;
-        $.prompt(msg, {
-            callback: doDelete,
-            buttons: btns
-        });
-
-        return isDeleted;
-    }
+    //     var doDelete = function (v) {
+    //         if (!v) {
+    //             return false;
+    //         }
+    //         parent = data.Path.split("/").reverse().slice(1).reverse().join("/") + "/";
+    //
+    //         _$.apiGet({
+    //             mode: "delete",
+    //             path: data.Path,
+    //             success: function (result) {
+    //                 //console.log("delete result -> ", result);
+    //                 removeNode(result.Path);
+    //                 // if the actual view is the deleted folder, we display parent folder
+    //                 //if ($("#uploader h1").attr("data-path") === result.path) {
+    //                 //    var a = result.path.split("/"),
+    //                 //        iparent = a.slice(0, length - 2).join("/") + "/";
+    //                 //    getFolderInfo(iparent);
+    //                 //}
+    //                 // remove fileinfo when item to remove is currently selected
+    //                 if ($("#preview").length) {
+    //                     // getFolderInfo(result.Path.substr(0, result.Path.lastIndexOf("/") + 1));
+    //                 }
+    //                 var rootpath = result.Path.substring(0, result.Path.length - 1); // removing the last slash
+    //                 rootpath = rootpath.substr(0, rootpath.lastIndexOf("/") + 1);
+    //                 $("#uploader").find("h1").attr("title", displayPath(rootpath, false)).attr("data-path", rootpath);
+    //                 isDeleted = true;
+    //
+    //                 if (config.options.showConfirmation) {
+    //                     $.prompt(lg.successful_delete);
+    //                 }
+    //
+    //                 // seems to be necessary when dealing w/ files located on s3 (need to look into a cleaner solution going forward)
+    //                 $("#filetree").find("a[data-path='" + parent + "/']").click().click();
+    //             }
+    //         });
+    //         return false;
+    //     };
+    //     var btns = {};
+    //     btns[lg.yes] = true;
+    //     btns[lg.no] = false;
+    //     $.prompt(msg, {
+    //         callback: doDelete,
+    //         buttons: btns
+    //     });
+    //
+    //     return isDeleted;
+    // }
 
     // Calls the SetUrl function for FCKEditor compatibility,
     // passes file path, dimensions, and alt text back to the

@@ -126,8 +126,9 @@
                 <button class="btn" data-bind="click: rename, visible: function () {$root.hasCapability('rename')}">Rename</button>
                 <button class="btn" data-bind="click: move, visible: function () {$root.hasCapability('move')}">Move</button>
                 <button class="btn" data-bind="click: removeMe, visible: function () {$root.hasCapability('move');}">Delete</button>
-                <button class="btn" data-bind="visible: function () {$root.hasCapability('replace')}">Replace</button>
-                <h1 title="/Scripts/filemanager/userfiles/computer_programmer.gif" class="h1 center-block">{{filename}}</h1>
+                <button class="btn" data-bind="click: replaceMe, visible: function () {$root.hasCapability('replace')}" id="replaceMe">Replace</button>
+                <form id="my-awesome-dropzone2" style="display: none;" class="dropzone"></form>
+                <h1 class="h1 center-block">{{filename}}</h1>
                 <!--<div id="tools"></div>-->
             </div>
             <dl>
@@ -144,7 +145,7 @@
     </script>
 
     <script type="text/html" id="image-template">
-        <img data-bind="attr: {src: getDownloadUrl, alt: getDownloadUrl}, visible: isImageFile" class="img-thumbnail center-block">
+        <img id="detailImage" data-bind="attr: {src: getDownloadUrl, alt: getDownloadUrl}, visible: isImageFile" class="img-thumbnail center-block">
     </script>
 
     <script type="text/html" id="video-player-template">

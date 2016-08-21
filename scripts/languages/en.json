@@ -70,7 +70,7 @@
     "prompt_foldername": "Enter the name of the new folder", 
     "quit_editor": "Quit editor",
     "rename": "Rename", 
-    "replace": "Replace file",
+    "replaceFile": "Replace file",
     "save": "Save",
     "search": "Search", 
     "search_reset": "Reset", 
@@ -87,5 +87,6 @@
     "support_fm": "Filemanager is a free software, please support !", 
     "upload": "Upload", 
     "version": "version",
-    "yes": "Yes"
+    "yes": "Yes",
+    "ok": "Ok"
 }

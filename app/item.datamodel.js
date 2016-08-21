@@ -236,5 +236,33 @@ define(function (require) {
             });//swal
         };//delete
 
+        self.replaceMe = function () {
+            $("#my-awesome-dropzone2").show();
+            $("#replaceMe").hide();
+            $("#my-awesome-dropzone2").dropzone({
+                url: self.config.options.fileConnector + "/replace",
+                params: {path: self.path()},
+                maxFiles: 1,
+                method: "put",
+                success: function (file, res) {
+                    if (res.error) {
+                        toastr.error(self.config.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
+                    } else {
+                        $("#my-awesome-dropzone2").hide();
+                        $("#replaceMe").show();
+                        $('#detailImage').attr('src', $('#detailImage').attr('src') + '?' + Math.random());
+
+                        toastr.success(self.config.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
+                    }
+                }
+            });
+
+            Dropzone.options.myAwesomeDropzone2.on("complete", function (file) {
+                myDropzone.removeFile(file);
+            });
+
+
+
+        };//replaceMe
     };//Item
 });//define

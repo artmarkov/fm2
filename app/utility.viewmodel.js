@@ -71,6 +71,14 @@ define(function (require) {
             return theme;
         };//loadIeFix
 
+        // return filename extension
+        self.getExtension = function (filename) {
+            if (filename.split(".").length === 1) {
+                return "";
+            }
+            return filename.split(".").pop().toLowerCase();
+        };
+
         // function to retrieve GET params
         self.urlParameters = function (name) {
             var results = new RegExp("[\\?&]" + name + "=([^&#]*)").exec(window.location.href);

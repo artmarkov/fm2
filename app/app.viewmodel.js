@@ -61,7 +61,7 @@ define(function (require) {
             if (self.currentView() === "uploads") {
                 $("#my-awesome-dropzone").dropzone({
                     url: config.options.fileConnector,
-                    params: {mode: "add",  currentPath: self.currentPath()}
+                    params: {path: self.currentPath()}
                 });
                 // $("#my-awesome-dropzone").on("sending", function(file, xhr, formData) {
                 //     // Will send the filesize along with the file as POST data.
