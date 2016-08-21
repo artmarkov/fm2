@@ -18,7 +18,26 @@ define(function (require) {
         item = item || {};
         item.properties = item.properties || {};
 
-        console.log("item config -> ", self.config);
+        // This is our context menu for each item, so simple :)
+        self.menu = ko.observableArray([{
+            text: "<span class='glyphicon glyphicon-download'></span>  Download",
+            action: function () {self.download(); }
+        }, {
+            text: "<span class=\'glyphicon glyphicon-random\'></span>  Rename",
+            action: function () {self.rename(); }
+        }, {
+            text: "<span class=\'glyphicon glyphicon-move\'></span>  Move",
+            action: function () {self.move(); }
+        }, {
+            text: "<span class='glyphicon glyphicon-trash'></span>  Delete",
+            action: function () {self.removeMe(); }
+        }, {
+            text: "<span class='glyphicon glyphicon-info-sign'></span>  Details",
+            action: function () {appVM.goToItem(self); }
+        }]);
+        //{ '<span class=\'glyphicon glyphicon-download\'></span>  Download': download, '<span class=\'glyphicon glyphicon-random\'></span>  Rename': rename, '<span class=\'glyphicon glyphicon-move\'></span>  Move': move }
+
+        // console.log("item config -> ", self.config);
 
         // Lets make the entire item into observables
         self.filename = ko.observable((item.filename));
@@ -237,9 +256,11 @@ define(function (require) {
         };//delete
 
         self.replaceMe = function () {
-            $("#my-awesome-dropzone2").show();
-            $("#replaceMe").hide();
-            $("#my-awesome-dropzone2").dropzone({
+            var dz = $("#my-replace-dropzone");
+            var button = $("#replaceMe");
+            dz.show();
+            button.hide();
+            dz.dropzone({
                 url: self.config.options.fileConnector + "/replace",
                 params: {path: self.path()},
                 maxFiles: 1,
@@ -248,9 +269,10 @@ define(function (require) {
                     if (res.error) {
                         toastr.error(self.config.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
                     } else {
-                        $("#my-awesome-dropzone2").hide();
-                        $("#replaceMe").show();
-                        $('#detailImage').attr('src', $('#detailImage').attr('src') + '?' + Math.random());
+                        dz.hide();
+                        button.show();
+                        var img = $('#detailImage');
+                        img.attr('src', img.attr('src') + '?' + Math.random());
 
                         toastr.success(self.config.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
                     }

@@ -151,14 +151,19 @@ define(function (require) {
 
         self.goLevelUp = function () {
             self.loading(true);
-            if (self.currentView() === "details") {
+            if (self.currentView() !== "grid" && self.currentView() !== "list") {
                 self.currentView(self.lastView());
                 self.loadCurrentFolder();
+                self.loading(false);
             } else {
                 var cpath = self.currentPath();
                 if (cpath !== config.options.fileRoot) {
                     self.currentPath(cpath.substring(0, cpath.slice(0, -1).lastIndexOf("/")) + "/");
                     self.loadCurrentFolder();
+                    self.loading(false);
+                } else {
+                    self.loadCurrentFolder();
+                    self.loading(false);
                 }
             }
         };

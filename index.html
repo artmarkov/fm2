@@ -88,7 +88,7 @@
 
     <script type="text/html" id="grid-template">
         <ul id="contents" class="grid" data-bind="foreach: {data: currentFolder, as: 'item'}">
-            <li class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.goToItem">
+            <li class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.goToItem, contextMenu: menu">
                 <div class="clip"><img width="64" data-bind="attr: {src: getIconUrl, alt: getIconUrl, dataPath: getIconUrl}"/>
                 </div>
                 <p data-bind="text: item.filename"></p>
@@ -107,7 +107,7 @@
             </tr>
             </thead>
             <tbody data-bind="foreach: {data: currentFolder, as: 'item'}">
-            <tr class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.goToItem">
+            <tr class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.goToItem, contextMenu: menu">
                 <td><span data-bind="css: item.isDirectory() ? 'glyphicon glyphicon-folder-close' : 'glyphicon glyphicon-file'">  {{item.filename}}</span> </td>
                 <td>{{item.properties().height}}x{{item.properties().width}}</td>
                 <td>{{item.properties().size}}</td>
@@ -127,7 +127,7 @@
                 <button class="btn" data-bind="click: move, visible: function () {$root.hasCapability('move')}">Move</button>
                 <button class="btn" data-bind="click: removeMe, visible: function () {$root.hasCapability('move');}">Delete</button>
                 <button class="btn" data-bind="click: replaceMe, visible: function () {$root.hasCapability('replace')}" id="replaceMe">Replace</button>
-                <form id="my-awesome-dropzone2" style="display: none;" class="dropzone"></form>
+                <form id="my-replace-dropzone" style="display: none;" class="dropzone"></form>
                 <h1 class="h1 center-block">{{filename}}</h1>
                 <!--<div id="tools"></div>-->
             </div>
