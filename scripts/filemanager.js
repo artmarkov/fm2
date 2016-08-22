@@ -119,7 +119,7 @@ require.config({
 define(function (require) {
     "use strict";
     require("css!styles/reset.css");
-    require("css!node_modules/knockout.contextmenu/dist/css/knockout.contextmenu.css")
+    require("css!node_modules/knockout.contextmenu/dist/css/knockout.contextmenu.css");
     require("css!node_modules/jquery.fancytree/dist/skin-lion/ui.fancytree.css");
     require("css!node_modules/jQuery-Impromptu/dist/jquery-impromptu.min");
     require("css!node_modules/jquery.splitter/css/jquery.splitter");
@@ -168,7 +168,7 @@ define(function (require) {
         fileConnector,
         fileRoot = appVM.config.options.fileRoot,
         baseUrl = window.location.protocol + "//" + window.location.host,
-        capabilities,
+        // capabilities,
         start,
         lg = appVM.language, //temporary until ko conversion done
         // fullexpandedFolder,
@@ -219,7 +219,7 @@ define(function (require) {
 
     // Read capabilities from config files if exists
     // else apply default settings
-    capabilities = config.options.capabilities || ["select", "download", "rename", "move", "delete", "replace"];
+    // capabilities = config.options.capabilities || ["select", "download", "rename", "move", "delete", "replace"];
 
     // Test if a given url exists
     function file_exists() {
@@ -297,47 +297,47 @@ define(function (require) {
 
     // preg_replace
     // Code from : http://xuxu.fr/2006/05/20/preg-replace-javascript/
-    function preg_replace(array_pattern, array_pattern_replace, str) {
-        var new_str = String(str),
-            reg_exp,
-            val_to_replace,
-            i;
-        for (i = 0; i < array_pattern.length; i++) {
-            reg_exp = new RegExp(array_pattern[i], "g");
-            val_to_replace = array_pattern_replace[i];
-            new_str = new_str.replace(reg_exp, val_to_replace);
-        }
-        return new_str;
-    }
+    // function preg_replace(array_pattern, array_pattern_replace, str) {
+    //     var new_str = String(str),
+    //         reg_exp,
+    //         val_to_replace,
+    //         i;
+    //     for (i = 0; i < array_pattern.length; i++) {
+    //         reg_exp = new RegExp(array_pattern[i], "g");
+    //         val_to_replace = array_pattern_replace[i];
+    //         new_str = new_str.replace(reg_exp, val_to_replace);
+    //     }
+    //     return new_str;
+    // }
 
     // cleanString (), on the same model as server side (connector)
     // cleanString
-    var cleanString = function (str) {
-        var cleaned,
-            p_search = ["Š", "š", "Đ", "đ", "Ž", "ž", "Č", "č", "Ć", "ć", "À",
-                "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï",
-                "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ő", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ", "ß",
-                "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í",
-                "î", "ï", "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ő", "ø", "ù", "ú", "û", "ü",
-                "ý", "ý", "þ", "ÿ", "Ŕ", "ŕ", " ", "'", "/"],
-            p_replace = ["S", "s", "Dj", "dj", "Z", "z", "C", "c", "C", "c", "A",
-                "A", "A", "A", "A", "A", "A", "C", "E", "E", "E", "E", "I", "I", "I", "I",
-                "N", "O", "O", "O", "O", "O", "O", "O", "U", "U", "U", "U", "Y", "B", "Ss",
-                "a", "a", "a", "a", "a", "a", "a", "c", "e", "e", "e", "e", "i", "i",
-                "i", "i", "o", "n", "o", "o", "o", "o", "o", "o", "o", "u", "u", "u", "u",
-                "y", "y", "b", "y", "R", "r", "_", "_", ""];
-
-        cleaned = preg_replace(p_search, p_replace, str);
-
-        // allow only latin alphabet
-        if (config.options.chars_only_latin) {
-            cleaned = cleaned.replace(/[^_a-zA-Z0-9]/g, "");
-        }
-
-        cleaned = cleaned.replace(/[_]+/g, "_");
-
-        return cleaned;
-    };
+    // var cleanString = function (str) {
+    //     var cleaned,
+    //         p_search = ["Š", "š", "Đ", "đ", "Ž", "ž", "Č", "č", "Ć", "ć", "À",
+    //             "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï",
+    //             "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ő", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ", "ß",
+    //             "à", "á", "â", "ã", "ä", "å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í",
+    //             "î", "ï", "ð", "ñ", "ò", "ó", "ô", "õ", "ö", "ő", "ø", "ù", "ú", "û", "ü",
+    //             "ý", "ý", "þ", "ÿ", "Ŕ", "ŕ", " ", "'", "/"],
+    //         p_replace = ["S", "s", "Dj", "dj", "Z", "z", "C", "c", "C", "c", "A",
+    //             "A", "A", "A", "A", "A", "A", "C", "E", "E", "E", "E", "I", "I", "I", "I",
+    //             "N", "O", "O", "O", "O", "O", "O", "O", "U", "U", "U", "U", "Y", "B", "Ss",
+    //             "a", "a", "a", "a", "a", "a", "a", "c", "e", "e", "e", "e", "i", "i",
+    //             "i", "i", "o", "n", "o", "o", "o", "o", "o", "o", "o", "u", "u", "u", "u",
+    //             "y", "y", "b", "y", "R", "r", "_", "_", ""];
+    //
+    //     cleaned = preg_replace(p_search, p_replace, str);
+    //
+    //     // allow only latin alphabet
+    //     if (config.options.chars_only_latin) {
+    //         cleaned = cleaned.replace(/[^_a-zA-Z0-9]/g, "");
+    //     }
+    //
+    //     cleaned = cleaned.replace(/[_]+/g, "_");
+    //
+    //     return cleaned;
+    // };
 
     // nameFormat (), separate filename from extension before calling cleanString()
     // nameFormat
@@ -371,26 +371,26 @@ define(function (require) {
 
     // Test if Data structure has the 'cap' capability
     // 'cap' is one of 'select', 'rename', 'delete', 'download', move
-    function has_capability(data, cap) {
-        if (data["File Type"] === "dir" && cap === "replace") {
-            return false;
-        }
-        if (data["File Type"] === "dir" && cap === "download") {
-            return config.security.allowFolderDownload === true;
-        }
-        if (data.Capabilities === undefined) {
-            return true;
-        }
-        return $.inArray(cap, data.Capabilities) > -1;
-    }
+    // function has_capability(data, cap) {
+    //     if (data["File Type"] === "dir" && cap === "replace") {
+    //         return false;
+    //     }
+    //     if (data["File Type"] === "dir" && cap === "download") {
+    //         return config.security.allowFolderDownload === true;
+    //     }
+    //     if (data.Capabilities === undefined) {
+    //         return true;
+    //     }
+    //     return $.inArray(cap, data.Capabilities) > -1;
+    // }
 
     // return filename extension
-    function getExtension(filename) {
-        if (filename.split(".").length === 1) {
-            return "";
-        }
-        return filename.split(".").pop().toLowerCase();
-    }
+    // function getExtension(filename) {
+    //     if (filename.split(".").length === 1) {
+    //         return "";
+    //     }
+    //     return filename.split(".").pop().toLowerCase();
+    // }
 
     // Test if file is authorized
     // function isAuthorizedFile(filename) {
@@ -1672,78 +1672,78 @@ define(function (require) {
 
     // Retrieve data (file/folder listing) for jqueryFileTree and pass the data back
     // to the callback function in jqueryFileTree
-    function populateFileTree(path, callback) {
-
-        //    url = fileConnector + "?path=" + encodeURIComponent(path)  + "&config=" + userconfig + "&mode=getfolder&showThumbs=" + config.options.showThumbs + "&time=" + d.getMilliseconds();
-        //if (_$.urlParameters("type")) {
-        //    url += "&type=" + _$.urlParameters("type");
-        //}
-
-        _$.apiGet({
-            mode: "getfolder",
-            path: encodeURIComponent(path.input || path),
-            success: function (data) {
-                //console.log("populateFileTree data -> ", data);
-                var result = "",
-                    extraclass,
-                    key,
-                    cap;
-                // Is there any error or user is unauthorized?
-                // if (data.Code === "-1") {
-                //     handleError(data.Error);
-                //     return;
-                // }
-
-                if (data) {
-                    var cap_classes = "";
-                    result += "<ul class=\"jqueryFileTree\" style=\"display: none;\">";
-                    for (key in data) {
-                        if (data.hasOwnProperty(key)) {
-                            for (cap in capabilities) {
-                                if (capabilities.hasOwnProperty(cap) && has_capability(data[key], capabilities[cap])) {
-                                    cap_classes += " cap_" + capabilities[cap];
-                                }
-                            }
-                            if (data[key]["File Type"] === "dir") {
-                                extraclass = data[key].Protected === 0
-                                    ? ""
-                                    : " directory-locked";
-                                result += "<li class=\"directory collapsed" +
-                                    extraclass +
-                                    "\"><a href=\"#\" class=\"" +
-                                    cap_classes +
-                                    "\" data-path=\"" +
-                                    data[key].Path +
-                                    "\">" +
-                                    data[key].Filename +
-                                    "</a></li>";
-                            } else {
-                                if (config.options.listFiles) {
-                                    extraclass = data[key].Protected === 0
-                                        ? ""
-                                        : " file-locked";
-                                    result += "<li class=\"file ext_" +
-                                        data[key]["File Type"].toLowerCase() +
-                                        extraclass +
-                                        "\"><a href=\"#\" class=\"" +
-                                        cap_classes +
-                                        "\" data-path=\"" +
-                                        data[key].Path +
-                                        "\">" +
-                                        data[key].Filename +
-                                        "</a></li>";
-                                }
-                            }
-                        }
-                    }
-                    result += "</ul>";
-                } else {
-                    result += "<h1>" + lg.could_not_retrieve_folder + "</h1>";
-                }
-                callback(result);
-            }
-        });
-    }
+    // function populateFileTree(path, callback) {
+    //
+    //     //    url = fileConnector + "?path=" + encodeURIComponent(path)  + "&config=" + userconfig + "&mode=getfolder&showThumbs=" + config.options.showThumbs + "&time=" + d.getMilliseconds();
+    //     //if (_$.urlParameters("type")) {
+    //     //    url += "&type=" + _$.urlParameters("type");
+    //     //}
+    //
+    //     _$.apiGet({
+    //         mode: "getfolder",
+    //         path: encodeURIComponent(path.input || path),
+    //         success: function (data) {
+    //             //console.log("populateFileTree data -> ", data);
+    //             var result = "",
+    //                 extraclass,
+    //                 key,
+    //                 cap;
+    //             // Is there any error or user is unauthorized?
+    //             // if (data.Code === "-1") {
+    //             //     handleError(data.Error);
+    //             //     return;
+    //             // }
+    //
+    //             if (data) {
+    //                 var cap_classes = "";
+    //                 result += "<ul class=\"jqueryFileTree\" style=\"display: none;\">";
+    //                 for (key in data) {
+    //                     if (data.hasOwnProperty(key)) {
+    //                         for (cap in capabilities) {
+    //                             if (capabilities.hasOwnProperty(cap) && has_capability(data[key], capabilities[cap])) {
+    //                                 cap_classes += " cap_" + capabilities[cap];
+    //                             }
+    //                         }
+    //                         if (data[key]["File Type"] === "dir") {
+    //                             extraclass = data[key].Protected === 0
+    //                                 ? ""
+    //                                 : " directory-locked";
+    //                             result += "<li class=\"directory collapsed" +
+    //                                 extraclass +
+    //                                 "\"><a href=\"#\" class=\"" +
+    //                                 cap_classes +
+    //                                 "\" data-path=\"" +
+    //                                 data[key].Path +
+    //                                 "\">" +
+    //                                 data[key].Filename +
+    //                                 "</a></li>";
+    //                         } else {
+    //                             if (config.options.listFiles) {
+    //                                 extraclass = data[key].Protected === 0
+    //                                     ? ""
+    //                                     : " file-locked";
+    //                                 result += "<li class=\"file ext_" +
+    //                                     data[key]["File Type"].toLowerCase() +
+    //                                     extraclass +
+    //                                     "\"><a href=\"#\" class=\"" +
+    //                                     cap_classes +
+    //                                     "\" data-path=\"" +
+    //                                     data[key].Path +
+    //                                     "\">" +
+    //                                     data[key].Filename +
+    //                                     "</a></li>";
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //                 result += "</ul>";
+    //             } else {
+    //                 result += "<h1>" + lg.could_not_retrieve_folder + "</h1>";
+    //             }
+    //             callback(result);
+    //         }
+    //     });
+    // }
 
 
     /*---------------------------------------------------------
@@ -1751,7 +1751,7 @@ define(function (require) {
      ---------------------------------------------------------*/
 
     $(function () {
-        var expandedFolder;
+        // var expandedFolder;
         //Dropzone;
 
         //$("#link-to-project").attr("href", config.url).attr("target", "_blank").attr("title", lg.support_fm + " [" + lg.version + " : " + config.version + "]");
@@ -1780,7 +1780,7 @@ define(function (require) {
         // }
 
 
-        $("#folder-info").html('<span id="items-counter"></span> ' + lg.items + " - " + lg.size + ' : <span id="items-size"></span> ' + lg.mb);
+        // $("#folder-info").html('<span id="items-counter"></span> ' + lg.items + " - " + lg.size + ' : <span id="items-size"></span> ' + lg.mb);
 
         // we finalize the FileManager UI initialization
         // with localized text if necessary
@@ -2072,12 +2072,12 @@ define(function (require) {
             // loadCSS("./scripts/custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css");
             // loadJS("./scripts/custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js");
 
-            var csTheme = config.customScrollbar.theme !== undefined
-                    ? config.customScrollbar.theme
-                    : "dark",
-                csButton = config.customScrollbar.button !== undefined
-                    ? config.customScrollbar.button
-                    : true;
+            // var csTheme = config.customScrollbar.theme !== undefined
+            //         ? config.customScrollbar.theme
+            //         : "dark",
+            //     csButton = config.customScrollbar.button !== undefined
+            //         ? config.customScrollbar.button
+            //         : true;
 
             // $(window).on("load", function () {
             //     $("#filetree").append("<div style='height:3000px'></div>"); // because if #filetree has height equal to 0, mCustomScrollbar is not applied
