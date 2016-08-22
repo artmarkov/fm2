@@ -25,7 +25,7 @@ define(function (require) {
 
         self._$.loadTheme();
         self._$.loadIeFix();
-        console.log($("#tree"));
+        // console.log($("#tree"));
 
         // Now we start our data processing
         self.currentPath = ko.observable(config.options.fileRoot);
@@ -39,7 +39,7 @@ define(function (require) {
                 return self.activeView();
             },
             write: function (value) {
-                if (self.activeView() === "grid" || self.activeView() === "list"){
+                if ((self.activeView() === "grid" || self.activeView() === "list") && value !== "grid" && value !== "list") {
                     self.lastView(self.activeView());
                 }
                 self.activeView(value);
@@ -87,6 +87,7 @@ define(function (require) {
             }
         };
 
+        // I think this needs to be broken out into 2 different functions, one for initialization, the other for reloading
         self.loadCurrentFolder = function (init) {
             var newItems = [],
                 newSize = 0,
@@ -96,9 +97,9 @@ define(function (require) {
                 path: encodeURIComponent(self.currentPath()),
                 success: function (data) {
                     $.each(data, function (i, d) {
-                        console.log("d -> ", d);
+                        //console.log("d -> ", d);
                         newSize += d.properties.size;
-                        newCount++
+                        newCount++;
                         newItems.push(new Item(self, d));
                     });
                     self.currentFolder(newItems);
@@ -124,19 +125,23 @@ define(function (require) {
                     } else {
                         // console.log("currentPath -> ", self.currentPath());
                         var node = $("#tree").fancytree("getTree").getNodeByKey(self.currentPath());
-                        if (!node.hasChildren()) {
-                            $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).addChildren(data);
-                        }
-                        $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setExpanded();
+                        //if (node.hasChildren()) {
+                        //     console.log("node -> ", node);
+                            node.removeChildren();
+                            node.render();
+                       // }
+                        $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).addChildren(data);
+                        //$("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setExpanded();
                     }
                     self.returnToFolderView();
+                    setTimeout(self._$.setDimensions, 100);
                     return data;
                 }
             });//apiGet
         };//loadCurrentFolder
 
         self.returnToFolderView = function () {
-            console.log("returnToFolderView currentView -> ", self.currentView(), " lastView -> ", self.lastView());
+            // console.log("returnToFolderView currentView -> ", self.currentView(), " lastView -> ", self.lastView());
             if (self.currentView !== "grid" && self.currentView() !== "list") {
                 self.currentView(self.lastView());
             }
@@ -200,9 +205,11 @@ define(function (require) {
 
         self.goToItem = function (data) {
             console.log("goToItem data -> ", data);
+            // we set no events on this one because we simply want to select it, not kick off the chain of activate events that normally
+            // happen when you physically click a node
+            $("#tree").fancytree("getTree").getNodeByKey(data.path()).setActive(true, {noEvents: true});
             self.currentItem(data);
             self.currentView("details");
-            $("#tree").fancytree("getTree").getNodeByKey(data.path()).setActive();
         };
 
         self.goLevelUp = function () {
@@ -228,7 +235,7 @@ define(function (require) {
             }
         };
 
-        self.hasCapability = function (capability) {
+        self.hasCapability = ko.pureComputed(function (capability) {
             if (self.config) {
                 if (capability === "select" && (self._$.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self._$.urlParameters("field_name"))) {
                     return true;
@@ -236,7 +243,7 @@ define(function (require) {
                 return ($.inArray(capability, self.config.options.capabilities) !== -1 && capability !== "select");
             }
             return false;
-        };//hasCapability
+        });//hasCapability
 
         self.switchViews = function () {
             console.log("switchViews start -> ", self.currentView());

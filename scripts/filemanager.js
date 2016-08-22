@@ -110,24 +110,24 @@ require.config({
         }
     },
     map: {
-        '*': {
-            "css": 'node_modules/require-css/css'
+        "*": {
+            "css": "node_modules/require-css/css"
         }
     }
 });
 
 define(function (require) {
     "use strict";
-    require("css!styles/reset.css");
+    // require("css!styles/reset.css");
     require("css!node_modules/knockout.contextmenu/dist/css/knockout.contextmenu.css");
     require("css!node_modules/jquery.fancytree/dist/skin-lion/ui.fancytree.css");
     require("css!node_modules/jQuery-Impromptu/dist/jquery-impromptu.min");
-    require("css!node_modules/jquery.splitter/css/jquery.splitter");
-    require("css!scripts/jquery.contextmenu/jquery.contextMenu-1.01");
+    require("css!node_modules/jquery.splitter/css/jquery.splitter.css");
+    // require("css!scripts/jquery.contextmenu/jquery.contextMenu-1.01");
     // require("css!scripts/dropzone/downloads/css/dropzone.css");
     require("css!node_modules/dropzone/dist/dropzone.css");
     require("css!node_modules/toastr/build/toastr.css");
-    require("css!node_modules/bootstrap/dist/css/bootstrap");
+    require("css!node_modules/bootstrap/dist/css/bootstrap.css");
     require("css!node_modules/sweetalert/dist/sweetalert.css");
     require("css!node_modules/jqueryfiletree/dist/jQueryFileTree.min.css");
 
@@ -1784,20 +1784,20 @@ define(function (require) {
 
         // we finalize the FileManager UI initialization
         // with localized text if necessary
-        if (config.options.autoload === true) {
-            var itemOptions = $('#itemOptions');
-            $("#upload").append(lg.upload);
-            $("#newfolder").append(lg.new_folder);
-            // $("#grid").attr("title", lg.grid_view);
-            // $("#list").attr("title", lg.list_view);
-            $fileinfo.find("h1").append(lg.select_from_left);
-            itemOptions.find('a[href$="#select"]').append(lg.select);
-            itemOptions.find('a[href$="#download"]').append(lg.download);
-            itemOptions.find('a[href$="#rename"]').append(lg.rename);
-            itemOptions.find('a[href$="#move"]').append(lg.move);
-            itemOptions.find('a[href$="#replace"]').append(lg.replace);
-            itemOptions.find('a[href$="#delete"]').append(lg.del);
-        }
+        // if (config.options.autoload === true) {
+        //     var itemOptions = $('#itemOptions');
+        //     $("#upload").append(lg.upload);
+        //     $("#newfolder").append(lg.new_folder);
+        //     // $("#grid").attr("title", lg.grid_view);
+        //     // $("#list").attr("title", lg.list_view);
+        //     $fileinfo.find("h1").append(lg.select_from_left);
+        //     itemOptions.find('a[href$="#select"]').append(lg.select);
+        //     itemOptions.find('a[href$="#download"]').append(lg.download);
+        //     itemOptions.find('a[href$="#rename"]').append(lg.rename);
+        //     itemOptions.find('a[href$="#move"]').append(lg.move);
+        //     itemOptions.find('a[href$="#replace"]').append(lg.replace);
+        //     itemOptions.find('a[href$="#delete"]').append(lg.del);
+        // }
 
         /** Adding a close button triggering callback function if CKEditorCleanUpFuncNum passed */
         if (_$.urlParameters("CKEditorCleanUpFuncNum")) {

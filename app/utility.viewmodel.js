@@ -136,5 +136,19 @@ define(function (require) {
 
             $.ajax(ajaxOptions);
         };//apiGet
+
+        self.setDimensions = function () {
+            var bheight = 53,
+                $uploader = $("#uploader");
+
+            if (self.urlParameters("CKEditorCleanUpFuncNum")) {
+                bheight += 60;
+            }
+
+            var newH = $(window).height() - $uploader.height() - $uploader.offset().top - bheight;
+            $("#splitter, #filetree, #fileinfo, .vsplitbar").height(newH);
+            var newW = $("#splitter").width() - $("div.vsplitbar").width() - $("#filetree").width();
+            $("#fileinfo").width(newW);
+        };
     };//function
 });//define
