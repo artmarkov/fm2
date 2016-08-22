@@ -12,6 +12,7 @@ define(function (require) {
     var Item = require("app/item.datamodel");
     var swal = require("sweetalert");
     var toastr = require("toastr");
+    require("jqueryfancytree");
 
     return function () {
         var self = this;
@@ -23,6 +24,7 @@ define(function (require) {
 
         self._$.loadTheme();
         self._$.loadIeFix();
+        console.log($("#tree"));
 
         // Now we start our data processing
         self.currentPath = ko.observable(config.options.fileRoot);
@@ -80,7 +82,7 @@ define(function (require) {
             }
         };
 
-        self.loadCurrentFolder = function () {
+        self.loadCurrentFolder = function (init) {
             var newItems = [];
             self._$.apiGet({
                 mode: "getfolder",
@@ -91,6 +93,26 @@ define(function (require) {
                     });
                     self.currentFolder(newItems);
                     self.loading(false);
+                    if (init) {
+                        $("#tree").fancytree({
+                            "focusOnSelect": true,
+                            source: [{title: config.options.fileRoot, children: data, key: config.options.fileRoot, folder: true, expanded: true}],
+                            activate: function (event, data) {
+                                console.log("node key ", data.node);
+                                self.currentPath(data.node.key);
+                                self.loadCurrentFolder();
+                            }
+                        });
+                        $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
+                    } else {
+                        console.log("currentPath -> ", self.currentPath());
+                        var node = $("#tree").fancytree("getTree").getNodeByKey(self.currentPath());
+                        if (!node.hasChildren()) {
+                            $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).addChildren(data);
+                        }
+                        $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setExpanded();
+                    }
+                    return data;
                 }
             });//apiGet
         };//loadCurrentFolder
@@ -127,6 +149,7 @@ define(function (require) {
         };//createFolder
 
         self.goHome = function () {
+            $("#tree").fancytree("getTree").getNodeByKey(config.options.fileRoot).setActive();
             self.currentPath(config.options.fileRoot);
             if (self.currentView() !== "grid" && self.currentView() !== "list") {
                 self.currentView(self.lastView());
@@ -140,6 +163,7 @@ define(function (require) {
 
         self.browseToItem = function (data) {
             console.log("browseToItem data -> ", data);
+            $("#tree").fancytree("getTree").getNodeByKey(data.path()).setActive();
             if (data.isDirectory()) {
                 self.currentPath(data.path());
                 self.loadCurrentFolder();
@@ -153,6 +177,7 @@ define(function (require) {
             console.log("goToItem data -> ", data);
             self.currentItem(data);
             self.currentView("details");
+            $("#tree").fancytree("getTree").getNodeByKey(data.path()).setActive();
         };
 
         self.goLevelUp = function () {
@@ -160,15 +185,19 @@ define(function (require) {
             if (self.currentView() !== "grid" && self.currentView() !== "list") {
                 self.currentView(self.lastView());
                 self.loadCurrentFolder();
+                $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
                 self.loading(false);
             } else {
                 var cpath = self.currentPath();
                 if (cpath !== config.options.fileRoot) {
-                    self.currentPath(cpath.substring(0, cpath.slice(0, -1).lastIndexOf("/")) + "/");
+                    var newPath = cpath.substring(0, cpath.slice(0, -1).lastIndexOf("/"));
+                    self.currentPath(newPath === "" ? "/" : newPath);
                     self.loadCurrentFolder();
+                    $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
                     self.loading(false);
                 } else {
                     self.loadCurrentFolder();
+                    $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
                     self.loading(false);
                 }
             }
@@ -207,6 +236,6 @@ define(function (require) {
         });
 
         // console.log("app.viewmodel version -> ", self.config);
-        self.loadCurrentFolder();
+        self.loadCurrentFolder(true);
     };
 });

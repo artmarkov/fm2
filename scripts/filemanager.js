@@ -77,10 +77,11 @@ require.config({
         "filesize": "node_modules/filesize/lib/filesize",
         "jquery": "node_modules/jquery/dist/jquery",
         "jqueryContextMenu": "scripts/jquery.contextmenu/jquery.contextMenu-1.01",
-        "jqueryFileTree": "scripts/jquery.filetree/jqueryFileTree",
+        "jqueryfancytree": "node_modules/jquery.fancytree/dist/jquery.fancytree",
         "jqueryImpromptu": "node_modules/jQuery-Impromptu/dist/jquery-impromptu",
         "jquerySplitter": "node_modules/jquery.splitter/js/jquery.splitter",
         "jqueryMCustomScrollbar": "node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar",
+        "jquery.ui": "node_modules/jquery-ui-dist/jquery-ui",
         "knockout": "node_modules/knockout/build/output/knockout-latest.debug",
         "knockout.contextmenu": "node_modules/knockout.contextmenu/dist/js/knockout.contextmenu",
         "knockoutPunches": "node_modules/knockout-punches/knockout.punches",
@@ -96,10 +97,11 @@ require.config({
             exports: "$"
         },
         "jqueryContextMenu": ["jquery"],
-        "jqueryFileTree": ["jquery"],
+        "jqueryfancytree": ["jquery", "jquery.ui"],
         "jqueryImpromptu": ["jquery"],
         "jquerySplitter": ["jquery"],
         "jqueryMCustomScrollbar": ["jquery"],
+        "jquery.ui": ["jquery"],
         "knockout.contextmenu": ["knockout"],
         "knockoutPunches": ["knockout"],
         "livesearch": ["jquery"],
@@ -118,7 +120,7 @@ define(function (require) {
     "use strict";
     require("css!styles/reset.css");
     require("css!node_modules/knockout.contextmenu/dist/css/knockout.contextmenu.css")
-    require("css!node_modules/jqueryfiletree/dist/jQueryFileTree.min");
+    require("css!node_modules/jquery.fancytree/dist/skin-lion/ui.fancytree.css");
     require("css!node_modules/jQuery-Impromptu/dist/jquery-impromptu.min");
     require("css!node_modules/jquery.splitter/css/jquery.splitter");
     require("css!scripts/jquery.contextmenu/jquery.contextMenu-1.01");
@@ -126,14 +128,16 @@ define(function (require) {
     require("css!node_modules/dropzone/dist/dropzone.css");
     require("css!node_modules/toastr/build/toastr.css");
     require("css!node_modules/bootstrap/dist/css/bootstrap");
-    require("css!node_modules/sweetalert/dist/sweetalert.css")
+    require("css!node_modules/sweetalert/dist/sweetalert.css");
+    require("css!node_modules/jqueryfiletree/dist/jQueryFileTree.min.css");
 
 
     //load jquery and related
     require("jquery"); //updated to 3.0
+    require("jquery.ui");
     require("jqueryContextMenu"); //replace with ?
     require("jqueryImpromptu"); //replace with sweetalerts
-    require("jqueryFileTree"); //replace with fancyTree
+    require("jqueryfancytree"); //replace with fancyTree
     require("jquerySplitter"); // Seems to be working well
     require("jqueryMCustomScrollbar"); //currently disabled
 
