@@ -66,7 +66,9 @@
 </form>
     <a data-bind="attr: {href: config.url}" id="link-to-project"></a>
     <p data-bind="text: 'v:' + config.version" style="float: right; margin: 1em"></p>
-    <div id="folder-info"></div>
+    <div id="folder-info">
+        <span id="items-counter">{{folderCount}}</span> {{language.items}} - {{language.size}} : <span id="items-size">{{folderSize}}</span>
+    </div>
 
 </div>
 
@@ -161,7 +163,7 @@
     </script>
 
     <script type="text/html" id="pdf-viewer-template">
-        <iframe id='fm-pdf-viewer' data-bind="attr: {src: 'scripts/ViewerJS/index.html#' + getDownloadUrl(), width: config.pdfs.pdfsReaderWidth
+        <iframe id='fm-pdf-viewer' data-bind="attr: {src: 'scripts/ViewerJS/index.html#' + getDownloadUrl(), width: config.pdfs.pdfsReaderWidth,
             height: config.pdfs.pdfsReaderHeight}"
             allowfullscreen webkitallowfullscreen></iframe>
     </script>

@@ -11,6 +11,7 @@ define(function (require) {
     var Utility = require("app/utility.viewmodel");
     var Item = require("app/item.datamodel");
     var swal = require("sweetalert");
+    var filesize = require("filesize");
     var toastr = require("toastr");
     require("jqueryfancytree");
 
@@ -29,6 +30,8 @@ define(function (require) {
         // Now we start our data processing
         self.currentPath = ko.observable(config.options.fileRoot);
         self.currentFolder = ko.observableArray([]);
+        self.folderSize = ko.observable(0);
+        self.folderCount = ko.observable(0);
         self.lastView = ko.observable(config.options.defaultViewMode);
         self.activeView = ko.observable(config.options.defaultViewMode);
         self.currentView = ko.pureComputed({
@@ -85,15 +88,22 @@ define(function (require) {
         };
 
         self.loadCurrentFolder = function (init) {
-            var newItems = [];
+            var newItems = [],
+                newSize = 0,
+                newCount = 0;
             self._$.apiGet({
                 mode: "getfolder",
                 path: encodeURIComponent(self.currentPath()),
                 success: function (data) {
                     $.each(data, function (i, d) {
+                        console.log("d -> ", d);
+                        newSize += d.properties.size;
+                        newCount++
                         newItems.push(new Item(self, d));
                     });
                     self.currentFolder(newItems);
+                    self.folderCount(newCount);
+                    self.folderSize(filesize(parseInt(newSize || 0, 10)));
                     self.loading(false);
                     if (init) {
                         $("#tree").fancytree({
@@ -127,7 +137,7 @@ define(function (require) {
 
         self.returnToFolderView = function () {
             console.log("returnToFolderView currentView -> ", self.currentView(), " lastView -> ", self.lastView());
-            if (self.currentView !== "grid" && self.currentView() !== "list"){
+            if (self.currentView !== "grid" && self.currentView() !== "list") {
                 self.currentView(self.lastView());
             }
         };
