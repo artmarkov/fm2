@@ -36,7 +36,9 @@ define(function (require) {
                 return self.activeView();
             },
             write: function (value) {
-                self.lastView(self.activeView());
+                if (self.activeView() === "grid" || self.activeView() === "list"){
+                    self.lastView(self.activeView());
+                }
                 self.activeView(value);
             },
             owner: self
@@ -98,24 +100,37 @@ define(function (require) {
                             "focusOnSelect": true,
                             source: [{title: config.options.fileRoot, children: data, key: config.options.fileRoot, folder: true, expanded: true}],
                             activate: function (event, data) {
-                                console.log("node key ", data.node);
-                                self.currentPath(data.node.key);
-                                self.loadCurrentFolder();
+                                // console.log("node key ", data.node);
+                                if (data.node.folder === true) {
+                                    self.currentPath(data.node.key);
+                                    self.loadCurrentFolder();
+                                } else {
+                                    self.currentItem(new Item(self, data.node.data));
+                                    self.currentView("details");
+                                }
                             }
                         });
                         $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
                     } else {
-                        console.log("currentPath -> ", self.currentPath());
+                        // console.log("currentPath -> ", self.currentPath());
                         var node = $("#tree").fancytree("getTree").getNodeByKey(self.currentPath());
                         if (!node.hasChildren()) {
                             $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).addChildren(data);
                         }
                         $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setExpanded();
                     }
+                    self.returnToFolderView();
                     return data;
                 }
             });//apiGet
         };//loadCurrentFolder
+
+        self.returnToFolderView = function () {
+            console.log("returnToFolderView currentView -> ", self.currentView(), " lastView -> ", self.lastView());
+            if (self.currentView !== "grid" && self.currentView() !== "list"){
+                self.currentView(self.lastView());
+            }
+        };
 
         self.createFolder = function () {
             swal({
@@ -208,7 +223,7 @@ define(function (require) {
                 if (capability === "select" && (self._$.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self._$.urlParameters("field_name"))) {
                     return true;
                 }
-                return $.inArray(capability, self.config.options.capabilities) !== -1 && capability !== "select";
+                return ($.inArray(capability, self.config.options.capabilities) !== -1 && capability !== "select");
             }
             return false;
         };//hasCapability
