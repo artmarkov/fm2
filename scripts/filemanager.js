@@ -119,13 +119,11 @@ define(function (require) {
     require("css!node_modules/knockout.contextmenu/dist/css/knockout.contextmenu.css");
     require("css!node_modules/jquery.fancytree/dist/skin-lion/ui.fancytree.css");
     require("css!node_modules/jquery.splitter/css/jquery.splitter.css");
-    // require("css!scripts/jquery.contextmenu/jquery.contextMenu-1.01");
-    // require("css!scripts/dropzone/downloads/css/dropzone.css");
     require("css!node_modules/dropzone/dist/dropzone.css");
     require("css!node_modules/toastr/build/toastr.css");
     require("css!node_modules/bootstrap/dist/css/bootstrap.css");
     require("css!node_modules/sweetalert/dist/sweetalert.css");
-    require("css!node_modules/jqueryfiletree/dist/jQueryFileTree.min.css");
+    require("css!node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css")
     // Load theme last so nothing overwrites our colors :)
     require("css!styles/fm2.css");
 
@@ -133,7 +131,6 @@ define(function (require) {
     //load jquery and related
     require("jquery"); //updated to 3.0
     require("jquery.ui");
-    require("jqueryContextMenu"); //replace with ?
     require("jqueryfancytree"); //replace with fancyTree
     require("jquerySplitter"); // Seems to be working well
     require("jqueryMCustomScrollbar"); //currently disabled
@@ -281,13 +278,13 @@ define(function (require) {
 
     $(function () {
 
-        if (_$.urlParameters("exclusiveFolder") !== 0) {
-            fileRoot += _$.urlParameters("exclusiveFolder");
-            if (fileRoot.charAt(fileRoot.length - 1) !== "/") {
-                fileRoot += "/";
-            } // add last '/' if needed
-            fileRoot = fileRoot.replace(/\/\//g, "\/");
-        }
+        // if (_$.urlParameters("exclusiveFolder") !== 0) {
+        //     fileRoot += _$.urlParameters("exclusiveFolder");
+        //     if (fileRoot.charAt(fileRoot.length - 1) !== "/") {
+        //         fileRoot += "/";
+        //     } // add last '/' if needed
+        //     fileRoot = fileRoot.replace(/\/\//g, "\/");
+        // }
 
 
 
@@ -301,21 +298,18 @@ define(function (require) {
         }
 
 
-        // Disable select function if no window.opener
-        if (!(window.opener || window.tinyMCEPopup || _$.urlParameters("field_name"))) {
-            $("#itemOptions").find("a[href$='#select']").remove();
-        }
+
         // Keep only browseOnly features if needed
-        if (config.options.browseOnly === true) {
-            $("#file-input-container").remove();
-            $("#upload").remove();
-            $("#newfolder").remove();
-            $("#toolbar").remove("#rename");
-            $(".contextMenu .rename").remove();
-            $(".contextMenu .move").remove();
-            $(".contextMenu .replace").remove();
-            $(".contextMenu .delete").remove();
-        }
+        // if (config.options.browseOnly === true) {
+        //     $("#file-input-container").remove();
+        //     $("#upload").remove();
+        //     $("#newfolder").remove();
+        //     $("#toolbar").remove("#rename");
+        //     $(".contextMenu .rename").remove();
+        //     $(".contextMenu .move").remove();
+        //     $(".contextMenu .replace").remove();
+        //     $(".contextMenu .delete").remove();
+        // }
 
         // Adjust layout.
         // setDimensions();
