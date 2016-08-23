@@ -5,7 +5,7 @@
     "culture": "en",
     "lang": "nodejs",
     "fileConnector": "http://localhost:3000/filemanager",
-    "theme": "flat-turquoise",
+    "theme": "flat-dark",
     "defaultViewMode": "grid",
     "localizeGUI": true,
     "showFullPath": false,
