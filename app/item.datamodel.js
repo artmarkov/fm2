@@ -1,4 +1,4 @@
-/*global define*/
+/*global define, window*/
 /**
  * Created by Joshua.Austill on 8/19/2016.
  */
@@ -282,5 +282,81 @@ define(function (require) {
                 }
             });
         };//replaceMe
+
+        // Calls the SetUrl function for FCKEditor compatibility,
+        // passes file path, dimensions, and alt text back to the
+        // opening window. Triggered by clicking the "Select"
+        // button in detail views or choosing the "Select"
+        // contextual menu option in list views.
+        // NOTE: closes the window when finished.
+        self.selectMe = function () {
+            var url;
+            // if (self.config.options.baseUrl !== false) {
+            //     url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
+            // } else {
+                url = self.config.options.fileConnector
+                    + "?mode=download"
+                    + "&path=" + self.path();
+            // }
+
+            if (window.opener || window.tinyMCEPopup || self._$.urlParameters("field_name") || self._$.urlParameters("CKEditorCleanUpFuncNum") || self._$.urlParameters("CKEditor")) {
+                if (window.tinyMCEPopup) {
+                    // use TinyMCE > 3.0 integration method
+                    var win = window.tinyMCEPopup.getWindowArg("window");
+                    win.document.getElementById(window.tinyMCEPopup.getWindowArg("input")).value = url;
+                    if (win.ImageDialog !== undefined) {
+                        // Update image dimensions
+                        if (win.ImageDialog.getImageData) {
+                            win.ImageDialog.getImageData();
+                        }
+
+                        // Preview if necessary
+                        if (win.ImageDialog.showPreviewImage) {
+                            win.ImageDialog.showPreviewImage(url);
+                        }
+                    }
+                    window.tinyMCEPopup.close();
+                    return;
+                }
+                // tinymce 4 and colorbox
+                if (self._$.urlParameters("field_name")) {
+                    window.parent.document.getElementById(self._$.urlParameters("field_name")).value = url;
+
+                    if (window.parent.tinyMCE !== undefined) {
+                        window.parent.tinyMCE.activeEditor.windowManager.close();
+                    }
+                    if (window.parent.$.fn.colorbox !== undefined) {
+                        window.parent.$.fn.colorbox.close();
+                    }
+                } else if (self._$.urlParameters("CKEditor")) {
+                    // use CKEditor 3.0 + integration method
+                    if (window.opener) {
+                        // Popup
+                        window.opener.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorFuncNum"), url);
+                    } else {
+                        // Modal (in iframe)
+                        window.parent.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorFuncNum"), url);
+                        window.parent.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorCleanUpFuncNum"));
+                    }
+                } else {
+                    // use FCKEditor 2.0 integration method
+                    if (data.Properties.Width !== "") {
+                        var p = url;
+                        var w = data.Properties.Width;
+                        var h = data.Properties.Height;
+                        window.opener.SetUrl(p, w, h);
+                    } else {
+                        window.opener.SetUrl(url);
+                    }
+                }
+
+                if (window.opener) {
+                    window.close();
+                }
+            } else {
+                toastr.error(self.config.language.error, self.config.language.fck_select_integration, {"positionClass": "toast-bottom-right"});
+            }
+        };//selectMe
+
     };//Item
 });//define

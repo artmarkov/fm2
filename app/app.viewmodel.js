@@ -235,7 +235,11 @@ define(function (require) {
             }
         };
 
-        self.hasCapability = ko.pureComputed(function (capability) {
+        self.hasCapability = function (capability) {
+            // console.log("hasCapability -> ", capability);
+            // if (capability === "select") {
+            //     console.log("hasCapability: urlParameters('CKEditor') -> ", self._$.urlParameters("CKEditor"), " window.opener -> ", window.opener, " window.tinyMCEPopu -> ", window.tinyMCEPopup, " urlParameters('field_name') -> ", self._$.urlParameters("field_name"));
+            // }
             if (self.config) {
                 if (capability === "select" && (self._$.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self._$.urlParameters("field_name"))) {
                     return true;
@@ -243,7 +247,7 @@ define(function (require) {
                 return ($.inArray(capability, self.config.options.capabilities) !== -1 && capability !== "select");
             }
             return false;
-        });//hasCapability
+        };//hasCapability
 
         self.switchViews = function () {
             console.log("switchViews start -> ", self.currentView());

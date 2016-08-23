@@ -48,7 +48,7 @@
     "dz_dictMaxFilesExceeded": "Only %s simultaneous uploads are allowed.",
     "dz_dictInvalidFileType": "You can't upload files of this type.",
     "edit": "Edit file", 
-    "fck_select_integration": "The 'Select' function is only used for integration with FCKEditor.", 
+    "fck_select_integration": "The 'Select' function is only used for integration with FCKEditor/TinyMCE/Etc.",
     "file_size_limit": "The file size limit (per file) is ", 
     "file_too_big": "The file is too big.", 
     "gb": "gb", 
@@ -88,5 +88,6 @@
     "upload": "Upload", 
     "version": "version",
     "yes": "Yes",
-    "ok": "Ok"
+    "ok": "Ok",
+    "error": "Error!"
 }

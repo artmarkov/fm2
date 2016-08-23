@@ -125,12 +125,12 @@
         <div class="text-center" data-bind="with: currentItem">
             <div data-bind="template: {name: templateName}"></div>
             <div>
-                <button class="btn" data-bind="visible: function () {!$root.hasCapability('select');} === true">Select</button>
-                <button class="btn" data-bind="click: download, visible: function () {$root.hasCapability('download')}">Download</button>
-                <button class="btn" data-bind="click: rename, visible: function () {$root.hasCapability('rename')}">Rename</button>
-                <button class="btn" data-bind="click: move, visible: function () {$root.hasCapability('move')}">Move</button>
-                <button class="btn" data-bind="click: removeMe, visible: function () {$root.hasCapability('move');}">Delete</button>
-                <button class="btn" data-bind="click: replaceMe, visible: function () {$root.hasCapability('replace')}" id="replaceMe">Replace</button>
+                <button class="btn" data-bind="click: selectMe, visible: $root.hasCapability('select')">Select</button>
+                <button class="btn" data-bind="click: download, visible: $root.hasCapability('download')">Download</button>
+                <button class="btn" data-bind="click: rename, visible: $root.hasCapability('rename')">Rename</button>
+                <button class="btn" data-bind="click: move, visible: $root.hasCapability('move')">Move</button>
+                <button class="btn" data-bind="click: removeMe, visible: $root.hasCapability('move')">Delete</button>
+                <button class="btn" data-bind="click: replaceMe, visible: $root.hasCapability('replace')" id="replaceMe">Replace</button>
                 <form id="my-replace-dropzone" style="display: none;" class="dropzone"></form>
                 <h1 class="h1">{{filename}}</h1>
                 <!--<div id="tools"></div>-->

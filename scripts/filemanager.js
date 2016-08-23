@@ -784,80 +784,80 @@ define(function (require) {
     //     return isDeleted;
     // }
 
-    // Calls the SetUrl function for FCKEditor compatibility,
-    // passes file path, dimensions, and alt text back to the
-    // opening window. Triggered by clicking the "Select"
-    // button in detail views or choosing the "Select"
-    // contextual menu option in list views.
-    // NOTE: closes the window when finished.
-    function selectItem(data) {
-        var url;
-        if (config.options.baseUrl !== false) {
-            url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
-        } else {
-            url = fileConnector
-                + "?mode=download"
-                + "&path=" + data.Path;
-        }
-
-        if (window.opener || window.tinyMCEPopup || _$.urlParameters("field_name") || _$.urlParameters("CKEditorCleanUpFuncNum") || _$.urlParameters("CKEditor")) {
-            if (window.tinyMCEPopup) {
-                // use TinyMCE > 3.0 integration method
-                var win = window.tinyMCEPopup.getWindowArg("window");
-                win.document.getElementById(window.tinyMCEPopup.getWindowArg("input")).value = url;
-                if (win.ImageDialog !== undefined) {
-                    // Update image dimensions
-                    if (win.ImageDialog.getImageData) {
-                        win.ImageDialog.getImageData();
-                    }
-
-                    // Preview if necessary
-                    if (win.ImageDialog.showPreviewImage) {
-                        win.ImageDialog.showPreviewImage(url);
-                    }
-                }
-                window.tinyMCEPopup.close();
-                return;
-            }
-            // tinymce 4 and colorbox
-            if (_$.urlParameters("field_name")) {
-                parent.document.getElementById(_$.urlParameters("field_name")).value = url;
-
-                if (parent.tinyMCE !== undefined) {
-                    parent.tinyMCE.activeEditor.windowManager.close();
-                }
-                if (parent.$.fn.colorbox !== undefined) {
-                    parent.$.fn.colorbox.close();
-                }
-            } else if (_$.urlParameters("CKEditor")) {
-                // use CKEditor 3.0 + integration method
-                if (window.opener) {
-                    // Popup
-                    window.opener.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorFuncNum"), url);
-                } else {
-                    // Modal (in iframe)
-                    parent.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorFuncNum"), url);
-                    parent.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorCleanUpFuncNum"));
-                }
-            } else {
-                // use FCKEditor 2.0 integration method
-                if (data.Properties.Width !== "") {
-                    var p = url;
-                    var w = data.Properties.Width;
-                    var h = data.Properties.Height;
-                    window.opener.SetUrl(p, w, h);
-                } else {
-                    window.opener.SetUrl(url);
-                }
-            }
-
-            if (window.opener) {
-                window.close();
-            }
-        } else {
-            $.prompt(lg.fck_select_integration);
-        }
-    }//selectItem
+    // // Calls the SetUrl function for FCKEditor compatibility,
+    // // passes file path, dimensions, and alt text back to the
+    // // opening window. Triggered by clicking the "Select"
+    // // button in detail views or choosing the "Select"
+    // // contextual menu option in list views.
+    // // NOTE: closes the window when finished.
+    // function selectItem(data) {
+    //     var url;
+    //     if (config.options.baseUrl !== false) {
+    //         url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
+    //     } else {
+    //         url = fileConnector
+    //             + "?mode=download"
+    //             + "&path=" + data.Path;
+    //     }
+    //
+    //     if (window.opener || window.tinyMCEPopup || _$.urlParameters("field_name") || _$.urlParameters("CKEditorCleanUpFuncNum") || _$.urlParameters("CKEditor")) {
+    //         if (window.tinyMCEPopup) {
+    //             // use TinyMCE > 3.0 integration method
+    //             var win = window.tinyMCEPopup.getWindowArg("window");
+    //             win.document.getElementById(window.tinyMCEPopup.getWindowArg("input")).value = url;
+    //             if (win.ImageDialog !== undefined) {
+    //                 // Update image dimensions
+    //                 if (win.ImageDialog.getImageData) {
+    //                     win.ImageDialog.getImageData();
+    //                 }
+    //
+    //                 // Preview if necessary
+    //                 if (win.ImageDialog.showPreviewImage) {
+    //                     win.ImageDialog.showPreviewImage(url);
+    //                 }
+    //             }
+    //             window.tinyMCEPopup.close();
+    //             return;
+    //         }
+    //         // tinymce 4 and colorbox
+    //         if (_$.urlParameters("field_name")) {
+    //             parent.document.getElementById(_$.urlParameters("field_name")).value = url;
+    //
+    //             if (parent.tinyMCE !== undefined) {
+    //                 parent.tinyMCE.activeEditor.windowManager.close();
+    //             }
+    //             if (parent.$.fn.colorbox !== undefined) {
+    //                 parent.$.fn.colorbox.close();
+    //             }
+    //         } else if (_$.urlParameters("CKEditor")) {
+    //             // use CKEditor 3.0 + integration method
+    //             if (window.opener) {
+    //                 // Popup
+    //                 window.opener.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorFuncNum"), url);
+    //             } else {
+    //                 // Modal (in iframe)
+    //                 parent.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorFuncNum"), url);
+    //                 parent.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorCleanUpFuncNum"));
+    //             }
+    //         } else {
+    //             // use FCKEditor 2.0 integration method
+    //             if (data.Properties.Width !== "") {
+    //                 var p = url;
+    //                 var w = data.Properties.Width;
+    //                 var h = data.Properties.Height;
+    //                 window.opener.SetUrl(p, w, h);
+    //             } else {
+    //                 window.opener.SetUrl(url);
+    //             }
+    //         }
+    //
+    //         if (window.opener) {
+    //             window.close();
+    //         }
+    //     } else {
+    //         $.prompt(lg.fck_select_integration);
+    //     }
+    // }//selectItem
 
     // Renames the current item and returns the new name.
     // Called by clicking the "Rename" button in detail views
