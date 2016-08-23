@@ -24,8 +24,6 @@ define(function (require) {
         self.config.language = self.language;
 
         self._$.loadTheme();
-        self._$.loadIeFix();
-        // console.log($("#tree"));
 
         // Now we start our data processing
         self.currentPath = ko.observable(config.options.fileRoot);
@@ -64,26 +62,12 @@ define(function (require) {
             return "uploads-template";
         };//templateName
 
-        self.afterRender = function (elements) {
+        self.afterRender = function () {
             if (self.currentView() === "uploads") {
                 $("#my-awesome-dropzone").dropzone({
                     url: config.options.fileConnector,
                     params: {path: self.currentPath()}
                 });
-                // $("#my-awesome-dropzone").on("sending", function(file, xhr, formData) {
-                //     // Will send the filesize along with the file as POST data.
-                //     formData.append("mode", "add");
-                //     formData.append("currentPath", self.currentPath());
-                // });
-
-                // The recommended way from within the init configuration:
-                // Dropzone.options.myAwesomeDropzone = {
-                //     sending: function (file, xhr, formData) {
-                //         // Will send the filesize along with the file as POST data.
-                //         formData.append("mode", "add");
-                //         formData.append("currentPath", self.currentPath());
-                //     }
-                // };
             }
         };
 
@@ -192,7 +176,7 @@ define(function (require) {
         });
 
         self.browseToItem = function (data) {
-            console.log("browseToItem data -> ", data);
+            // console.log("browseToItem data -> ", data);
             $("#tree").fancytree("getTree").getNodeByKey(data.path()).setActive();
             if (data.isDirectory()) {
                 self.currentPath(data.path());
@@ -204,7 +188,7 @@ define(function (require) {
         };
 
         self.goToItem = function (data) {
-            console.log("goToItem data -> ", data);
+            // console.log("goToItem data -> ", data);
             // we set no events on this one because we simply want to select it, not kick off the chain of activate events that normally
             // happen when you physically click a node
             $("#tree").fancytree("getTree").getNodeByKey(data.path()).setActive(true, {noEvents: true});
@@ -250,7 +234,7 @@ define(function (require) {
         };//hasCapability
 
         self.switchViews = function () {
-            console.log("switchViews start -> ", self.currentView());
+            // console.log("switchViews start -> ", self.currentView());
             if (self.currentView() !== "list" && self.currentView() !== "grid") {
                 self.currentView(self.lastView());
             } else if (self.currentView() === "grid") {
@@ -258,7 +242,7 @@ define(function (require) {
             } else {
                 self.currentView("grid");
             }
-            console.log("switchViews end -> ", self.currentView());
+            // console.log("switchViews end -> ", self.currentView());
         };//switchViews
 
         self.viewButtonClass = ko.pureComputed(function () {

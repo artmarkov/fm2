@@ -91,7 +91,7 @@ define(function (require) {
         });//getIconUrl
 
         self.getDownloadUrl = ko.pureComputed(function () {
-            console.log("getDownloadUrl file -> ", self);
+            // console.log("getDownloadUrl file -> ", self);
             if (self.config && self.path()) {
                 if (self.isDirectory()) {
                     return self.config.icons.path + self.config.icons.directory;

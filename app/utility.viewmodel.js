@@ -48,29 +48,6 @@ define(function (require) {
             return theme;
         };//loadTheme
 
-        self.loadIeFix = function () {
-            var theme;
-
-            switch (config.options.theme) {
-            case "flat-dark":
-                theme = "themes/flat-dark/styles/ie.css";
-                break;
-            case "flat-oil":
-                theme = "themes/flat-oil/styles/ie.css";
-                break;
-            case "flat-turquoise":
-                theme = "themes/flat-turquoise/styles/ie.css";
-                break;
-            default:
-                theme = "themes/default/styles/ie.css";
-            }
-
-            var cssLink = $("<link rel='stylesheet' type='text/css' href='" + theme + "'>");
-            $("head").append(cssLink);
-
-            return theme;
-        };//loadIeFix
-
         // return filename extension
         self.getExtension = function (filename) {
             if (filename.split(".").length === 1) {
@@ -138,17 +115,21 @@ define(function (require) {
         };//apiGet
 
         self.setDimensions = function () {
-            var bheight = 53,
-                $uploader = $("#uploader");
+
+            console.log("setDimensions: uploader -> ", $("#uploader").height(), " offset? -> ", $("#uploader").offset().top, " footer -> ", $("#footer").height(), " window -> ", $(window).height());
+            var windowHeight = $(window).height(),
+                headerHeight = $("#uploader").height(),
+                headerOffset = $("#uploader").offset().top,
+                footerHeight = $("#footer").height(),
+                ckEditorExtraHeight = 0;
 
             if (self.urlParameters("CKEditorCleanUpFuncNum")) {
-                bheight += 60;
+                ckEditorExtraHeight += 60;
             }
 
-            var newH = $(window).height() - $uploader.height() - $uploader.offset().top - bheight;
+            var newH = windowHeight - headerHeight - footerHeight - headerOffset - ckEditorExtraHeight;
             $("#splitter, #filetree, #fileinfo, .vsplitbar").height(newH);
-            var newW = $("#splitter").width() - $("div.vsplitbar").width() - $("#filetree").width();
-            $("#fileinfo").width(newW);
         };
+        $(window).resize(self.setDimensions);
     };//function
 });//define

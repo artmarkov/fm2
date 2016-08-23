@@ -116,7 +116,6 @@ require.config({
 
 define(function (require) {
     "use strict";
-    // require("css!styles/reset.css");
     require("css!node_modules/knockout.contextmenu/dist/css/knockout.contextmenu.css");
     require("css!node_modules/jquery.fancytree/dist/skin-lion/ui.fancytree.css");
     require("css!node_modules/jquery.splitter/css/jquery.splitter.css");
@@ -127,6 +126,8 @@ define(function (require) {
     require("css!node_modules/bootstrap/dist/css/bootstrap.css");
     require("css!node_modules/sweetalert/dist/sweetalert.css");
     require("css!node_modules/jqueryfiletree/dist/jQueryFileTree.min.css");
+    // Load theme last so nothing overwrites our colors :)
+    require("css!styles/fm2.css");
 
 
     //load jquery and related
@@ -174,19 +175,19 @@ define(function (require) {
 
     // Forces columns to fill the layout vertically.
     // Called on initial page load and on resize.
-    var setDimensions = function () {
-        var bheight = 53,
-            $uploader = $("#uploader");
-
-        if (_$.urlParameters("CKEditorCleanUpFuncNum")) {
-            bheight += 60;
-        }
-
-        var newH = $(window).height() - $uploader.height() - $uploader.offset().top - bheight;
-        $("#splitter, #filetree, #fileinfo, .vsplitbar").height(newH);
-        var newW = $("#splitter").width() - $("div.vsplitbar").width() - $("#filetree").width();
-        $fileinfo.width(newW);
-    };
+    // var setDimensions = function () {
+    //     var bheight = 53,
+    //         $uploader = $("#uploader");
+    //
+    //     if (_$.urlParameters("CKEditorCleanUpFuncNum")) {
+    //         bheight += 60;
+    //     }
+    //
+    //     var newH = $(window).height() - $uploader.height() - $uploader.offset().top - bheight;
+    //     $("#splitter, #filetree, #fileinfo, .vsplitbar").height(newH);
+    //     var newW = $("#splitter").width() - $("div.vsplitbar").width() - $("#filetree").width();
+    //     $fileinfo.width(newW);
+    // };
 
 
 //     // Display an 'edit' link for editable files
@@ -317,8 +318,8 @@ define(function (require) {
         }
 
         // Adjust layout.
-        setDimensions();
-        $(window).resize(setDimensions);
+        // setDimensions();
+        // $(window).resize(setDimensions);
 
         // Provides support for adjustible columns.
         $("#splitter").height(100).split({
@@ -340,13 +341,13 @@ define(function (require) {
         console.log("Total execution time : " + time + " ms");
     }
 
-    $(window).on("load", function () {
-        setDimensions();
-    });
+    // $(window).on("load", function () {
+    //     setDimensions();
+    // });
 
-    $(window).on("load", function () {
-        $fileinfo.css({"left": $("#splitter").find(".vsplitbar").width() + $("#filetree").width()});
-    });
-
-    setTimeout(setDimensions, 0);
+    // $(window).on("load", function () {
+    //     $fileinfo.css({"left": $("#splitter").find(".vsplitbar").width() + $("#filetree").width()});
+    // });
+    //
+    // setTimeout(setDimensions, 0);
 });

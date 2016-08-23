@@ -1,0 +1,38 @@
+/*
+    20160823 - jlaustill new file for css that isn't theme specific and applies fm2 wide
+*/
+
+/* this is to fix the grid display to fixed height with the bootstrap grid */
+.col-fix {
+    float: none;
+    display: inline-block;
+    margin: 0 -0.125em;
+    vertical-align: top;
+}
+
+/* this is to pad the grid view so filenames don't get to comfy */
+.grid-border {
+    padding: 10px;
+}
+
+/* this pads the top menu a bit */
+#uploader {
+    margin-bottom: 5px;
+}
+
+/* small fixes that bootstrap doesn't take care of */
+body {
+    padding: 10px;
+    overflow:hidden;
+}
+
+/* this make filetree fit in and seem like part of the app */
+ul.fancytree-container {
+    background-color: inherit;
+    border: none;
+}
+
+/* we need filenames to wrap no matter what for the grid */
+#fileinfo {
+    word-break: break-all;
+}

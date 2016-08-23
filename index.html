@@ -23,7 +23,7 @@
 <body>
 <div id="loading-wrap" data-bind="visible: loading"><!-- loading wrapper / removed when loaded --></div>
 <div>
-    <form id="uploader" method="post">
+    <div id="uploader" method="post">
         <div class="pull-left">
             <h6 data-bind="text: 'Current Folder: ' + currentPath()"></h6>
             </div>
@@ -41,9 +41,11 @@
             <!--</div>-->
             <button type="button" class="btn btn-default" data-bind="click: function (){currentView('uploads');}, visible: function () {hasCapability('upload')}"><span class="glyphicon glyphicon-upload"> Upload</span></button>
             <button type="button" class="btn btn-default" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> New Folder</button>
-            <button type="button" data-bind="title: language.list_view, click: switchViews, css: viewButtonClass" class="btn btn-default"></button>
+            <button type="button" data-bind="title: language.list_view, click: switchViews" class="btn btn-default"><span data-bind="css: viewButtonClass"></span></button>
         </div>
-    </form>
+
+        <div class="clearfix"></div>
+    </div>
 
     <div id="splitter">
         <div id="tree">
@@ -73,6 +75,7 @@
             <span id="items-counter">{{folderCount}}</span> {{language.items}} - {{language.size}} : <span id="items-size">{{folderSize}}</span>
         </div>
     </div>
+    <div class="clearfix"></div>
 
 </div>
 
