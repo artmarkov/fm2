@@ -28,14 +28,15 @@
 
  If you are new to nodejs and express, the first parameter defines the endpoint, and the second the loading of this file.
  */
+/*global __appRoot*/
 
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 var fs = require("fs");
 var paths = require("path");
 var multer  = require('multer');
 var upload = multer({ dest: 'upload/'});
-var config = require("../config/filemanager.config.json");
+var config = require("../config/fm2.api.config.json");
 
 paths.posix = require("path-posix");
 
@@ -86,17 +87,11 @@ module.exports = function () {
             fs.stat(parsedPath.osFullPath, function (err, stats) {
                 if (err) {
                     callback(errors(err));
-                } else if (stats.isDirectory()) {
-                    parsedPath.isDirectory = true;
-                    parsedPath.stats = stats;
-                    callback(null, parsedPath);
-                } else if (stats.isFile()) {
-                    parsedPath.isDirectory = false;
-                    parsedPath.stats = stats;
-                    callback(null, parsedPath);
-                } else {
-                    callback(errors(err));
+                    return;
                 }
+                parsedPath.isDirectory = !!stats.isDirectory();
+                parsedPath.stats = stats;
+                callback(null, parsedPath);
             });
         });//parseNewPath
     }//parsePath
@@ -105,9 +100,9 @@ module.exports = function () {
     // adheres to the DRY principle
     function fileInfo(pp, callback) {
         var result = {
-            "path": pp.uiPath,
-            "preview": pp.uiPath,
-            "filename": pp.filename,
+            "path": (pp.uiPath),
+            "preview": (pp.uiPath),
+            "filename": (pp.filename),
             "fileType": paths.parse(pp.osFullPath).ext.toLowerCase().replace(".", ""),
             "isDirectory": false,
             "thumbnail": "images/fileicons/" + paths.parse(pp.osFullPath).ext.toLowerCase().replace(".", "") + ".png",
@@ -117,8 +112,10 @@ module.exports = function () {
                 "filemtime": pp.stats.mtime,
                 "height": 0,
                 "width": 0,
-                "size": 0
-            }
+                "size": pp.stats.size
+            },
+            "title": pp.filename,
+            "key": pp.uiPath
         };//result
         callback(result);
     }//fileInfo
@@ -127,9 +124,9 @@ module.exports = function () {
     // adheres to the DRY principle
     function directoryInfo(pp, callback) {
         var result = {
-            "path": pp.uiPath,
-            "preview": pp.uiPath,
-            "filename": pp.filename,
+            "path": (pp.uiPath),
+            "preview": (pp.uiPath),
+            "filename": (pp.filename),
             "fileType": "dir",
             "isDirectory": true,
             "thumbnail": "images/fileicons/_Open.png",
@@ -139,8 +136,11 @@ module.exports = function () {
                 "filemtime": pp.stats.mtime,
                 "height": 0,
                 "width": 0,
-                "size": 0
-            }
+                "size": pp.stats.size
+            },
+            "title": pp.filename,
+            "folder": true,
+            "key": pp.uiPath
         };//result
         callback(result);
     }//directoryInfo
@@ -169,7 +169,10 @@ module.exports = function () {
                 callback(err);
             } else {
                 getinfo(ipp, function (result) {
-                    loopInfo.results.push(result);
+                    // console.log("config -> ", config.security.allowedFileTypes.indexOf(result.fileType), " and ", result);
+                    if (config.security.allowedFileTypes.indexOf(result.fileType) !== -1 || result.isDirectory) {
+                        loopInfo.results.push(result);
+                    }
                     if ($index + 1 >= loopInfo.total) {
                         callback(loopInfo.results);
                     }//if
@@ -179,7 +182,7 @@ module.exports = function () {
     }//getIndividualFileInfo
 
     function getfolder(pp, callback) {
-        fs.stat(pp.osFullPath, function (err, stats) {
+        fs.stat(pp.osFullPath, function (err) {
             if (err) {
                 console.log("err -> ", err);
                 callback(errors(err));
@@ -216,7 +219,7 @@ module.exports = function () {
                     callback(errors(err));
                 } else {
                     callback({
-                        "Path": pp.relativePath
+                        "path": pp.uiPath
                     });//callback
                 }//if
             });//fs.rmdir
@@ -226,7 +229,7 @@ module.exports = function () {
                     callback(errors(err));
                 } else {
                     callback({
-                        "Path": pp.relativePath
+                        "path": pp.uiPath
                     });//callback
                 }//if
             });//fs.unlink
@@ -247,45 +250,55 @@ module.exports = function () {
         });//fs.mkdir
     }//addfolder
 
-    // function to save uploaded files to their proper locations
-    function renameIndividualFile(loopInfo, files, pp, callback, $index) {
-        if (loopInfo.error === false) {
-            var oldfilename = paths.join(__appRoot, files[$index].path),
-                // new files comes with a directory, replaced files with a filename.  I think there is a better way to handle this
-                // but this works as a starting point
-                newfilename = paths.join(
-                    pp.osFullDirectory,
-                    pp.isDirectory ? pp.relativePath : "",
-                    pp.isDirectory ? files[$index].originalname : pp.filename
-                ); //not sure if this is the best way to handle this or not
+    //function to save a replaced file, tried to combine this with save new files, but it
+    // just got to complicated
+    function replacefile(pp, file, callback) {
+        var oldfilename = paths.join(__appRoot, file.path),
+            //     // new files comes with a directory, replaced files with a filename.  I think there is a better way to handle this
+            //     // but this works as a starting point
+            newfilename = paths.join(
+                pp.osFullPath
+            ); //not sure if this is the best way to handle this or not
 
-            fs.rename(oldfilename, newfilename, function (err) {
-                if (err) {
-                    loopInfo.error = true;
-                    console.log("savefiles error -> ", err);
-                    callback(errors(err));
-                } else if ($index + 1 >= loopInfo.total) {
-                    callback({
-                        "Path": pp.relativePath,
-                        "Name": pp.filename
-                    });//callback
-                }//if
-            });//fs.rename
-        }//if not loop error
-    }//renameIndividualFile
+        // console.log("replacefile pp -> ", pp, " file -> ", file, " oldfilename -> ", oldfilename, " newfilename -> ", newfilename);
 
-    function savefiles(pp, files, callback) {
-        var loopInfo = {
-                results: {},
-                total: files.length,
-                error: false
-            },
-            i;
+        fs.rename(oldfilename, newfilename, function (err) {
+            if (err) {
+                console.log("replacefile error -> ", err);
+                callback(errors(err));
+            } else {
+                callback({
+                    "path": pp.uiPath,
+                    "name": pp.isDirectory ? file.originalname : pp.filename
+                });//callback
+            }//if
+        });//fs.rename
+    }//replacefile
 
-        for (i = 0; i < loopInfo.total; i++) {
-            renameIndividualFile(loopInfo, files, pp, callback, i);
-        }//for
-    }//savefiles
+    function savefile(pp, file, callback) {
+        var oldfilename = paths.join(__appRoot, file.path),
+            //     // new files comes with a directory, replaced files with a filename.  I think there is a better way to handle this
+            //     // but this works as a starting point
+            newfilename = paths.join(
+                pp.osExecutionPath,
+                pp.osRelativePath,
+                file.originalname
+            ); //not sure if this is the best way to handle this or not
+
+        // console.log("savefile pp -> ", pp, " file -> ", file, " oldfilename -> ", oldfilename, " newfilename -> ", newfilename);
+
+        fs.rename(oldfilename, newfilename, function (err) {
+            if (err) {
+                console.log("savefiles error -> ", err);
+                callback(errors(err));
+            } else {
+                callback({
+                    "path": pp.uiPath,
+                    "name": pp.isDirectory ? file.originalname : pp.filename
+                });//callback
+            }//if
+        });//fs.rename
+    }//savefile
 
     // function to rename files
     function rename(old, newish, callback) {
@@ -294,21 +307,15 @@ module.exports = function () {
                 callback(errors(err));
             } else {
                 callback({
-                    "Old Path": old.uiPath,
-                    "Old Name": old.filename,
-                    "New Path": newish.uiPath,
-                    "New Name": newish.filename
+                    "oldPath": old.uiPath,
+                    "oldName": old.filename,
+                    "newPath": newish.uiPath,
+                    "newName": newish.filename
                 });//callback
             }//if
         }); //fs.rename
     }//rename
 
-    // RichFilemanager expects a pretified string and not a json object, so this will do that
-    // This results in numbers getting recieved as 0 instead of '0'
-    function oldRespond(res, obj) {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(obj));
-    }//respond
     function respond(res, obj) {
         if (obj.errors) {
             console.log("respond err -> ", obj);
@@ -318,7 +325,6 @@ module.exports = function () {
         }
     }//respond
 
-    // finally, our main route handling that calls the above functions :)
     router.route("/")
         .get(function (req, res) {
             var mode = req.query.mode,
@@ -330,6 +336,7 @@ module.exports = function () {
                         if (err) {
                             respond(res, err);
                         } else {
+                            console.log("getinfo pp -> ", pp);
                             getinfo(pp, function (result) {
                                 respond(res, result);
                             });//getinfo
@@ -364,6 +371,7 @@ module.exports = function () {
                     });//parsePath
                     break;
                 case "addfolder":
+                    console.log("addfolder query -> ", req.query);
                     parsePath(path, function (err, pp) {
                         if (err) {
                             respond(res, err);
@@ -420,36 +428,30 @@ module.exports = function () {
                     respond(res, errors({code: "GET route not found: " + mode.trim(), errno: 404}));
             }//switch
         })//get
-        .post(upload.array("files", 5), function (req, res) {
-            var mode = req.body.mode;
+        .post(upload.single("file"), function (req, res) {
+            parsePath(req.body.path, function (err, pp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    savefile(pp, req.file, function (result) {
+                        respond(res, result);
+                    });//savefiles
+                }
+            });//parsePath
+        });//post
 
-            switch (mode.trim()) {
-                case "add":
-                    parsePath(req.body.currentpath, function (err, pp) {
-                        if (err) {
-                            respond(res, err);
-                        } else {
-                            savefiles(pp, req.files, function (result) {
-                                oldRespond(res, result);
-                            });//savefiles
-                        }
-                    });//parsePath
-                    break;
-                case "replace":
-                    parsePath(req.body.newfilepath, function (err, pp) {
-                        if (err) {
-                            respond(res, err);
-                        } else {
-                            savefiles(pp, req.files, function (result) {
-                                oldRespond(res, result);
-                            });//savefiles
-                        }
-                    });//parsePath
-                    break;
-                default:
-                    console.log("no matching POST route found with mode: '", mode.trim(), " query -> ", req.query);
-                    respond(res, errors({code: "POST route not found: " + mode.trim(), errno: 404}));
-            }//switch
+    router.route("/replace")
+        .put(upload.single("file"), function (req, res) {
+            parsePath(req.body.path, function (err, pp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    console.log("/replace pp -> ", pp, " req.file -> ", req.file);
+                    replacefile(pp, req.file, function (result) {
+                        respond(res, result);
+                    });//savefiles
+                }//if err
+            });//parsePath
         }); //post
 
     return router;
