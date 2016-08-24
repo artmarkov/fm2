@@ -89,7 +89,7 @@ define(function (require) {
                         + "&time=" + Date.now();
             }
 
-            console.log("apiGet url -> ", url);
+            // console.log("apiGet url -> ", url);
 
             var ajaxOptions = {
                 "url": url,
@@ -146,7 +146,7 @@ define(function (require) {
                     }
                 }
             };
-            console.log("apiPost url -> ", url);
+            // console.log("apiPost url -> ", url);
 
             // console.log("config -> ", config.options.getParams);
             // console.log("ajaxOptions before -> ", ajaxOptions);

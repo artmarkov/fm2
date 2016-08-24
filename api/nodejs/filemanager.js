@@ -137,7 +137,7 @@ module.exports = function () {
     function directoryInfo(pp, callback) {
         var result = {
             "path": (pp.uiPath),
-            "dir": (pp.uiPath),
+            "dir": paths.posix.parse(pp.uiPath).dir,
             "directPath": ("/item?path=" + pp.uiPath),
             "preview": ("/item/preview?path=" + pp.uiPath),
             "filename": (pp.filename),
@@ -311,6 +311,7 @@ module.exports = function () {
 
     // function to rename files
     function rename(old, newish, callback) {
+        console.log("rename old -> ", old, " new -> ", newish);
         fs.rename(old.osFullPath, newish.osFullPath, function (err) {
             if (err) {
                 callback(errors(err));
@@ -339,8 +340,8 @@ module.exports = function () {
     }//respond
 
     /* ****************************************************
-    New routes 2.0
-       ****************************************************
+     New routes 2.0
+     ****************************************************
      */
 
     router.route("/file")
