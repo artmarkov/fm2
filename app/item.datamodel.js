@@ -110,7 +110,9 @@ define(function (require) {
             // console.log("getDownloadUrl file -> ", self);
             if (self.config && self.path()) {
                 if (self.isDirectory()) {
-                    return self.config.icons.path + self.config.icons.directory;
+                    //return self.config.icons.path + self.config.icons.directory;
+                    toastr.warning("Not implemented yet.", "Sorry, this is coming in the future :)", {"positionClass": "toast-bottom-right"});
+                    return false;
                 }
                 return self.config.options.fileConnector
                         + self.directPath();
@@ -175,7 +177,10 @@ define(function (require) {
         };//templateName
 
         self.download = function () {
-            window.location = self.getDownloadUrl();
+            var downloadUrl = self.getDownloadUrl();
+            if (downloadUrl) {
+                window.location = downloadUrl;
+            }
         };//download
 
         self.rename = function () {
@@ -316,8 +321,7 @@ define(function (require) {
             //     url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
             // } else {
             url = self.config.options.fileConnector
-                    + "?mode=download"
-                    + "&path=" + self.path();
+                    + self.directPath();
             // }
 
             if (window.opener || window.tinyMCEPopup || self._$.urlParameters("field_name") || self._$.urlParameters("CKEditorCleanUpFuncNum") || self._$.urlParameters("CKEditor")) {
