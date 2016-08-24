@@ -18,33 +18,7 @@ define(function (require) {
         item = item || {};
         item.properties = item.properties || {};
 
-        // This is our context menu for each item, so simple :)
-        self.menu = ko.observableArray([{
-            text: "<span class='glyphicon glyphicon-download'></span>  Download",
-            action: function () {
-                self.download();
-            }
-        }, {
-            text: "<span class=\'glyphicon glyphicon-random\'></span>  Rename",
-            action: function () {
-                self.rename();
-            }
-        }, {
-            text: "<span class=\'glyphicon glyphicon-move\'></span>  Move",
-            action: function () {
-                self.move();
-            }
-        }, {
-            text: "<span class='glyphicon glyphicon-trash'></span>  Delete",
-            action: function () {
-                self.removeMe();
-            }
-        }, {
-            text: "<span class='glyphicon glyphicon-info-sign'></span>  Details",
-            action: function () {
-                appVM.goToItem(self);
-            }
-        }]);
+
         //{ '<span class=\'glyphicon glyphicon-download\'></span>  Download': download, '<span class=\'glyphicon glyphicon-random\'></span>  Rename': rename, '<span class=\'glyphicon glyphicon-move\'></span>  Move': move }
 
         // console.log("item config -> ", self.config);
@@ -95,6 +69,45 @@ define(function (require) {
             });//apiGet
         };//reloadSelf
 
+        self.canDownload = ko.pureComputed(function () {
+            if (self.config && !self.isDirectory()) {
+                return $.inArray("download", self.config.options.capabilities) !== -1;
+            }
+            return false;
+        });
+
+        // This is our context menu for each item, so simple :)
+        self.menu = ko.observableArray([{
+            text: "<span class=\'glyphicon glyphicon-random\'></span>  Rename",
+            action: function () {
+                self.rename();
+            }
+        }, {
+            text: "<span class=\'glyphicon glyphicon-move\'></span>  Move",
+            action: function () {
+                self.move();
+            }
+        }, {
+            text: "<span class='glyphicon glyphicon-trash'></span>  Delete",
+            action: function () {
+                self.removeMe();
+            }
+        }, {
+            text: "<span class='glyphicon glyphicon-info-sign'></span>  Details",
+            action: function () {
+                appVM.goToItem(self);
+            }
+        }]);
+
+        if (self.canDownload()) {
+            self.menu.push({
+                text: "<span class='glyphicon glyphicon-download'></span>  Download",
+                action: function () {
+                    self.download();
+                }
+            });
+        }
+
         self.getIconUrl = ko.pureComputed(function () {
             var url = self.config.icons.path;
             if (self.isDirectory()) {
@@ -111,7 +124,6 @@ define(function (require) {
             if (self.config && self.path()) {
                 if (self.isDirectory()) {
                     //return self.config.icons.path + self.config.icons.directory;
-                    toastr.warning("Not implemented yet.", "Sorry, this is coming in the future :)", {"positionClass": "toast-bottom-right"});
                     return false;
                 }
                 return self.config.options.fileConnector
