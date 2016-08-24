@@ -49,11 +49,11 @@ module.exports = function () {
         err = err || {}; // This allows us to call errors and just get a default error
         return {
             errors: [{
-                title: err.code || "Error.",
-                code: err.errno || -1,
-                detail: err.Error || "An error occurred.",
+                title: err.title || err.code || "Error.",
+                code: err.errno || err.code || -1,
+                detail: err.Error || err.detail || "An error occurred.",
                 status: err.status,
-                source: err.syscall
+                source: err.syscall || err.source
             }]
         };//return
     }//errors
@@ -83,17 +83,27 @@ module.exports = function () {
     // because of windows, we are going to start by parsing out all the needed path information
     // this will include original values, as well as OS specific values
     function parsePath(path, callback) {
-        parseNewPath(path, function (parsedPath) {
-            fs.stat(parsedPath.osFullPath, function (err, stats) {
-                if (err) {
-                    callback(errors(err));
-                    return;
-                }
-                parsedPath.isDirectory = !!stats.isDirectory();
-                parsedPath.stats = stats;
-                callback(null, parsedPath);
-            });
-        });//parseNewPath
+        if (path) {
+            parseNewPath(path, function (parsedPath) {
+                fs.stat(parsedPath.osFullPath, function (err, stats) {
+                    if (err) {
+                        callback(errors(err));
+                        return;
+                    }
+                    parsedPath.isDirectory = !!stats.isDirectory();
+                    parsedPath.stats = stats;
+                    callback(null, parsedPath);
+                }); //fs.stat
+            });//parseNewPath
+        } else {
+            callback(new errors({
+                "code": 404,
+                "title": "Path not provided",
+                "detail": "You must provide a path parameter, IE ?path=/folder/file.ext",
+                "source": "parsePath",
+                "status": "error"
+            }));
+        }
     }//parsePath
 
     // This function will create the return object for a file.  This keeps it consistent and
@@ -101,7 +111,9 @@ module.exports = function () {
     function fileInfo(pp, callback) {
         var result = {
             "path": (pp.uiPath),
-            "preview": (pp.uiPath),
+            "dir": paths.posix.parse(pp.uiPath).dir,
+            "directPath": ("/item?path=" + pp.uiPath),
+            "preview": ("/item/preview?path=" + pp.uiPath),
             "filename": (pp.filename),
             "fileType": paths.parse(pp.osFullPath).ext.toLowerCase().replace(".", ""),
             "isDirectory": false,
@@ -125,7 +137,9 @@ module.exports = function () {
     function directoryInfo(pp, callback) {
         var result = {
             "path": (pp.uiPath),
-            "preview": (pp.uiPath),
+            "dir": (pp.uiPath),
+            "directPath": ("/item?path=" + pp.uiPath),
+            "preview": ("/item/preview?path=" + pp.uiPath),
             "filename": (pp.filename),
             "fileType": "dir",
             "isDirectory": true,
@@ -177,7 +191,7 @@ module.exports = function () {
                         callback(loopInfo.results);
                     }//if
                 });//getinfo
-            }
+            }//if
         });//parsePath
     }//getIndividualFileInfo
 
@@ -208,32 +222,30 @@ module.exports = function () {
                     }//if
                 });//fs.readdir
             }//if
-        });
+        });//fs.stat
     }//getinfo
 
     // function to delete a file/folder
     function deleteItem(pp, callback) {
-        if (pp.isDirectory === true) {
-            fs.rmdir(pp.osFullPath, function (err) {
-                if (err) {
-                    callback(errors(err));
-                } else {
-                    callback({
-                        "path": pp.uiPath
-                    });//callback
-                }//if
-            });//fs.rmdir
-        } else {
-            fs.unlink(pp.osFullPath, function (err) {
-                if (err) {
-                    callback(errors(err));
-                } else {
-                    callback({
-                        "path": pp.uiPath
-                    });//callback
-                }//if
-            });//fs.unlink
-        }//if
+        getinfo(pp, function (item) {
+            if (pp.isDirectory === true) {
+                fs.rmdir(pp.osFullPath, function (err) {
+                    if (err) {
+                        callback(errors(err));
+                    } else {
+                        callback(item);//callback
+                    }//if
+                });//fs.rmdir
+            } else {
+                fs.unlink(pp.osFullPath, function (err) {
+                    if (err) {
+                        callback(errors(err));
+                    } else {
+                        callback(item);//callback
+                    }//if
+                });//fs.unlink
+            }//if
+        });
     }//deleteItem
 
     // function to add a new folder
@@ -242,10 +254,9 @@ module.exports = function () {
             if (err) {
                 callback(errors(err));
             } else {
-                callback({
-                    "Parent": pp.relativePath,
-                    "Name": name
-                });//callback
+                getinfo(pp, function (ipp) {
+                    callback(ipp);//callback
+                });
             }//if
         });//fs.mkdir
     }//addfolder
@@ -254,8 +265,7 @@ module.exports = function () {
     // just got to complicated
     function replacefile(pp, file, callback) {
         var oldfilename = paths.join(__appRoot, file.path),
-            //     // new files comes with a directory, replaced files with a filename.  I think there is a better way to handle this
-            //     // but this works as a starting point
+
             newfilename = paths.join(
                 pp.osFullPath
             ); //not sure if this is the best way to handle this or not
@@ -277,8 +287,7 @@ module.exports = function () {
 
     function savefile(pp, file, callback) {
         var oldfilename = paths.join(__appRoot, file.path),
-            //     // new files comes with a directory, replaced files with a filename.  I think there is a better way to handle this
-            //     // but this works as a starting point
+
             newfilename = paths.join(
                 pp.osExecutionPath,
                 pp.osRelativePath,
@@ -306,12 +315,15 @@ module.exports = function () {
             if (err) {
                 callback(errors(err));
             } else {
-                callback({
-                    "oldPath": old.uiPath,
-                    "oldName": old.filename,
-                    "newPath": newish.uiPath,
-                    "newName": newish.filename
-                });//callback
+                parsePath(newish.uiPath, function (err, pp) {
+                    if (err) {
+                        callback(err);
+                    } else {
+                        getinfo(pp, function (ipp) {
+                            callback(ipp);
+                        });//getinfo
+                    } //if
+                });//parsePath
             }//if
         }); //fs.rename
     }//rename
@@ -321,113 +333,17 @@ module.exports = function () {
             console.log("respond err -> ", obj);
             res.json(obj);
         } else {
+            // console.log(JSON.stringify(obj));
             res.json({data: obj});
         }
     }//respond
 
-    router.route("/")
-        .get(function (req, res) {
-            var mode = req.query.mode,
-                path = req.query.path;
+    /* ****************************************************
+    New routes 2.0
+       ****************************************************
+     */
 
-            switch (mode.trim()) {
-                case "getinfo":
-                    parsePath(path, function (err, pp) {
-                        if (err) {
-                            respond(res, err);
-                        } else {
-                            console.log("getinfo pp -> ", pp);
-                            getinfo(pp, function (result) {
-                                respond(res, result);
-                            });//getinfo
-                        }
-                    });//parsePath
-                    break;
-                case "getfolder":
-                    console.log("getfolder -> ", path);
-                    parsePath(path, function (err, pp) {
-                        if (err) {
-                            respond(res, err);
-                        } else {
-                            getfolder(pp, function (result) {
-                                respond(res, result);
-                            });//getfolder
-                        }
-                    });//parsePath
-                    break;
-                case "getimage":
-                case "preview":
-                // until I implement the thumbnail & preview features, getimage is just returning the entire file
-                // so this falls through to download.
-                case "download":
-                    parsePath(path, function (err, pp) {
-                        if (err) {
-                            respond(res, err);
-                        } else {
-                            res.setHeader("content-disposition", "attachment; filename=" + pp.filename);
-                            res.setHeader("content-type", "application/octet-stream");
-                            res.sendFile(pp.osFullPath);
-                        }
-                    });//parsePath
-                    break;
-                case "addfolder":
-                    console.log("addfolder query -> ", req.query);
-                    parsePath(path, function (err, pp) {
-                        if (err) {
-                            respond(res, err);
-                        } else {
-                            console.log("addfolder path -> ", path, " pp -> ", pp);
-                            addfolder(pp, req.query.name, function (result) {
-                                respond(res, result);
-                            });//addfolder
-                        }
-                    });//parsePath
-                    break;
-                case "delete":
-                    parsePath(path, function (err, pp) {
-                        if (err) {
-                            respond(res, err);
-                        } else {
-                            deleteItem(pp, function (result) {
-                                respond(res, result);
-                            });//parsePath
-                        }
-                    });//parsePath
-                    break;
-                case "rename":
-                    parsePath(req.query.old, function (err, opp) {
-                        if (err) {
-                            respond(res, err);
-                        } else {
-                            var newPath = paths.posix.parse(opp.uiPath).dir,
-                                newish = paths.posix.join(newPath, req.query.new);
-
-                            parseNewPath(newish, function (npp) {
-                                rename(opp, npp, function (result) {
-                                    respond(res, result);
-                                });//rename
-                            });//parseNewPath
-                        }
-                    });//parsePath
-                    break;
-                case "move":
-                    parsePath(req.query.old, function (err, opp) {
-                        if (err) {
-                            respond(res, err);
-                        } else {
-                            parseNewPath(paths.posix.join("/", req.query.new, opp.filename), function (npp) {
-                                rename(opp, npp, function (result) {
-                                    respond(res, result);
-                                });//rename
-                            });//parseNewPath
-                        }
-                    });//parsePath
-                    break;
-                default:
-                    console.log("no matching GET route found with mode: '", mode.trim(), " query -> ", req.query);
-                    respond(res, errors({code: "GET route not found: " + mode.trim(), errno: 404}));
-            }//switch
-        })//get
+    router.route("/file")
         .post(upload.single("file"), function (req, res) {
             parsePath(req.body.path, function (err, pp) {
                 if (err) {
@@ -438,9 +354,7 @@ module.exports = function () {
                     });//savefiles
                 }
             });//parsePath
-        });//post
-
-    router.route("/replace")
+        })//post
         .put(upload.single("file"), function (req, res) {
             parsePath(req.body.path, function (err, pp) {
                 if (err) {
@@ -452,7 +366,119 @@ module.exports = function () {
                     });//savefiles
                 }//if err
             });//parsePath
-        }); //post
+        }); //put
+
+    router.route("/item")
+        .get(function (req,res) {
+            parsePath(req.query.path, function (err, pp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    res.setHeader("content-disposition", "attachment; filename=" + pp.filename);
+                    res.setHeader("content-type", "application/octet-stream");
+                    res.sendFile(pp.osFullPath);
+                }
+            });//parsePath
+        })//get
+        .patch(function (req, res) {
+            // console.log("PATCH /item -> ", req.query);
+            parsePath(req.query.path, function (err, opp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    parseNewPath(paths.posix.join("/", req.query.newPath, opp.filename), function (npp) {
+                        rename(opp, npp, function (result) {
+                            respond(res, result);
+                        });//rename
+                    });//parseNewPath
+                }//if
+            });//parsePath
+        })//patch
+        .delete(function (req, res) {
+            parsePath(req.query.path, function (err, pp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    deleteItem(pp, function (result) {
+                        respond(res, result);
+                    });//parsePath
+                }//if
+            });//parsePath
+        });// route: /item
+
+    router.route("/item/meta")
+        .get(function (req, res) {
+            parsePath(req.query.path, function (err, pp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    //console.log("getinfo pp -> ", pp);
+                    getinfo(pp, function (result) {
+                        respond(res, result);
+                    });//getinfo
+                }
+            });//parsePath
+        });// /item/meta
+
+    router.route("/item/meta/name")
+        .put(function (req, res) {
+            parsePath(req.query.path, function (err, opp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    var newPath = paths.posix.parse(opp.uiPath).dir,
+                        newish = paths.posix.join(newPath, req.query.new);
+
+                    parseNewPath(newish, function (npp) {
+                        rename(opp, npp, function (result) {
+                            respond(res, result);
+                        });//rename
+                    });//parseNewPath
+                }
+            });//parsePath
+        });// route /item/meta/name
+
+    // For now this is just returning the entire file.  In future, it will need to handle creating thumbnails
+    // and whatever is appropiate
+    router.route("/item/preview")
+        .get(function (req, res) {
+            parsePath(req.query.path, function (err, pp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    res.setHeader("content-disposition", "attachment; filename=" + pp.filename);
+                    res.setHeader("content-type", "application/octet-stream");
+                    res.sendFile(pp.osFullPath);
+                }
+            });//parsePath
+        });// route: /item/preview
+
+    router.route("/folder")
+        .get(function (req, res) {
+            // console.log("getfolder -> ", req.query.path);
+            parsePath(req.query.path, function (err, pp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    getfolder(pp, function (result) {
+                        respond(res, result);
+                    });//getfolder
+                }
+            });//parsePath
+        })//get
+        .post(function (req, res) {
+            // console.log("addfolder query -> ", req.query);
+            parsePath(req.query.path, function (err, pp) {
+                if (err) {
+                    respond(res, err);
+                } else {
+                    console.log("addfolder path -> ", req.query.path, " pp -> ", pp);
+                    addfolder(pp, req.query.name, function (result) {
+                        respond(res, result);
+                    });//addfolder
+                }
+            });//parsePath
+        });//router /folder
 
     return router;
 };//module.exports
