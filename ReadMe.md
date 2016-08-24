@@ -1,17 +1,39 @@
 Filemanager
 ========================
 
-FM is an open-source file manager released under MIT license. It is an alternative to elfinder or CKFinder.
+FM2 is an open-source file manager released under MIT license. It is an alternative to elfinder or CKFinder.
 
 Support
 -------
 
-Filemanager is under free license. If you want to support the filemanager development or just thank its main maintainer by paying a beer, you can make a donation by clicking the following button : 
+Filemanager-2.0 is under free license. If you want to support the filemanager development or just thank its main maintainer by paying for a glass of whiskey, you can make a donation by clicking the following button : 
 [![Donate](https://www.paypal.com/en_US/i/btn/x-click-but21.gif)](http://paypal.me/jlaustill) 
 
+Main features 2.0
+-------------
 
+* completely rewritten from scratch using 1.0 as a blueprint.  simogeo did such a wonderful job with this filemanagers visual appearance, why mess with a good thing?
+* All libraries updated to newest, jquery 3, dropzone 4.3, and jquery.splitter 0.23
+* Now based on Bootstrap 3
+* MVVM architecture with Knockoutjs 3.4.0
+* Fancy Tree replaces jquery.filetree
+* Sweetalert replaces jquery.impromptu
+* toastr replaces alerts
+* AMD loading with requirejs
+* api and ui seperate
 
-Main features
+2.0 Future roadmap
+--------------
+
+* build process for better deployment
+* jquery extension $.fm2() instead of iframes
+* spotlight like search
+* drag and drop
+* in place file editing
+* same great themes
+* same great language support
+
+Main features 1.0
 -------------
 
 * A Filemanager relying on jquery.
@@ -49,7 +71,10 @@ Main features
 
 Screenshot
 -------------
+Current state as of version 2.0.3
+![Filemanager-2.0 V2.0.3 Screenshot](https://github.com/jlaustill/Filemanager-2.0/blob/master/images/v2_0_3.png?raw=true)
 
+Original Filemanager
 ![Filemanager Screenshot](http://i57.tinypic.com/35cqw74.png)
 
 
@@ -64,18 +89,16 @@ Installation and Setup
 
 **Preamble**
 
-Since many changes have been done recently, only PHP and MVC connectors are now available. You can try the latest version for others connectors, but with no warranty they implement all features and work correctly.
+Since many changes have been done recently, only a nodejs api is available. Previous connectors will NOT work, promise 100%.  I will be standardizing the api to JSON API 1.0 standards, and working with other developers to bring at least asp.net and php on board.  
 
 To use other connectors, please download v0.8 version from https://github.com/simogeo/Filemanager/archive/v0.8.zip
 (PHP, ASHX, ASP, CFM, lasso, PL and JSP connectors are available)
-
-A JSP/Java connector implementation is available at : https://github.com/th-schwarz/C5Connector.Java 
 
 ---
 
 **(1)** Check out a copy of the FileManager from the repository using Git :
 
-git clone http://github.com/simogeo/Filemanager.git
+git clone http://github.com/jlaustill/Filemanager-2.0.git
 
 or download the archive from Github : https://github.com/simogeo/Filemanager/archive/master.zip
 
