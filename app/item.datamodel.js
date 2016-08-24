@@ -245,8 +245,8 @@ define(function (require) {
                 animation: "slide-from-top",
                 confirmButtonText: self.config.language.yes
             }, function () {
-                self._$.apiGet({
-                    mode: "delete",
+                self._$.apiDelete({
+                    url: "/item",
                     path: self.path(),
                     success: function (result) {
                         console.log("delete result -> ", result);

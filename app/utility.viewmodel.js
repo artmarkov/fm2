@@ -159,6 +159,42 @@ define(function (require) {
             $.ajax(ajaxOptions);
         };//apiGet
 
+        // This is our main access point for the api, everything should pass through this call that is a GET
+        self.apiDelete = function (options) {
+            var url = config.options.fileConnector
+                + options.url
+                + "?path=" + options.path
+
+            var ajaxOptions = {
+                "url": url,
+                "method": "DELETE",
+                "dataType": options.dataType || "json",
+                "success": function (data) {
+                    if (data.errors) {
+                        handleAjaxError(data.errors);
+                    } else {
+                        options.success(data.data);
+                    }
+                },
+                "error": function (err) {
+                    if (options.error) {
+                        options.error(err);
+                    } else {
+                        handleAjaxError(err);
+                    }
+                }
+            };
+
+            // console.log("config -> ", config.options.getParams);
+            // console.log("ajaxOptions before -> ", ajaxOptions);
+            if (config.options.getParams) {
+                $.extend(ajaxOptions, config.options.getParams);
+            }
+            //console.log("ajaxOptions after -> ", ajaxOptions);
+
+            $.ajax(ajaxOptions);
+        };//apiGet
+
         self.setDimensions = function () {
 
             // console.log("setDimensions: uploader -> ", $("#uploader").height(), " offset? -> ", $("#uploader").offset().top, " footer -> ", $("#footer").height(), " window -> ", $(window).height());
