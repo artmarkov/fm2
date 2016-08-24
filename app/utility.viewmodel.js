@@ -76,14 +76,22 @@ define(function (require) {
 
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiGet = function (options) {
-            var url = config.options.fileConnector
-                + "?mode=" + options.mode
-                + "&path=" + options.path
-                + "&old=" + options.old
-                + "&new=" + options.new
-                + "&name=" + encodeURIComponent(options.foldername)
-                + "&time=" + Date.now();
+            var url = "";
+            if (options.url) {
+                url = config.options.fileConnector
+                + options.url
+                + "?path=" + options.path
+            } else {
+                url = config.options.fileConnector
+                    + "?mode=" + options.mode
+                    + "&path=" + options.path
+                    + "&old=" + options.old
+                    + "&new=" + options.new
+                    + "&name=" + encodeURIComponent(options.foldername)
+                    + "&time=" + Date.now();
+            }
 
+            console.log("url -> ", url);
 
             var ajaxOptions = {
                 "url": url,

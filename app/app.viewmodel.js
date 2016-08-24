@@ -77,7 +77,8 @@ define(function (require) {
                 newSize = 0,
                 newCount = 0;
             self._$.apiGet({
-                mode: "getfolder",
+                // mode: "getfolder",
+                url: "/folder",
                 path: encodeURIComponent(self.currentPath()),
                 success: function (data) {
                     $.each(data, function (i, d) {

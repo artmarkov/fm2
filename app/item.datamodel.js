@@ -58,8 +58,10 @@ define(function (require) {
         });//self.properties
 
         self.reloadSelf = function () {
+            // console.log("reloadSelf path -> ", self.path());
             self._$.apiGet({
-                mode: "getinfo",
+                url: "/item/meta",
+                // mode: "getinfo",
                 path: self.path(),
                 success: function (item) {
                     // console.log("reloadSelf item -> ", item);
@@ -189,7 +191,7 @@ define(function (require) {
                         new: inputValue,
                         old: self.path(),
                         success: function (result) {
-                            self.path(result.newPath);
+                            self.path(result.path);
                             self.reloadSelf();
                             appVM.loadCurrentFolder();
                             toastr.success(self.config.language.successful_rename, result.newName, {"positionClass": "toast-bottom-right"});
