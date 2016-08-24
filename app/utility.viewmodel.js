@@ -91,7 +91,7 @@ define(function (require) {
                     + "&time=" + Date.now();
             }
 
-            console.log("url -> ", url);
+            console.log("apiGet url -> ", url);
 
             var ajaxOptions = {
                 "url": url,
@@ -121,6 +121,81 @@ define(function (require) {
 
             $.ajax(ajaxOptions);
         };//apiGet
+
+        // This is our main access point for the api, everything should pass through this call that is a GET
+        self.apiPost = function (options) {
+            var url = config.options.fileConnector
+                + options.url
+                + "?path=" + encodeURIComponent(options.path)
+                + "&name=" + encodeURIComponent(options.name);
+
+            var ajaxOptions = {
+                "url": url,
+                "method": "POST",
+                "dataType": options.dataType || "json",
+                "success": function (data) {
+                    if (data.errors) {
+                        handleAjaxError(data.errors);
+                    } else {
+                        options.success(data.data);
+                    }
+                },
+                "error": function (err) {
+                    if (options.error) {
+                        options.error(err);
+                    } else {
+                        handleAjaxError(err);
+                    }
+                }
+            };
+            console.log("apiPost url -> ", url);
+
+            // console.log("config -> ", config.options.getParams);
+            // console.log("ajaxOptions before -> ", ajaxOptions);
+            if (config.options.getParams) {
+                $.extend(ajaxOptions, config.options.getParams);
+            }
+            //console.log("ajaxOptions after -> ", ajaxOptions);
+
+            $.ajax(ajaxOptions);
+        };//apiPost
+
+        // This is our main access point for the api, everything should pass through this call that is a GET
+        self.apiPut = function (options) {
+            var url = config.options.fileConnector
+                + options.url
+                + "?path=" + options.path
+                + "&new=" + options.new
+
+            var ajaxOptions = {
+                "url": url,
+                "method": "PUT",
+                "dataType": options.dataType || "json",
+                "success": function (data) {
+                    if (data.errors) {
+                        handleAjaxError(data.errors);
+                    } else {
+                        options.success(data.data);
+                    }
+                },
+                "error": function (err) {
+                    if (options.error) {
+                        options.error(err);
+                    } else {
+                        handleAjaxError(err);
+                    }
+                }
+            };
+
+            // console.log("config -> ", config.options.getParams);
+            // console.log("ajaxOptions before -> ", ajaxOptions);
+            if (config.options.getParams) {
+                $.extend(ajaxOptions, config.options.getParams);
+            }
+            //console.log("ajaxOptions after -> ", ajaxOptions);
+
+            $.ajax(ajaxOptions);
+        };//apiPut
 
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiPatch = function (options) {
@@ -157,7 +232,7 @@ define(function (require) {
             //console.log("ajaxOptions after -> ", ajaxOptions);
 
             $.ajax(ajaxOptions);
-        };//apiGet
+        };//apiPatch
 
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiDelete = function (options) {

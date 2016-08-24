@@ -186,15 +186,15 @@ define(function (require) {
                         swal.showInputError(self.config.language.INVALID_DIRECTORY_OR_FILE);
                         return false;
                     }
-                    self._$.apiGet({
-                        mode: "rename",
+                    self._$.apiPut({
+                        url: "/item/meta/name",
                         new: inputValue,
-                        old: self.path(),
+                        path: self.path(),
                         success: function (result) {
                             self.path(result.path);
                             self.reloadSelf();
                             appVM.loadCurrentFolder();
-                            toastr.success(self.config.language.successful_rename, result.newName, {"positionClass": "toast-bottom-right"});
+                            toastr.success(self.config.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
                         }
                     });//apiGet
                 });//swal
@@ -263,7 +263,7 @@ define(function (require) {
             dz.show();
             button.hide();
             dz.dropzone({
-                url: self.config.options.fileConnector + "/replace",
+                url: self.config.options.fileConnector + "/file",
                 params: {path: self.path()},
                 maxFiles: 1,
                 method: "put",
@@ -273,8 +273,13 @@ define(function (require) {
                     } else {
                         dz.hide();
                         button.show();
-                        var img = $('#detailImage');
-                        img.attr('src', img.attr('src') + '?' + Math.random());
+                        var img = $('#detailImage'),
+                            newImg = img.attr('src');
+                        newImg += img.attr('src').indexOf('?') === -1 ? "?" : "&";
+                        newImg += Math.random();
+
+                        // console.log("image after random ", newImg);
+                        img.attr('src', newImg);
 
                         toastr.success(self.config.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
                     }

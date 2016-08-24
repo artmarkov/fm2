@@ -65,7 +65,7 @@ define(function (require) {
         self.afterRender = function () {
             if (self.currentView() === "uploads") {
                 $("#my-awesome-dropzone").dropzone({
-                    url: config.options.fileConnector,
+                    url: config.options.fileConnector + "/file",
                     params: {path: self.currentPath()}
                 });
             }
@@ -151,9 +151,9 @@ define(function (require) {
                         return false;
                     }
                     //console.log("new folder will be ", inputValue);
-                    self._$.apiGet({
-                        mode: "addfolder",
-                        foldername: inputValue,
+                    self._$.apiPost({
+                        url: "/folder",
+                        name: inputValue,
                         path: self.currentPath(),
                         success: function () {
                             self.loadCurrentFolder();
