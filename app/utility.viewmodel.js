@@ -78,17 +78,15 @@ define(function (require) {
         self.apiGet = function (options) {
             var url = "";
             if (options.url) {
-                url = config.options.fileConnector
-                + options.url
-                + "?path=" + options.path
+                url = config.options.fileConnector + options.url + "?path=" + options.path;
             } else {
                 url = config.options.fileConnector
-                    + "?mode=" + options.mode
-                    + "&path=" + options.path
-                    + "&old=" + options.old
-                    + "&new=" + options.new
-                    + "&name=" + encodeURIComponent(options.foldername)
-                    + "&time=" + Date.now();
+                        + "?mode=" + options.mode
+                        + "&path=" + options.path
+                        + "&old=" + options.old
+                        + "&new=" + options.new
+                        + "&name=" + encodeURIComponent(options.foldername)
+                        + "&time=" + Date.now();
             }
 
             console.log("apiGet url -> ", url);
@@ -125,9 +123,9 @@ define(function (require) {
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiPost = function (options) {
             var url = config.options.fileConnector
-                + options.url
-                + "?path=" + encodeURIComponent(options.path)
-                + "&name=" + encodeURIComponent(options.name);
+                    + options.url
+                    + "?path=" + encodeURIComponent(options.path)
+                    + "&name=" + encodeURIComponent(options.name);
 
             var ajaxOptions = {
                 "url": url,
@@ -162,10 +160,7 @@ define(function (require) {
 
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiPut = function (options) {
-            var url = config.options.fileConnector
-                + options.url
-                + "?path=" + options.path
-                + "&new=" + options.new
+            var url = config.options.fileConnector + options.url + "?path=" + options.path + "&new=" + options.new;
 
             var ajaxOptions = {
                 "url": url,
@@ -200,9 +195,11 @@ define(function (require) {
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiPatch = function (options) {
             var url = config.options.fileConnector
-                + options.url
-                + "?path=" + options.path
-                + "&newPath=" + options.newPath
+                    + options.url
+                    + "?path="
+                    + options.path
+                    + "&newPath="
+                    + options.newPath;
 
             var ajaxOptions = {
                 "url": url,
@@ -237,8 +234,8 @@ define(function (require) {
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiDelete = function (options) {
             var url = config.options.fileConnector
-                + options.url
-                + "?path=" + options.path
+                    + options.url
+                    + "?path=" + options.path;
 
             var ajaxOptions = {
                 "url": url,

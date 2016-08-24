@@ -95,7 +95,7 @@ define(function (require) {
                         $("#tree").fancytree({
                             "focusOnSelect": true,
                             source: [{title: config.options.fileRoot, children: data, key: config.options.fileRoot, folder: true, expanded: true}],
-                            activate: function (event, data) {
+                            activate: function (ignore, data) {
                                 // console.log("node key ", data.node);
                                 if (data.node.folder === true) {
                                     self.currentPath(data.node.key);
@@ -141,26 +141,25 @@ define(function (require) {
                 closeOnConfirm: true,
                 animation: "slide-from-top",
                 inputPlaceholder: "Write something"
-            },
-                function (inputValue) {
-                    if (inputValue === false) {
-                        return false;
+            }, function (inputValue) {
+                if (inputValue === false) {
+                    return false;
+                }
+                if (inputValue === "") {
+                    swal.showInputError(self.language.no_foldername);
+                    return false;
+                }
+                //console.log("new folder will be ", inputValue);
+                self._$.apiPost({
+                    url: "/folder",
+                    name: inputValue,
+                    path: self.currentPath(),
+                    success: function () {
+                        self.loadCurrentFolder();
+                        toastr.success(self.language.successful_added_folder, inputValue, {"positionClass": "toast-bottom-right"});
                     }
-                    if (inputValue === "") {
-                        swal.showInputError(self.language.no_foldername);
-                        return false;
-                    }
-                    //console.log("new folder will be ", inputValue);
-                    self._$.apiPost({
-                        url: "/folder",
-                        name: inputValue,
-                        path: self.currentPath(),
-                        success: function () {
-                            self.loadCurrentFolder();
-                            toastr.success(self.language.successful_added_folder, inputValue, {"positionClass": "toast-bottom-right"});
-                        }
-                    });//apiGet
-                });//swal
+                });//apiGet
+            });//swal
         };//createFolder
 
         self.goHome = function () {
@@ -208,7 +207,9 @@ define(function (require) {
                 var cpath = self.currentPath();
                 if (cpath !== config.options.fileRoot) {
                     var newPath = cpath.substring(0, cpath.slice(0, -1).lastIndexOf("/"));
-                    self.currentPath(newPath === "" ? "/" : newPath);
+                    self.currentPath(newPath === ""
+                        ? "/"
+                        : newPath);
                     self.loadCurrentFolder();
                     $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
                     self.loading(false);

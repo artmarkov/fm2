@@ -21,26 +21,36 @@ define(function (require) {
         // This is our context menu for each item, so simple :)
         self.menu = ko.observableArray([{
             text: "<span class='glyphicon glyphicon-download'></span>  Download",
-            action: function () {self.download(); }
+            action: function () {
+                self.download();
+            }
         }, {
             text: "<span class=\'glyphicon glyphicon-random\'></span>  Rename",
-            action: function () {self.rename(); }
+            action: function () {
+                self.rename();
+            }
         }, {
             text: "<span class=\'glyphicon glyphicon-move\'></span>  Move",
-            action: function () {self.move(); }
+            action: function () {
+                self.move();
+            }
         }, {
             text: "<span class='glyphicon glyphicon-trash'></span>  Delete",
-            action: function () {self.removeMe(); }
+            action: function () {
+                self.removeMe();
+            }
         }, {
             text: "<span class='glyphicon glyphicon-info-sign'></span>  Details",
-            action: function () {appVM.goToItem(self); }
+            action: function () {
+                appVM.goToItem(self);
+            }
         }]);
         //{ '<span class=\'glyphicon glyphicon-download\'></span>  Download': download, '<span class=\'glyphicon glyphicon-random\'></span>  Rename': rename, '<span class=\'glyphicon glyphicon-move\'></span>  Move': move }
 
         // console.log("item config -> ", self.config);
 
         // Lets make the entire item into observables
-        self.filename = ko.observable((item.filename));
+        self.filename = ko.observable(item.filename);
         self.fileType = ko.observable(item.fileType);
         self.isDirectory = ko.observable(item.isDirectory);
         self.path = ko.observable(item.path);
@@ -65,7 +75,7 @@ define(function (require) {
                 path: self.path(),
                 success: function (item) {
                     // console.log("reloadSelf item -> ", item);
-                    self.filename((item.filename));
+                    self.filename(item.filename);
                     self.fileType(item.fileType);
                     self.isDirectory(item.isDirectory);
                     self.path(item.path);
@@ -103,7 +113,7 @@ define(function (require) {
                     return self.config.icons.path + self.config.icons.directory;
                 }
                 return self.config.options.fileConnector
-                    + self.directPath();
+                        + self.directPath();
             }
         });//getDownloadUrl
 
@@ -113,7 +123,7 @@ define(function (require) {
                     return self.config.icons.path + self.config.icons.directory;
                 }
                 return self.config.options.fileConnector
-                    + self.preview();
+                        + self.preview();
             }
         });//getDownloadUrl
 
@@ -177,27 +187,26 @@ define(function (require) {
                 closeOnConfirm: true,
                 animation: "slide-from-top",
                 inputPlaceholder: "Write something"
-            },
-                function (inputValue) {
-                    if (inputValue === false) {
-                        return false;
+            }, function (inputValue) {
+                if (inputValue === false) {
+                    return false;
+                }
+                if (inputValue === "") {
+                    swal.showInputError(self.config.language.INVALID_DIRECTORY_OR_FILE);
+                    return false;
+                }
+                self._$.apiPut({
+                    url: "/item/meta/name",
+                    new: inputValue,
+                    path: self.path(),
+                    success: function (result) {
+                        self.path(result.path);
+                        self.reloadSelf();
+                        appVM.loadCurrentFolder();
+                        toastr.success(self.config.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
                     }
-                    if (inputValue === "") {
-                        swal.showInputError(self.config.language.INVALID_DIRECTORY_OR_FILE);
-                        return false;
-                    }
-                    self._$.apiPut({
-                        url: "/item/meta/name",
-                        new: inputValue,
-                        path: self.path(),
-                        success: function (result) {
-                            self.path(result.path);
-                            self.reloadSelf();
-                            appVM.loadCurrentFolder();
-                            toastr.success(self.config.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
-                        }
-                    });//apiGet
-                });//swal
+                });//apiGet
+            });//swal
         };//rename
 
         self.move = function () {
@@ -209,29 +218,28 @@ define(function (require) {
                 closeOnConfirm: true,
                 animation: "slide-from-top",
                 inputPlaceholder: "Write something"
-            },
-                function (inputValue) {
-                    if (inputValue === false) {
-                        return false;
+            }, function (inputValue) {
+                if (inputValue === false) {
+                    return false;
+                }
+                if (inputValue === "") {
+                    swal.showInputError(self.config.language.help_move);
+                    return false;
+                }
+                self._$.apiPatch({
+                    url: "/item",
+                    newPath: inputValue,
+                    path: self.path(),
+                    success: function (result) {
+                        // console.log("move result -> ", result);
+                        self.path(result.path);
+                        self.reloadSelf();
+                        appVM.currentPath(result.dir);
+                        appVM.loadCurrentFolder();
+                        toastr.success(self.config.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
                     }
-                    if (inputValue === "") {
-                        swal.showInputError(self.config.language.help_move);
-                        return false;
-                    }
-                    self._$.apiPatch({
-                        url: "/item",
-                        newPath: inputValue,
-                        path: self.path(),
-                        success: function (result) {
-                            // console.log("move result -> ", result);
-                            self.path(result.path);
-                            self.reloadSelf();
-                            appVM.currentPath(result.dir);
-                            appVM.loadCurrentFolder();
-                            toastr.success(self.config.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
-                        }
-                    });//apiGet
-                });//swal
+                });//apiGet
+            });//swal
         };//move
 
         //naming this 'delete' breaks knockoutjs, blah
@@ -267,19 +275,21 @@ define(function (require) {
                 params: {path: self.path()},
                 maxFiles: 1,
                 method: "put",
-                success: function (file, res) {
+                success: function (ignore, res) {
                     if (res.error) {
                         toastr.error(self.config.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
                     } else {
                         dz.hide();
                         button.show();
-                        var img = $('#detailImage'),
-                            newImg = img.attr('src');
-                        newImg += img.attr('src').indexOf('?') === -1 ? "?" : "&";
+                        var img = $("#detailImage"),
+                            newImg = img.attr("src");
+                        newImg += img.attr("src").indexOf("?") === -1
+                            ? "?"
+                            : "&";
                         newImg += Math.random();
 
                         // console.log("image after random ", newImg);
-                        img.attr('src', newImg);
+                        img.attr("src", newImg);
 
                         toastr.success(self.config.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
                     }
@@ -301,7 +311,7 @@ define(function (require) {
             // if (self.config.options.baseUrl !== false) {
             //     url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
             // } else {
-                url = self.config.options.fileConnector
+            url = self.config.options.fileConnector
                     + "?mode=download"
                     + "&path=" + self.path();
             // }
