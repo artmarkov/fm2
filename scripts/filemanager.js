@@ -322,6 +322,11 @@ define(function (require) {
             limit: 200
         });
 
+        // I think I'll need a custom binding to make the custom scrollbars work properly
+        // $("#tree").mCustomScrollbar({
+        //     axis: "yx"
+        // });
+
         //getDetailView(fileRoot + expandedFolder);
     });//function Initialization
 

@@ -109,11 +109,11 @@ define(function (require) {
                     } else {
                         // console.log("currentPath -> ", self.currentPath());
                         var node = $("#tree").fancytree("getTree").getNodeByKey(self.currentPath());
-                        //if (node.hasChildren()) {
+                        if (node.hasChildren()) {
                         //     console.log("node -> ", node);
                             node.removeChildren();
                             node.render();
-                       // }
+                        }
                         $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).addChildren(data);
                         //$("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setExpanded();
                     }

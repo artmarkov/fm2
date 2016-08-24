@@ -44,12 +44,14 @@ define(function (require) {
         self.fileType = ko.observable(item.fileType);
         self.isDirectory = ko.observable(item.isDirectory);
         self.path = ko.observable(item.path);
+        self.dir = ko.observable(item.dir);
+        self.directPath = ko.observable(item.directPath);
         self.preview = ko.observable(item.preview);
         self.thumbnail = ko.observable(item.thumbnail);
         self.properties = ko.observable({
             dateCreated: item.properties.dateCreated,
             dateModified: item.properties.dateModified,
-            filemtime: item.properties.filemtime,
+            // filemtime: item.properties.filemtime,
             height: item.properties.height,
             width: item.properties.width,
             size: filesize(parseInt(item.properties.size || 0, 10))
@@ -60,17 +62,19 @@ define(function (require) {
                 mode: "getinfo",
                 path: self.path(),
                 success: function (item) {
-                    console.log("reloadSelf item -> ", item);
+                    // console.log("reloadSelf item -> ", item);
                     self.filename((item.filename));
                     self.fileType(item.fileType);
                     self.isDirectory(item.isDirectory);
                     self.path(item.path);
+                    self.dir(item.dir);
+                    self.path(item.directPath);
                     self.preview(item.preview);
                     self.thumbnail(item.thumbnail);
                     self.properties({
                         dateCreated: item.properties.dateCreated,
                         dateModified: item.properties.dateModified,
-                        filemtime: item.properties.filemtime,
+                        // filemtime: item.properties.filemtime,
                         height: item.properties.height,
                         width: item.properties.width,
                         size: filesize(parseInt(item.properties.size || 0, 10))
@@ -97,9 +101,7 @@ define(function (require) {
                     return self.config.icons.path + self.config.icons.directory;
                 }
                 return self.config.options.fileConnector
-                    + "?mode=download"
-                    + "&path=" + encodeURIComponent(self.path())
-                    + "&time=" + Date.now();
+                    + self.directPath();
             }
         });//getDownloadUrl
 
@@ -109,9 +111,7 @@ define(function (require) {
                     return self.config.icons.path + self.config.icons.directory;
                 }
                 return self.config.options.fileConnector
-                    + "?mode=preview"
-                    + "&path=" + encodeURIComponent(self.preview())
-                    + "&time=" + Date.now();
+                    + self.preview();
             }
         });//getDownloadUrl
 
@@ -216,17 +216,17 @@ define(function (require) {
                         swal.showInputError(self.config.language.help_move);
                         return false;
                     }
-                    self._$.apiGet({
-                        mode: "move",
-                        new: inputValue,
-                        old: self.path(),
+                    self._$.apiPatch({
+                        url: "/item",
+                        newPath: inputValue,
+                        path: self.path(),
                         success: function (result) {
-                            console.log("move result -> ", result);
-                            self.path(result.newPath);
+                            // console.log("move result -> ", result);
+                            self.path(result.path);
                             self.reloadSelf();
-                            appVM.currentPath(inputValue);
+                            appVM.currentPath(result.dir);
                             appVM.loadCurrentFolder();
-                            toastr.success(self.config.language.successful_moved, result.newName, {"positionClass": "toast-bottom-right"});
+                            toastr.success(self.config.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
                         }
                     });//apiGet
                 });//swal

@@ -114,9 +114,46 @@ define(function (require) {
             $.ajax(ajaxOptions);
         };//apiGet
 
+        // This is our main access point for the api, everything should pass through this call that is a GET
+        self.apiPatch = function (options) {
+            var url = config.options.fileConnector
+                + options.url
+                + "?path=" + options.path
+                + "&newPath=" + options.newPath
+
+            var ajaxOptions = {
+                "url": url,
+                "method": "PATCH",
+                "dataType": options.dataType || "json",
+                "success": function (data) {
+                    if (data.errors) {
+                        handleAjaxError(data.errors);
+                    } else {
+                        options.success(data.data);
+                    }
+                },
+                "error": function (err) {
+                    if (options.error) {
+                        options.error(err);
+                    } else {
+                        handleAjaxError(err);
+                    }
+                }
+            };
+
+            // console.log("config -> ", config.options.getParams);
+            // console.log("ajaxOptions before -> ", ajaxOptions);
+            if (config.options.getParams) {
+                $.extend(ajaxOptions, config.options.getParams);
+            }
+            //console.log("ajaxOptions after -> ", ajaxOptions);
+
+            $.ajax(ajaxOptions);
+        };//apiGet
+
         self.setDimensions = function () {
 
-            console.log("setDimensions: uploader -> ", $("#uploader").height(), " offset? -> ", $("#uploader").offset().top, " footer -> ", $("#footer").height(), " window -> ", $(window).height());
+            // console.log("setDimensions: uploader -> ", $("#uploader").height(), " offset? -> ", $("#uploader").offset().top, " footer -> ", $("#footer").height(), " window -> ", $(window).height());
             var windowHeight = $(window).height(),
                 headerHeight = $("#uploader").height(),
                 headerOffset = $("#uploader").offset().top,
