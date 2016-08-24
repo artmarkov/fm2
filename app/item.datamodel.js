@@ -257,9 +257,13 @@ define(function (require) {
                     url: "/item",
                     path: self.path(),
                     success: function (result) {
-                        console.log("delete result -> ", result);
+                        // console.log("delete result -> ", result);
                         toastr.success(self.config.language.successful_delete, result.path, {"positionClass": "toast-bottom-right"});
-                        appVM.goLevelUp();
+                        if (appVM.currentView() === "details") {
+                            appVM.goLevelUp();
+                        } else {
+                            appVM.loadCurrentFolder();
+                        }
                     }//success
                 });//apiGet
             });//swal
