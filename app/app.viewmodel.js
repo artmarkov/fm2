@@ -118,7 +118,8 @@ define(function (require) {
         self.loadCurrentFolder = function (init) {
             var newItems = [],
                 newSize = 0,
-                newCount = 0;
+                newCount = 0,
+                $tree = $("#tree");
             self.util.apiGet({
                 // mode: "getfolder",
                 url: "/folder",
@@ -135,7 +136,7 @@ define(function (require) {
                     self.folderSize(filesize(parseInt(newSize || 0, 10)));
                     self.loading(false);
                     if (init) {
-                        $("#tree").fancytree({
+                        $tree.fancytree({
                             "focusOnSelect": true,
                             source: [{title: config.options.fileRoot, children: data, key: config.options.fileRoot, folder: true, expanded: true}],
                             activate: function (ignore, data) {
@@ -149,16 +150,16 @@ define(function (require) {
                                 }
                             }
                         });
-                        $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
+                        $tree.fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
                     } else {
                         // console.log("currentPath -> ", self.currentPath());
-                        var node = $("#tree").fancytree("getTree").getNodeByKey(self.currentPath());
+                        var node = $tree.fancytree("getTree").getNodeByKey(self.currentPath());
                         if (node.hasChildren()) {
                         //     console.log("node -> ", node);
                             node.removeChildren();
                             node.render();
                         }
-                        $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).addChildren(data);
+                        $tree.fancytree("getTree").getNodeByKey(self.currentPath()).addChildren(data);
                         //$("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setExpanded();
                     }
                     self.returnToFolderView();
@@ -202,6 +203,7 @@ define(function (require) {
                         toastr.success(self.language.successful_added_folder, inputValue, {"positionClass": "toast-bottom-right"});
                     }
                 });//apiGet
+                return false;
             });//swal
         };//createFolder
 

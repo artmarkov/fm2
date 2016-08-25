@@ -54,7 +54,7 @@
     "New Name", "Old Path", errors, code, title, description, detail, paths,
     config, jquery, exports, shim, jquery-impromptu, jqueryFileTree
 */
-/*global FileReader,jQuery,$, define*/
+/*global FileReader,$, define*/
 
 /**
  *    Filemanager JS core
@@ -123,7 +123,7 @@ define(function (require) {
     require("css!node_modules/toastr/build/toastr.css");
     require("css!node_modules/bootstrap/dist/css/bootstrap.css");
     require("css!node_modules/sweetalert/dist/sweetalert.css");
-    require("css!node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css")
+    require("css!node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css");
     // Load theme last so nothing overwrites our colors :)
     require("css!styles/fm2.css");
 
@@ -313,7 +313,7 @@ define(function (require) {
         // Provides support for adjustible columns.
         $("#splitter").height(100).split({
             position: appVM.config.options.splitPercentage,
-            orientation: 'vertical',
+            orientation: "vertical",
             limit: 200
         });
 

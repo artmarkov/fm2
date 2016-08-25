@@ -271,8 +271,9 @@ define(function (require) {
 
             // console.log("setDimensions: uploader -> ", $("#uploader").height(), " offset? -> ", $("#uploader").offset().top, " footer -> ", $("#footer").height(), " window -> ", $(window).height());
             var windowHeight = $(window).height(),
-                headerHeight = $("#uploader").height(),
-                headerOffset = $("#uploader").offset().top,
+                $uploader = $("#uploader"),
+                headerHeight = $uploader.height(),
+                headerOffset = $uploader.offset().top,
                 footerHeight = $("#footer").height(),
                 ckEditorExtraHeight = 0;
 

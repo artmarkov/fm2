@@ -1,4 +1,4 @@
-/*global define, window*/
+/*global define, window, data*/
 /**
  * Created by Joshua.Austill on 8/19/2016.
  */
@@ -9,7 +9,7 @@ define(function (require) {
     var filesize = require("filesize");
     var swal = require("sweetalert");
     var toastr = require("toastr");
-    var Utility = require("app/utility.viewmodel");
+    // var Utility = require("app/utility.viewmodel");
 
     return function (appVM, item) {
         var self = this;
@@ -144,6 +144,7 @@ define(function (require) {
                 return appVM.config.options.fileConnector
                         + self.directPath();
             }
+            return false;
         });//getDownloadUrl
 
         self.getPreviewUrl = ko.pureComputed(function () {
@@ -154,6 +155,7 @@ define(function (require) {
                 return appVM.config.options.fileConnector
                         + self.preview();
             }
+            return false;
         });//getDownloadUrl
 
         // Is file in the list of accepted image file formats?
@@ -238,6 +240,7 @@ define(function (require) {
                         toastr.success(appVM.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
                     }
                 });//apiGet
+                return false;
             });//swal
         };//rename
 
@@ -271,6 +274,7 @@ define(function (require) {
                         toastr.success(appVM.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
                     }
                 });//apiGet
+                return false;
             });//swal
         };//move
 
@@ -392,7 +396,7 @@ define(function (require) {
                     }
                 } else {
                     // use FCKEditor 2.0 integration method
-                    if (data.Properties.Width !== "") {
+                    if (data !== undefined && data.Properties.Width !== "") {
                         var p = url;
                         var w = data.Properties.Width;
                         var h = data.Properties.Height;
