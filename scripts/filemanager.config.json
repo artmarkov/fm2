@@ -35,6 +35,7 @@
       }}
   },
     "security": {
+        "capabilities": [ "select", "upload", "download", "rename", "move", "replace", "delete" ],
         "allowFolderDownload": false,
         "allowChangeExtensions": false,
         "allowNoExtension": false,

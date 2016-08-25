@@ -21,7 +21,50 @@ define(function (require) {
         self.config = config;
         self.util = new Utility(self);
         self.language = self.util.getLanguage();
-        // self.config.language = self.language;
+        self.canUpload = ko.observable(false);
+        self.canDownload = ko.observable(false);
+        self.canRename = ko.observable(false);
+        self.canMove = ko.observable(false);
+        self.canDelete = ko.observable(false);
+        self.canReplace = ko.observable(false);
+        self.canSelect = ko.observable(false);
+
+        self.util.apiGet({
+            url: "",
+            success: function (rules) {
+                //console.log("rules -> ", rules);
+                $.extend(self.config, rules[0]);
+                // console.log("self.config after rules load", self.config);
+
+                if ($.inArray("upload", self.config.security.capabilities) !== -1) {
+                    self.canUpload(true);
+                }
+
+                if ($.inArray("download", self.config.security.capabilities) !== -1) {
+                    self.canDownload(true);
+                }
+
+                if ($.inArray("rename", self.config.security.capabilities) !== -1) {
+                    self.canRename(true);
+                }
+
+                if ($.inArray("move", self.config.security.capabilities) !== -1) {
+                    self.canMove(true);
+                }
+
+                if ($.inArray("delete", self.config.security.capabilities) !== -1) {
+                    self.canDelete(true);
+                }
+
+                if ($.inArray("replace", self.config.security.capabilities) !== -1) {
+                    self.canReplace(true);
+                }
+
+                if ($.inArray("select", self.config.security.capabilities) !== -1 && (self.util.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self.util.urlParameters("field_name"))) {
+                    self.canSelect(true);
+                }
+            }
+        });
 
         self.util.loadTheme();
 
@@ -221,20 +264,6 @@ define(function (require) {
             }
         };
 
-        self.hasCapability = function (capability) {
-            // console.log("hasCapability -> ", capability);
-            // if (capability === "select") {
-            //     console.log("hasCapability: urlParameters('CKEditor') -> ", self.util.urlParameters("CKEditor"), " window.opener -> ", window.opener, " window.tinyMCEPopu -> ", window.tinyMCEPopup, " urlParameters('field_name') -> ", self.util.urlParameters("field_name"));
-            // }
-            if (self.config) {
-                if (capability === "select" && (self.util.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self.util.urlParameters("field_name"))) {
-                    return true;
-                }
-                return ($.inArray(capability, self.config.options.capabilities) !== -1 && capability !== "select");
-            }
-            return false;
-        };//hasCapability
-
         self.switchViews = function () {
             // console.log("switchViews start -> ", self.currentView());
             if (self.currentView() !== "list" && self.currentView() !== "grid") {
@@ -252,10 +281,6 @@ define(function (require) {
                 ? "glyphicon glyphicon-th-list"
                 : "glyphicon glyphicon-th";
         });//viewButtonClass
-
-        self.capClasses = ko.computed(function () {
-            return config.options.capabilities;
-        });
 
         // console.log("app.viewmodel version -> ", self.config);
         self.loadCurrentFolder(true);

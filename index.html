@@ -30,7 +30,7 @@
         <div class="pull-right">
             <button type="button" class="btn btn-default" data-bind="click: goLevelUp, visible: currentPath() !== config.options.fileRoot || currentView() === 'details'"><span class="glyphicon glyphicon-level-up"></span></button>
             <button type="button" class="btn btn-default" data-bind="click: goHome, visible: notHome"><span class="glyphicon glyphicon-home"></span></button>
-            <button type="button" class="btn btn-default" data-bind="click: function (){currentView('uploads');}, visible: function () {hasCapability('upload')}"><span class="glyphicon glyphicon-upload"> Upload</span></button>
+            <button type="button" class="btn btn-default" data-bind="click: function (){currentView('uploads');}, visible: canUpload"><span class="glyphicon glyphicon-upload"> Upload</span></button>
             <button type="button" class="btn btn-default" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> New Folder</button>
             <button type="button" data-bind="title: language.list_view, click: switchViews" class="btn btn-default"><span data-bind="css: viewButtonClass"></span></button>
         </div>
@@ -108,12 +108,12 @@
     <div class="text-center" data-bind="with: currentItem">
         <div data-bind="template: {name: templateName}"></div>
         <div>
-            <button class="btn" data-bind="click: selectMe, visible: $root.hasCapability('select')">Select</button>
+            <button class="btn" data-bind="click: selectMe, visible: $root.canSelect">Select</button>
             <button class="btn" data-bind="click: download, visible: canDownload">Download</button>
-            <button class="btn" data-bind="click: rename, visible: $root.hasCapability('rename')">Rename</button>
-            <button class="btn" data-bind="click: move, visible: $root.hasCapability('move')">Move</button>
-            <button class="btn" data-bind="click: removeMe, visible: $root.hasCapability('move')">Delete</button>
-            <button class="btn" data-bind="click: replaceMe, visible: $root.hasCapability('replace')" id="replaceMe">Replace</button>
+            <button class="btn" data-bind="click: rename, visible: $root.canRename">Rename</button>
+            <button class="btn" data-bind="click: move, visible: $root.canMove">Move</button>
+            <button class="btn" data-bind="click: removeMe, visible: $root.canDelete">Delete</button>
+            <button class="btn" data-bind="click: replaceMe, visible: canReplace" id="replaceMe">Replace</button>
             <form id="my-replace-dropzone" style="display: none;" class="dropzone"></form>
             <h1 class="h1">{{filename}}</h1>
             <!--<div id="tools"></div>-->

@@ -344,6 +344,19 @@ module.exports = function () {
      ****************************************************
      */
 
+    // This route will return the servers rules to the ui
+    router.route("/")
+        .get(function (req, res) {
+            res.json({
+                data: [{
+                    security: {
+                        capabilities: config.security.capabilities,
+                        allowedFileTypes: config.security.allowedFileTypes
+                    }
+                }]
+            });
+        });
+
     router.route("/file")
         .post(upload.single("file"), function (req, res) {
             parsePath(req.body.path, function (err, pp) {
