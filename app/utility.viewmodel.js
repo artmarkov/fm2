@@ -9,14 +9,14 @@ define(function (require) {
     var toastr = require("toastr");
     // var ko = require("knockout");
 
-    return function (config) {
+    return function (appVM) {
         var self = this;
         // toastr.info("Is toastr working :)", "Yup, it's are working", {"positionClass": "toast-bottom-right"});
 
         self.getLanguage = function () {
             var culture;
 
-            switch (config.options.culture) {
+            switch (appVM.config.options.culture) {
             case "en":
                 culture = JSON.parse(require("text!scripts/languages/en.json"));
                 break;
@@ -28,7 +28,7 @@ define(function (require) {
         self.loadTheme = function () {
             var theme;
 
-            switch (config.options.theme) {
+            switch (appVM.config.options.theme) {
             case "flat-dark":
                 theme = "themes/flat-dark/styles/filemanager.css";
                 break;
@@ -78,9 +78,9 @@ define(function (require) {
         self.apiGet = function (options) {
             var url = "";
             if (options.url) {
-                url = config.options.fileConnector + options.url + "?path=" + options.path;
+                url = appVM.config.options.fileConnector + options.url + "?path=" + options.path;
             } else {
-                url = config.options.fileConnector
+                url = appVM.config.options.fileConnector
                         + "?mode=" + options.mode
                         + "&path=" + options.path
                         + "&old=" + options.old
@@ -110,10 +110,10 @@ define(function (require) {
                 }
             };
 
-            // console.log("config -> ", config.options.getParams);
+            // console.log("appVM.config -> ", appVM.config.options.getParams);
             // console.log("ajaxOptions before -> ", ajaxOptions);
-            if (config.options.getParams) {
-                $.extend(ajaxOptions, config.options.getParams);
+            if (appVM.config.options.getParams) {
+                $.extend(ajaxOptions, appVM.config.options.getParams);
             }
             //console.log("ajaxOptions after -> ", ajaxOptions);
 
@@ -122,7 +122,7 @@ define(function (require) {
 
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiPost = function (options) {
-            var url = config.options.fileConnector
+            var url = appVM.config.options.fileConnector
                     + options.url
                     + "?path=" + encodeURIComponent(options.path)
                     + "&name=" + encodeURIComponent(options.name);
@@ -148,10 +148,10 @@ define(function (require) {
             };
             // console.log("apiPost url -> ", url);
 
-            // console.log("config -> ", config.options.getParams);
+            // console.log("appVM.config -> ", appVM.config.options.getParams);
             // console.log("ajaxOptions before -> ", ajaxOptions);
-            if (config.options.getParams) {
-                $.extend(ajaxOptions, config.options.getParams);
+            if (appVM.config.options.getParams) {
+                $.extend(ajaxOptions, appVM.config.options.getParams);
             }
             //console.log("ajaxOptions after -> ", ajaxOptions);
 
@@ -160,7 +160,7 @@ define(function (require) {
 
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiPut = function (options) {
-            var url = config.options.fileConnector + options.url + "?path=" + options.path + "&new=" + options.new;
+            var url = appVM.config.options.fileConnector + options.url + "?path=" + options.path + "&new=" + options.new;
 
             var ajaxOptions = {
                 "url": url,
@@ -182,10 +182,10 @@ define(function (require) {
                 }
             };
 
-            // console.log("config -> ", config.options.getParams);
+            // console.log("appVM.config -> ", appVM.config.options.getParams);
             // console.log("ajaxOptions before -> ", ajaxOptions);
-            if (config.options.getParams) {
-                $.extend(ajaxOptions, config.options.getParams);
+            if (appVM.config.options.getParams) {
+                $.extend(ajaxOptions, appVM.config.options.getParams);
             }
             //console.log("ajaxOptions after -> ", ajaxOptions);
 
@@ -194,7 +194,7 @@ define(function (require) {
 
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiPatch = function (options) {
-            var url = config.options.fileConnector
+            var url = appVM.config.options.fileConnector
                     + options.url
                     + "?path="
                     + options.path
@@ -221,10 +221,10 @@ define(function (require) {
                 }
             };
 
-            // console.log("config -> ", config.options.getParams);
+            // console.log("appVM.config -> ", appVM.config.options.getParams);
             // console.log("ajaxOptions before -> ", ajaxOptions);
-            if (config.options.getParams) {
-                $.extend(ajaxOptions, config.options.getParams);
+            if (appVM.config.options.getParams) {
+                $.extend(ajaxOptions, appVM.config.options.getParams);
             }
             //console.log("ajaxOptions after -> ", ajaxOptions);
 
@@ -233,7 +233,7 @@ define(function (require) {
 
         // This is our main access point for the api, everything should pass through this call that is a GET
         self.apiDelete = function (options) {
-            var url = config.options.fileConnector
+            var url = appVM.config.options.fileConnector
                     + options.url
                     + "?path=" + options.path;
 
@@ -257,10 +257,10 @@ define(function (require) {
                 }
             };
 
-            // console.log("config -> ", config.options.getParams);
+            // console.log("appVM.config -> ", appVM.config.options.getParams);
             // console.log("ajaxOptions before -> ", ajaxOptions);
-            if (config.options.getParams) {
-                $.extend(ajaxOptions, config.options.getParams);
+            if (appVM.config.options.getParams) {
+                $.extend(ajaxOptions, appVM.config.options.getParams);
             }
             //console.log("ajaxOptions after -> ", ajaxOptions);
 

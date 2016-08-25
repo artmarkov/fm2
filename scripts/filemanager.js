@@ -154,19 +154,14 @@ define(function (require) {
     var appVM = new AppViewModel();
     ko.applyBindings(appVM);
 
-    var _$ = appVM._$,
-        fileRoot = appVM.config.options.fileRoot,
-        start,
-        lg = appVM.language, //temporary until ko conversion done
-        config = appVM.config, //temporary until ko conversion done
-        $fileinfo = $("#fileinfo");
+    var start;
 
     /*---------------------------------------------------------
      Setup, Layout, and Status Functions
      ---------------------------------------------------------*/
 
     //noinspection JSUnresolvedVariable
-    if (config.options.logger) {
+    if (appVM.config.options.logger) {
         start = Date.now();
     }
 
@@ -193,13 +188,13 @@ define(function (require) {
 //     function editItem(data) {
 //         var isEdited = false;
 //
-//         $fileinfo.find("div#tools").append(" <a id='edit-file' href='#' title='" + lg.edit + "'><span>" + lg.edit + "</span></a>");
+//         $fileinfo.find("div#tools").append(" <a id='edit-file' href='#' title='" + appVM.language.edit + "'><span>" + appVM.language.edit + "</span></a>");
 //
 //         $("#edit-file").click(function () {
 //             $(this).hide(); // hiding Edit link
 //
 //             var d = new Date(), // to prevent IE cache issues
-//                 connectString = fileConnector + "?mode=editfile&path=" + encodeURIComponent(data.Path) + "&config=" + userconfig + "&time=" + d.getMilliseconds();
+//                 connectString = fileConnector + "?mode=editfile&path=" + encodeURIComponent(data.Path) + "&appVM.config=" + userappVM.config + "&time=" + d.getMilliseconds();
 //
 //             $.ajax({
 //                 type: "GET",
@@ -212,8 +207,8 @@ define(function (require) {
 //                     content += "<textarea id='edit-content' name='content'>" + result.Content + "</textarea>";
 //                     content += "<input type='hidden' name='mode' value='savefile' />";
 //                     content += "<input type='hidden' name='path' value='" + data.Path + "' />";
-//                     content += "<button id='edit-cancel' class='edition' type='button'>" + lg.quit_editor + "</button>";
-//                     content += "<button id='edit-save' class='edition' type='button'>" + lg.save + "</button>";
+//                     content += "<button id='edit-cancel' class='edition' type='button'>" + appVM.language.quit_editor + "</button>";
+//                     content += "<button id='edit-save' class='edition' type='button'>" + appVM.language.save + "</button>";
 //                     content += "</form>";
 //
 //                     var el = $("preview");
@@ -237,15 +232,15 @@ define(function (require) {
 //
 //                         $.ajax({
 //                             type: "POST",
-//                             url: fileConnector + "?config=" + userconfig,
+//                             url: fileConnector + "?appVM.config=" + userappVM.config,
 //                             dataType: "json",
 //                             data: postData,
 //                             async: false,
 //                             success: function (result) {
 //                                 // if (result.Code === 0) {
 //                                 isEdited = true;
-//                                 // if (config.options.showConfirmation) $.prompt(lg.successful_edit);
-//                                 $.prompt(lg.successful_edit);
+//                                 // if (appVM.config.options.showConfirmation) $.prompt(appVM.language.successful_edit);
+//                                 $.prompt(appVM.language.successful_edit);
 //                                 // } else {
 //                                 //     isEdited = false;
 //                                 //     $.prompt(result.Error);
@@ -255,8 +250,8 @@ define(function (require) {
 //
 //                     });
 //
-//                     // we instantiate codeMirror according to config options
-// //                    codeMirrorEditor = instantiateCodeMirror(getExtension(data.Path), config);
+//                     // we instantiate codeMirror according to appVM.config options
+// //                    codeMirrorEditor = instantiateCodeMirror(getExtension(data.Path), appVM.config);
 //                     // } else {
 //                     //     isEdited = false;
 //                     //     $.prompt(result.Error);
@@ -289,18 +284,18 @@ define(function (require) {
 
 
         /** Adding a close button triggering callback function if CKEditorCleanUpFuncNum passed */
-        if (_$.urlParameters("CKEditorCleanUpFuncNum")) {
-            $("body").append("<button id='close-btn' type='button'>" + lg.close + "</button>");
+        if (appVM.util.urlParameters("CKEditorCleanUpFuncNum")) {
+            $("body").append("<button id='close-btn' type='button'>" + appVM.language.close + "</button>");
 
             $("#close-btn").click(function () {
-                parent.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorCleanUpFuncNum"));
+                parent.CKEDITOR.tools.callFunction(appVM.util.urlParameters("CKEditorCleanUpFuncNum"));
             });
         }
 
 
 
         // Keep only browseOnly features if needed
-        // if (config.options.browseOnly === true) {
+        // if (appVM.config.options.browseOnly === true) {
         //     $("#file-input-container").remove();
         //     $("#upload").remove();
         //     $("#newfolder").remove();
@@ -317,7 +312,7 @@ define(function (require) {
 
         // Provides support for adjustible columns.
         $("#splitter").height(100).split({
-            position: config.options.splitPercentage,
+            position: appVM.config.options.splitPercentage,
             orientation: 'vertical',
             limit: 200
         });
@@ -334,7 +329,7 @@ define(function (require) {
     var doc = document.documentElement;
     doc.setAttribute("data-useragent", navigator.userAgent);
 
-    if (config.options.logger) {
+    if (appVM.config.options.logger) {
         var end = Date.now();
         var time = end - start;
         console.log("Total execution time : " + time + " ms");

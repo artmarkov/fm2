@@ -13,15 +13,13 @@ define(function (require) {
 
     return function (appVM, item) {
         var self = this;
-        self.config = appVM.config;
-        self._$ = new Utility(self.config);
         item = item || {};
         item.properties = item.properties || {};
 
 
         //{ '<span class=\'glyphicon glyphicon-download\'></span>  Download': download, '<span class=\'glyphicon glyphicon-random\'></span>  Rename': rename, '<span class=\'glyphicon glyphicon-move\'></span>  Move': move }
 
-        // console.log("item config -> ", self.config);
+        // console.log("item config -> ", appVM.config);
 
         // Lets make the entire item into observables
         self.filename = ko.observable(item.filename);
@@ -43,7 +41,7 @@ define(function (require) {
 
         self.reloadSelf = function () {
             // console.log("reloadSelf path -> ", self.path());
-            self._$.apiGet({
+            appVM.util.apiGet({
                 url: "/item/meta",
                 // mode: "getinfo",
                 path: self.path(),
@@ -70,8 +68,8 @@ define(function (require) {
         };//reloadSelf
 
         self.canDownload = ko.pureComputed(function () {
-            if (self.config && !self.isDirectory()) {
-                return $.inArray("download", self.config.options.capabilities) !== -1;
+            if (appVM.config && !self.isDirectory()) {
+                return $.inArray("download", appVM.config.options.capabilities) !== -1;
             }
             return false;
         });
@@ -109,9 +107,9 @@ define(function (require) {
         }
 
         self.getIconUrl = ko.pureComputed(function () {
-            var url = self.config.icons.path;
+            var url = appVM.config.icons.path;
             if (self.isDirectory()) {
-                url += self.config.icons.directory;
+                url += appVM.config.icons.directory;
             } else {
                 url += self.fileType() + ".png";
             }
@@ -121,60 +119,60 @@ define(function (require) {
 
         self.getDownloadUrl = ko.pureComputed(function () {
             // console.log("getDownloadUrl file -> ", self);
-            if (self.config && self.path()) {
+            if (appVM.config && self.path()) {
                 if (self.isDirectory()) {
-                    //return self.config.icons.path + self.config.icons.directory;
+                    //return appVM.config.icons.path + appVM.config.icons.directory;
                     return false;
                 }
-                return self.config.options.fileConnector
+                return appVM.config.options.fileConnector
                         + self.directPath();
             }
         });//getDownloadUrl
 
         self.getPreviewUrl = ko.pureComputed(function () {
-            if (self.config) {
+            if (appVM.config) {
                 if (self.isDirectory()) {
-                    return self.config.icons.path + self.config.icons.directory;
+                    return appVM.config.icons.path + appVM.config.icons.directory;
                 }
-                return self.config.options.fileConnector
+                return appVM.config.options.fileConnector
                         + self.preview();
             }
         });//getDownloadUrl
 
         // Is file in the list of accepted image file formats?
         self.isImageFile = ko.pureComputed(function () {
-            if (self.config) {
-                return $.inArray(self.fileType(), self.config.images.imagesExt || []) !== -1 || self.isDirectory();
+            if (appVM.config) {
+                return $.inArray(self.fileType(), appVM.config.images.imagesExt || []) !== -1 || self.isDirectory();
             }
             return false;
         });
 
         // Test if file is supported web video file
         self.isVideoFile = ko.pureComputed(function () {
-            if (self.config) {
-                return $.inArray(self.fileType(), self.config.videos.videosExt || []) !== -1;
+            if (appVM.config) {
+                return $.inArray(self.fileType(), appVM.config.videos.videosExt || []) !== -1;
             }
             return false;
         });
 
         // Test if file is supported web audio file
         self.isAudioFile = ko.pureComputed(function () {
-            if (self.config) {
-                return $.inArray(self.fileType(), self.config.audios.audiosExt || []) !== -1;
+            if (appVM.config) {
+                return $.inArray(self.fileType(), appVM.config.audios.audiosExt || []) !== -1;
             }
             return false;
         });
 
         // Test if file is pdf file
         self.isPdfFile = ko.pureComputed(function () {
-            if (self.config) {
-                return $.inArray(self.fileType(), self.config.pdfs.pdfsExt || []) !== -1;
+            if (appVM.config) {
+                return $.inArray(self.fileType(), appVM.config.pdfs.pdfsExt || []) !== -1;
             }
             return false;
         });
 
         self.templateName = function () {
-            if (self.config) {
+            if (appVM.config) {
                 if (self.isVideoFile()) {
                     return "video-player-template";
                 }
@@ -197,8 +195,8 @@ define(function (require) {
 
         self.rename = function () {
             swal({
-                title: self.config.language.rename,
-                text: self.config.language.new_filename,
+                title: appVM.language.rename,
+                text: appVM.language.new_filename,
                 type: "input",
                 showCancelButton: true,
                 closeOnConfirm: true,
@@ -209,10 +207,10 @@ define(function (require) {
                     return false;
                 }
                 if (inputValue === "") {
-                    swal.showInputError(self.config.language.INVALID_DIRECTORY_OR_FILE);
+                    swal.showInputError(appVM.language.INVALID_DIRECTORY_OR_FILE);
                     return false;
                 }
-                self._$.apiPut({
+                appVM.util.apiPut({
                     url: "/item/meta/name",
                     new: inputValue,
                     path: self.path(),
@@ -220,7 +218,7 @@ define(function (require) {
                         self.path(result.path);
                         self.reloadSelf();
                         appVM.loadCurrentFolder();
-                        toastr.success(self.config.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
+                        toastr.success(appVM.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
                     }
                 });//apiGet
             });//swal
@@ -228,8 +226,8 @@ define(function (require) {
 
         self.move = function () {
             swal({
-                title: self.config.language.move,
-                text: self.config.language.prompt_foldername,
+                title: appVM.language.move,
+                text: appVM.language.prompt_foldername,
                 type: "input",
                 showCancelButton: true,
                 closeOnConfirm: true,
@@ -240,10 +238,10 @@ define(function (require) {
                     return false;
                 }
                 if (inputValue === "") {
-                    swal.showInputError(self.config.language.help_move);
+                    swal.showInputError(appVM.language.help_move);
                     return false;
                 }
-                self._$.apiPatch({
+                appVM.util.apiPatch({
                     url: "/item",
                     newPath: inputValue,
                     path: self.path(),
@@ -253,7 +251,7 @@ define(function (require) {
                         self.reloadSelf();
                         appVM.currentPath(result.dir);
                         appVM.loadCurrentFolder();
-                        toastr.success(self.config.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
+                        toastr.success(appVM.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
                     }
                 });//apiGet
             });//swal
@@ -262,20 +260,20 @@ define(function (require) {
         //naming this 'delete' breaks knockoutjs, blah
         self.removeMe = function () {
             swal({
-                title: self.config.language.del,
-                text: self.config.language.confirmation_delete,
+                title: appVM.language.del,
+                text: appVM.language.confirmation_delete,
                 type: "warning",
                 showCancelButton: true,
                 closeOnConfirm: true,
                 animation: "slide-from-top",
-                confirmButtonText: self.config.language.yes
+                confirmButtonText: appVM.language.yes
             }, function () {
-                self._$.apiDelete({
+                appVM.util.apiDelete({
                     url: "/item",
                     path: self.path(),
                     success: function (result) {
                         // console.log("delete result -> ", result);
-                        toastr.success(self.config.language.successful_delete, result.path, {"positionClass": "toast-bottom-right"});
+                        toastr.success(appVM.language.successful_delete, result.path, {"positionClass": "toast-bottom-right"});
                         if (appVM.currentView() === "details") {
                             appVM.goLevelUp();
                         } else {
@@ -292,13 +290,13 @@ define(function (require) {
             dz.show();
             button.hide();
             dz.dropzone({
-                url: self.config.options.fileConnector + "/file",
+                url: appVM.config.options.fileConnector + "/file",
                 params: {path: self.path()},
                 maxFiles: 1,
                 method: "put",
                 success: function (ignore, res) {
                     if (res.error) {
-                        toastr.error(self.config.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
+                        toastr.error(appVM.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
                     } else {
                         dz.hide();
                         button.show();
@@ -312,7 +310,7 @@ define(function (require) {
                         // console.log("image after random ", newImg);
                         img.attr("src", newImg);
 
-                        toastr.success(self.config.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
+                        toastr.success(appVM.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
                     }
                 },
                 complete: function (file) {
@@ -329,14 +327,14 @@ define(function (require) {
         // NOTE: closes the window when finished.
         self.selectMe = function () {
             var url;
-            // if (self.config.options.baseUrl !== false) {
+            // if (appVM.config.options.baseUrl !== false) {
             //     url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
             // } else {
-            url = self.config.options.fileConnector
+            url = appVM.config.options.fileConnector
                     + self.directPath();
             // }
 
-            if (window.opener || window.tinyMCEPopup || self._$.urlParameters("field_name") || self._$.urlParameters("CKEditorCleanUpFuncNum") || self._$.urlParameters("CKEditor")) {
+            if (window.opener || window.tinyMCEPopup || appVM.util.urlParameters("field_name") || appVM.util.urlParameters("CKEditorCleanUpFuncNum") || appVM.util.urlParameters("CKEditor")) {
                 if (window.tinyMCEPopup) {
                     // use TinyMCE > 3.0 integration method
                     var win = window.tinyMCEPopup.getWindowArg("window");
@@ -356,8 +354,8 @@ define(function (require) {
                     return;
                 }
                 // tinymce 4 and colorbox
-                if (self._$.urlParameters("field_name")) {
-                    window.parent.document.getElementById(self._$.urlParameters("field_name")).value = url;
+                if (appVM.util.urlParameters("field_name")) {
+                    window.parent.document.getElementById(appVM.util.urlParameters("field_name")).value = url;
 
                     if (window.parent.tinyMCE !== undefined) {
                         window.parent.tinyMCE.activeEditor.windowManager.close();
@@ -365,15 +363,15 @@ define(function (require) {
                     if (window.parent.$.fn.colorbox !== undefined) {
                         window.parent.$.fn.colorbox.close();
                     }
-                } else if (self._$.urlParameters("CKEditor")) {
+                } else if (appVM.util.urlParameters("CKEditor")) {
                     // use CKEditor 3.0 + integration method
                     if (window.opener) {
                         // Popup
-                        window.opener.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorFuncNum"), url);
+                        window.opener.CKEDITOR.tools.callFunction(appVM.util.urlParameters("CKEditorFuncNum"), url);
                     } else {
                         // Modal (in iframe)
-                        window.parent.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorFuncNum"), url);
-                        window.parent.CKEDITOR.tools.callFunction(_$.urlParameters("CKEditorCleanUpFuncNum"));
+                        window.parent.CKEDITOR.tools.callFunction(appVM.util.urlParameters("CKEditorFuncNum"), url);
+                        window.parent.CKEDITOR.tools.callFunction(appVM.util.urlParameters("CKEditorCleanUpFuncNum"));
                     }
                 } else {
                     // use FCKEditor 2.0 integration method
@@ -391,7 +389,7 @@ define(function (require) {
                     window.close();
                 }
             } else {
-                toastr.error(self.config.language.error, self.config.language.fck_select_integration, {"positionClass": "toast-bottom-right"});
+                toastr.error(appVM.language.error, appVM.language.fck_select_integration, {"positionClass": "toast-bottom-right"});
             }
         };//selectMe
 

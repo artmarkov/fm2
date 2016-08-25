@@ -19,11 +19,11 @@ define(function (require) {
         var self = this;
         //configuration stuff first :)
         self.config = config;
-        self._$ = new Utility(self.config);
-        self.language = self._$.getLanguage();
-        self.config.language = self.language;
+        self.util = new Utility(self);
+        self.language = self.util.getLanguage();
+        // self.config.language = self.language;
 
-        self._$.loadTheme();
+        self.util.loadTheme();
 
         // Now we start our data processing
         self.currentPath = ko.observable(config.options.fileRoot);
@@ -76,7 +76,7 @@ define(function (require) {
             var newItems = [],
                 newSize = 0,
                 newCount = 0;
-            self._$.apiGet({
+            self.util.apiGet({
                 // mode: "getfolder",
                 url: "/folder",
                 path: encodeURIComponent(self.currentPath()),
@@ -119,7 +119,7 @@ define(function (require) {
                         //$("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setExpanded();
                     }
                     self.returnToFolderView();
-                    setTimeout(self._$.setDimensions, 100);
+                    setTimeout(self.util.setDimensions, 100);
                     return data;
                 }
             });//apiGet
@@ -150,7 +150,7 @@ define(function (require) {
                     return false;
                 }
                 //console.log("new folder will be ", inputValue);
-                self._$.apiPost({
+                self.util.apiPost({
                     url: "/folder",
                     name: inputValue,
                     path: self.currentPath(),
@@ -224,10 +224,10 @@ define(function (require) {
         self.hasCapability = function (capability) {
             // console.log("hasCapability -> ", capability);
             // if (capability === "select") {
-            //     console.log("hasCapability: urlParameters('CKEditor') -> ", self._$.urlParameters("CKEditor"), " window.opener -> ", window.opener, " window.tinyMCEPopu -> ", window.tinyMCEPopup, " urlParameters('field_name') -> ", self._$.urlParameters("field_name"));
+            //     console.log("hasCapability: urlParameters('CKEditor') -> ", self.util.urlParameters("CKEditor"), " window.opener -> ", window.opener, " window.tinyMCEPopu -> ", window.tinyMCEPopup, " urlParameters('field_name') -> ", self.util.urlParameters("field_name"));
             // }
             if (self.config) {
-                if (capability === "select" && (self._$.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self._$.urlParameters("field_name"))) {
+                if (capability === "select" && (self.util.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self.util.urlParameters("field_name"))) {
                     return true;
                 }
                 return ($.inArray(capability, self.config.options.capabilities) !== -1 && capability !== "select");
