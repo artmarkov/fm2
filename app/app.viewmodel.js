@@ -160,7 +160,7 @@ define(function (require) {
                             node.render();
                         }
                         $tree.fancytree("getTree").getNodeByKey(self.currentPath()).addChildren(data);
-                        //$("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setExpanded();
+                        // $tree.fancytree("getTree").getNodeByKey(self.currentPath()).setExpanded();
                     }
                     self.returnToFolderView();
                     setTimeout(self.util.setDimensions, 100);
