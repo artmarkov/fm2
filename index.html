@@ -25,13 +25,13 @@
 <div>
     <div id="uploader" method="post">
         <div class="pull-left">
-            <h6 data-bind="text: 'Current Folder: ' + currentPath()"></h6>
+            <h6 data-bind="text: language.current_folder + currentPath()"></h6>
             </div>
         <div class="pull-right">
             <button type="button" class="btn btn-default" data-bind="click: goLevelUp, visible: currentPath() !== config.options.fileRoot || currentView() === 'details'"><span class="glyphicon glyphicon-level-up"></span></button>
             <button type="button" class="btn btn-default" data-bind="click: goHome, visible: notHome"><span class="glyphicon glyphicon-home"></span></button>
-            <button type="button" class="btn btn-default" data-bind="click: function (){currentView('uploads');}, visible: canUpload"><span class="glyphicon glyphicon-upload"> Upload</span></button>
-            <button type="button" class="btn btn-default" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> New Folder</button>
+            <button type="button" class="btn btn-default" data-bind="click: function (){currentView('uploads');}, visible: canUpload"><span class="glyphicon glyphicon-upload"> {{language.upload}}</span></button>
+            <button type="button" class="btn btn-default" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> {{language.new_folder}}</button>
             <button type="button" data-bind="title: language.list_view, click: switchViews" class="btn btn-default"><span data-bind="css: viewButtonClass"></span></button>
         </div>
 
@@ -49,7 +49,7 @@
 
 <div id="footer">
     <div class="pull-left">
-        <p data-bind="text: 'Version: ' + config.version"></p>
+        <p data-bind="text: language.version + config.version"></p>
     </div>
     <div class="pull-right">
         <a data-bind="attr: {href: config.url}" id="link-to-project"></a>
@@ -74,7 +74,6 @@
             <div id="contents" class="" data-bind="foreach: {data: currentFolder, as: 'item'}">
                 <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2 col-fix grid-border text-center" data-bind="click: $root.browseToItem, contextMenu: menu">
                     <img width="64" data-bind="attr: {src: getIconUrl, alt: getIconUrl, dataPath: getIconUrl}"/>
-
                     <p class="text-center" data-bind="text: item.filename"></p>
                 </div>
             </div>
@@ -108,24 +107,24 @@
     <div class="text-center" data-bind="with: currentItem">
         <div data-bind="template: {name: templateName}"></div>
         <div>
-            <button class="btn" data-bind="click: selectMe, visible: $root.canSelect">Select</button>
-            <button class="btn" data-bind="click: download, visible: canDownload">Download</button>
-            <button class="btn" data-bind="click: rename, visible: $root.canRename">Rename</button>
-            <button class="btn" data-bind="click: move, visible: $root.canMove">Move</button>
-            <button class="btn" data-bind="click: removeMe, visible: $root.canDelete">Delete</button>
-            <button class="btn" data-bind="click: replaceMe, visible: canReplace" id="replaceMe">Replace</button>
+            <button class="btn" data-bind="click: selectMe, visible: $root.canSelect">{{$root.language.select}}</button>
+            <button class="btn" data-bind="click: download, visible: canDownload">{{$root.language.download}}</button>
+            <button class="btn" data-bind="click: rename, visible: $root.canRename">{{$root.language.rename}}</button>
+            <button class="btn" data-bind="click: move, visible: $root.canMove">{{$root.language.move}}</button>
+            <button class="btn" data-bind="click: removeMe, visible: $root.canDelete">{{$root.language.del}}</button>
+            <button class="btn" data-bind="click: replaceMe, visible: canReplace" id="replaceMe">{{$root.language.replace}}</button>
             <form id="my-replace-dropzone" style="display: none;" class="dropzone"></form>
             <h1 class="h1">{{filename}}</h1>
             <!--<div id="tools"></div>-->
         </div>
         <dl>
-            <dt>Dimensions</dt>
+            <dt>{{$root.language.dimensions}}</dt>
             <dd>{{properties().height}}x{{properties().width}}</dd>
-            <dt>Created</dt>
+            <dt>{{$root.language.created}}</dt>
             <dd>{{properties().dateCreated}}</dd>
-            <dt>Modified</dt>
+            <dt>{{$root.language.modified}}</dt>
             <dd>{{properties().dateModified}}</dd>
-            <dt>Size</dt>
+            <dt>{{$root.language.size}}</dt>
             <dd>{{properties().size}}</dd>
         </dl>
     </div>

@@ -7,20 +7,93 @@ define(function (require) {
     "use strict";
     var $ = require("jquery");
     var toastr = require("toastr");
-    // var ko = require("knockout");
 
     return function (appVM) {
         var self = this;
-        // toastr.info("Is toastr working :)", "Yup, it's are working", {"positionClass": "toast-bottom-right"});
 
         self.getLanguage = function () {
             var culture;
 
             switch (appVM.config.options.culture) {
+            case "ar":
+                culture = JSON.parse(require("text!scripts/languages/ar.json"));
+                break;
+            case "bs":
+                culture = JSON.parse(require("text!scripts/languages/bs.json"));
+                break;
+            case "ca":
+                culture = JSON.parse(require("text!scripts/languages/ca.json"));
+                break;
+            case "cs":
+                culture = JSON.parse(require("text!scripts/languages/cs.json"));
+                break;
+            case "da":
+                culture = JSON.parse(require("text!scripts/languages/da.json"));
+                break;
+            case "de":
+                culture = JSON.parse(require("text!scripts/languages/de.json"));
+                break;
+            case "el":
+                culture = JSON.parse(require("text!scripts/languages/el.json"));
+                break;
             case "en":
                 culture = JSON.parse(require("text!scripts/languages/en.json"));
                 break;
-            }
+            case "en-gb":
+                culture = JSON.parse(require("text!scripts/languages/en-gb.json"));
+                break;
+            case "es":
+                culture = JSON.parse(require("text!scripts/languages/es.json"));
+                break;
+            case "fi":
+                culture = JSON.parse(require("text!scripts/languages/fi.json"));
+                break;
+            case "fr":
+                culture = JSON.parse(require("text!scripts/languages/fr.json"));
+                break;
+            case "he":
+                culture = JSON.parse(require("text!scripts/languages/he.json"));
+                break;
+            case "hu":
+                culture = JSON.parse(require("text!scripts/languages/hu.json"));
+                break;
+            case "it":
+                culture = JSON.parse(require("text!scripts/languages/it.json"));
+                break;
+            case "ja":
+                culture = JSON.parse(require("text!scripts/languages/ja.json"));
+                break;
+            case "nl":
+                culture = JSON.parse(require("text!scripts/languages/nl.json"));
+                break;
+            case "pl":
+                culture = JSON.parse(require("text!scripts/languages/pl.json"));
+                break;
+            case "pt":
+                culture = JSON.parse(require("text!scripts/languages/pt.json"));
+                break;
+            case "ru":
+                culture = JSON.parse(require("text!scripts/languages/ru.json"));
+                break;
+            case "sv":
+                culture = JSON.parse(require("text!scripts/languages/sv.json"));
+                break;
+            case "tr":
+                culture = JSON.parse(require("text!scripts/languages/tr.json"));
+                break;
+            case "vn":
+                culture = JSON.parse(require("text!scripts/languages/vn.json"));
+                break;
+            case "zh-cn":
+                culture = JSON.parse(require("text!scripts/languages/zh-cn.json"));
+                break;
+            case "zh-tw":
+                culture = JSON.parse(require("text!scripts/languages/zh-tw.json"));
+                break;
+            default:
+                culture = JSON.parse(require("text!scripts/languages/en.json"));
+                break;
+            }//switch language
 
             return culture;
         };//getLanguage

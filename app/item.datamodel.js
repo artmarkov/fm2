@@ -302,6 +302,10 @@ define(function (require) {
             button.hide();
             dz.dropzone({
                 url: appVM.config.options.fileConnector + "/file",
+                dictCancelUpload: appVM.language.cancel,
+                dictRemoveFile: appVM.language.del,
+                dictDefaultMessage: appVM.language.dz_dictDefaultMessage,
+                dictInvalidFileType: appVM.language.dz_dictInvalidFileType,
                 params: {path: self.path()},
                 maxFiles: 1,
                 method: "put",
