@@ -89,5 +89,7 @@
     "version": "version",
     "yes": "Yes",
     "ok": "Ok",
-    "error": "Error!"
+    "error": "Error!",
+    "details": "Details",
+    "inputPlaceholder": "Write something..."
 }

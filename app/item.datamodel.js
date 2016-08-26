@@ -9,7 +9,6 @@ define(function (require) {
     var filesize = require("filesize");
     var swal = require("sweetalert");
     var toastr = require("toastr");
-    // var Utility = require("app/utility.viewmodel");
 
     return function (appVM, item) {
         var self = this;
@@ -28,20 +27,17 @@ define(function (require) {
         self.properties = ko.observable({
             dateCreated: item.properties.dateCreated,
             dateModified: item.properties.dateModified,
-            // filemtime: item.properties.filemtime,
             height: item.properties.height,
             width: item.properties.width,
             size: filesize(parseInt(item.properties.size || 0, 10))
         });//self.properties
 
+        //This function makes a call to the api to reload the current item.  Used after replacing,renaming,moving, etc to ensure success
         self.reloadSelf = function () {
-            // console.log("reloadSelf path -> ", self.path());
             appVM.util.apiGet({
                 url: "/item/meta",
-                // mode: "getinfo",
                 path: self.path(),
                 success: function (item) {
-                    // console.log("reloadSelf item -> ", item);
                     self.filename(item.filename);
                     self.fileType(item.fileType);
                     self.isDirectory(item.isDirectory);
@@ -53,11 +49,10 @@ define(function (require) {
                     self.properties({
                         dateCreated: item.properties.dateCreated,
                         dateModified: item.properties.dateModified,
-                        // filemtime: item.properties.filemtime,
                         height: item.properties.height,
                         width: item.properties.width,
                         size: filesize(parseInt(item.properties.size || 0, 10))
-                    });
+                    });//self.properties
                 }//success
             });//apiGet
         };//reloadSelf
@@ -72,56 +67,56 @@ define(function (require) {
 
         // This is our context menu for each item, so simple :)
         self.menu = ko.observableArray([{
-            text: "<span class='glyphicon glyphicon-info-sign'></span>  Details",
+            text: "<span class='glyphicon glyphicon-info-sign'></span>  " + appVM.language.details,
             action: function () {
                 appVM.goToItem(self);
-            }
-        }]);
+            }//self.menu.push
+        }]);//self.menu
 
         if (appVM.canSelect()) {
             self.menu.push({
-                text: "<span class='glyphicon glyphicon-download'></span>  Select",
+                text: "<span class='glyphicon glyphicon-download'></span>  " + appVM.language.select,
                 action: function () {
                     self.selectMe();
                 }
-            });
-        }
+            });//self.menu.push
+        }//if canSelect
 
         if (self.canDownload()) {
             self.menu.push({
-                text: "<span class='glyphicon glyphicon-download'></span>  Download",
+                text: "<span class='glyphicon glyphicon-download'></span>  " + appVM.language.download,
                 action: function () {
                     self.download();
                 }
-            });
-        }
+            });//self.menu.push
+        }//if canDownload
 
         if (appVM.canRename()) {
             self.menu.push({
-                text: "<span class=\'glyphicon glyphicon-random\'></span>  Rename",
+                text: "<span class=\'glyphicon glyphicon-random\'></span>  " + appVM.language.rename,
                 action: function () {
                     self.rename();
                 }
-            });
-        }
+            });//self.menu.push
+        }//if canRename
 
         if (appVM.canMove()) {
             self.menu.push({
-                text: "<span class=\'glyphicon glyphicon-move\'></span>  Move",
+                text: "<span class=\'glyphicon glyphicon-move\'></span>  " + appVM.language.move,
                 action: function () {
                     self.move();
                 }
-            });
-        }
+            });//self.menu.push
+        }//if canMove
 
         if (appVM.canDelete()) {
             self.menu.push({
-                text: "<span class='glyphicon glyphicon-trash'></span>  Delete",
+                text: "<span class='glyphicon glyphicon-trash'></span>  " + appVM.language.del,
                 action: function () {
                     self.removeMe();
                 }
-            });
-        }
+            });//self.menu.push
+        }//if canDelete
 
         self.getIconUrl = ko.pureComputed(function () {
             var url = appVM.config.icons.path;
@@ -129,21 +124,18 @@ define(function (require) {
                 url += appVM.config.icons.directory;
             } else {
                 url += self.fileType() + ".png";
-            }
-
+            }//if
             return url;
         });//getIconUrl
 
         self.getDownloadUrl = ko.pureComputed(function () {
-            // console.log("getDownloadUrl file -> ", self);
             if (appVM.config && self.path()) {
                 if (self.isDirectory()) {
-                    //return appVM.config.icons.path + appVM.config.icons.directory;
                     return false;
-                }
+                }//if
                 return appVM.config.options.fileConnector
                         + self.directPath();
-            }
+            }//if
             return false;
         });//getDownloadUrl
 
@@ -151,10 +143,10 @@ define(function (require) {
             if (appVM.config) {
                 if (self.isDirectory()) {
                     return appVM.config.icons.path + appVM.config.icons.directory;
-                }
+                }//if
                 return appVM.config.options.fileConnector
                         + self.preview();
-            }
+            }//if
             return false;
         });//getDownloadUrl
 
@@ -162,46 +154,46 @@ define(function (require) {
         self.isImageFile = ko.pureComputed(function () {
             if (appVM.config) {
                 return $.inArray(self.fileType(), appVM.config.images.imagesExt || []) !== -1 || self.isDirectory();
-            }
+            }//if
             return false;
-        });
+        });//isImageFile
 
         // Test if file is supported web video file
         self.isVideoFile = ko.pureComputed(function () {
             if (appVM.config) {
                 return $.inArray(self.fileType(), appVM.config.videos.videosExt || []) !== -1;
-            }
+            }//if
             return false;
-        });
+        });//isVideoFile
 
         // Test if file is supported web audio file
         self.isAudioFile = ko.pureComputed(function () {
             if (appVM.config) {
                 return $.inArray(self.fileType(), appVM.config.audios.audiosExt || []) !== -1;
-            }
+            }//if
             return false;
-        });
+        });//isAudioFile
 
         // Test if file is pdf file
         self.isPdfFile = ko.pureComputed(function () {
             if (appVM.config) {
                 return $.inArray(self.fileType(), appVM.config.pdfs.pdfsExt || []) !== -1;
-            }
+            }//if
             return false;
-        });
+        });//ifPdfFile
 
         self.templateName = function () {
             if (appVM.config) {
                 if (self.isVideoFile()) {
                     return "video-player-template";
-                }
+                }//if isVideoFile
                 if (self.isAudioFile()) {
                     return "audio-player-template";
-                }
+                }//if isAudioFile
                 if (self.isPdfFile()) {
                     return "pdf-viewer-template";
-                }
-            }
+                }//if isPdfFile
+            }//if appVM.config
             return "image-template";
         };//templateName
 
@@ -209,7 +201,7 @@ define(function (require) {
             var downloadUrl = self.getDownloadUrl();
             if (downloadUrl) {
                 window.location = downloadUrl;
-            }
+            }//if downloadUrl
         };//download
 
         self.rename = function () {
@@ -220,15 +212,15 @@ define(function (require) {
                 showCancelButton: true,
                 closeOnConfirm: true,
                 animation: "slide-from-top",
-                inputPlaceholder: "Write something"
+                inputPlaceholder: appVM.language.inputPlaceholder
             }, function (inputValue) {
                 if (inputValue === false) {
                     return false;
-                }
+                }//if
                 if (inputValue === "") {
                     swal.showInputError(appVM.language.INVALID_DIRECTORY_OR_FILE);
                     return false;
-                }
+                }//if
                 appVM.util.apiPut({
                     url: "/item/meta/name",
                     new: inputValue,
@@ -238,7 +230,7 @@ define(function (require) {
                         self.reloadSelf();
                         appVM.loadCurrentFolder();
                         toastr.success(appVM.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
-                    }
+                    }//success
                 });//apiGet
                 return false;
             });//swal
@@ -252,21 +244,20 @@ define(function (require) {
                 showCancelButton: true,
                 closeOnConfirm: true,
                 animation: "slide-from-top",
-                inputPlaceholder: "Write something"
+                inputPlaceholder: appVM.language.inputPlaceholder
             }, function (inputValue) {
                 if (inputValue === false) {
                     return false;
-                }
+                }//if
                 if (inputValue === "") {
                     swal.showInputError(appVM.language.help_move);
                     return false;
-                }
+                }//if
                 appVM.util.apiPatch({
                     url: "/item",
                     newPath: inputValue,
                     path: self.path(),
                     success: function (result) {
-                        // console.log("move result -> ", result);
                         self.path(result.path);
                         self.reloadSelf();
                         appVM.currentPath(result.dir);
@@ -293,7 +284,6 @@ define(function (require) {
                     url: "/item",
                     path: self.path(),
                     success: function (result) {
-                        // console.log("delete result -> ", result);
                         toastr.success(appVM.language.successful_delete, result.path, {"positionClass": "toast-bottom-right"});
                         if (appVM.currentView() === "details") {
                             appVM.goLevelUp();
@@ -321,6 +311,8 @@ define(function (require) {
                     } else {
                         dz.hide();
                         button.show();
+
+                        //This ensures the image is reloaded by appending a random number
                         var img = $("#detailImage"),
                             newImg = img.attr("src");
                         newImg += img.attr("src").indexOf("?") === -1
@@ -328,16 +320,15 @@ define(function (require) {
                             : "&";
                         newImg += Math.random();
 
-                        // console.log("image after random ", newImg);
                         img.attr("src", newImg);
 
                         toastr.success(appVM.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
-                    }
-                },
+                    }//if
+                }, //success
                 complete: function (file) {
                     this.removeFile(file);
-                }
-            });
+                }//complete
+            });//dropzone
         };//replaceMe
 
         // Calls the SetUrl function for FCKEditor compatibility,
@@ -347,13 +338,8 @@ define(function (require) {
         // contextual menu option in list views.
         // NOTE: closes the window when finished.
         self.selectMe = function () {
-            var url;
-            // if (appVM.config.options.baseUrl !== false) {
-            //     url = smartPath(baseUrl, data.Path.replace(fileRoot, ""));
-            // } else {
-            url = appVM.config.options.fileConnector
+            var url = appVM.config.options.fileConnector
                     + self.directPath();
-            // }
 
             if (window.opener || window.tinyMCEPopup || appVM.util.urlParameters("field_name") || appVM.util.urlParameters("CKEditorCleanUpFuncNum") || appVM.util.urlParameters("CKEditor")) {
                 if (window.tinyMCEPopup) {
@@ -364,26 +350,27 @@ define(function (require) {
                         // Update image dimensions
                         if (win.ImageDialog.getImageData) {
                             win.ImageDialog.getImageData();
-                        }
+                        }//if
 
                         // Preview if necessary
                         if (win.ImageDialog.showPreviewImage) {
                             win.ImageDialog.showPreviewImage(url);
-                        }
-                    }
+                        }//if
+                    }//if ImageDialog
                     window.tinyMCEPopup.close();
                     return;
-                }
+                }//if tinyMCEPopup
+
                 // tinymce 4 and colorbox
                 if (appVM.util.urlParameters("field_name")) {
                     window.parent.document.getElementById(appVM.util.urlParameters("field_name")).value = url;
 
                     if (window.parent.tinyMCE !== undefined) {
                         window.parent.tinyMCE.activeEditor.windowManager.close();
-                    }
+                    }//if
                     if (window.parent.$.fn.colorbox !== undefined) {
                         window.parent.$.fn.colorbox.close();
-                    }
+                    }//if
                 } else if (appVM.util.urlParameters("CKEditor")) {
                     // use CKEditor 3.0 + integration method
                     if (window.opener) {
@@ -393,7 +380,7 @@ define(function (require) {
                         // Modal (in iframe)
                         window.parent.CKEDITOR.tools.callFunction(appVM.util.urlParameters("CKEditorFuncNum"), url);
                         window.parent.CKEDITOR.tools.callFunction(appVM.util.urlParameters("CKEditorCleanUpFuncNum"));
-                    }
+                    }//if opener
                 } else {
                     // use FCKEditor 2.0 integration method
                     if (data !== undefined && data.Properties.Width !== "") {
@@ -403,16 +390,15 @@ define(function (require) {
                         window.opener.SetUrl(p, w, h);
                     } else {
                         window.opener.SetUrl(url);
-                    }
-                }
+                    }//if
+                }//if tinyMCE 4 and colorbox
 
                 if (window.opener) {
                     window.close();
-                }
+                }//if opener
             } else {
                 toastr.error(appVM.language.error, appVM.language.fck_select_integration, {"positionClass": "toast-bottom-right"});
-            }
+            }//if we are a plugin for an editor
         };//selectMe
-
     };//Item
 });//define
