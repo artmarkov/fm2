@@ -36,7 +36,7 @@ print "-------------------------------------------\n" + bcolors.ENDC
 
 for files in os.listdir("."):
     # we exclude 'en.json' file
-    if files.endswith(".js") and files != 'en.json':
+    if files.endswith(".json") and files != 'en.json':
         filesList.append(files) # we populate filesList
         print bcolors.OKBLUE + files+ bcolors.ENDC # display file names
 
