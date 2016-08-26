@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/jlaustill/Filemanager-2.0.svg?branch=master)](https://travis-ci.org/jlaustill/Filemanager-2.0)
 Filemanager
 ========================
 
