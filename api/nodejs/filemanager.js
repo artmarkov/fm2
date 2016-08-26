@@ -34,8 +34,8 @@ var express = require("express");
 var router = express.Router();
 var fs = require("fs");
 var paths = require("path");
-var multer  = require('multer');
-var upload = multer({ dest: 'upload/'});
+var multer  = require("multer");
+var upload = multer({ dest: "upload/"});
 var config = require("../config/fm2.api.config.json");
 
 paths.posix = require("path-posix");
@@ -103,7 +103,9 @@ module.exports = function () {
                 "source": "parsePath",
                 "status": "error"
             }));
+            return false;
         }
+        return false;
     }//parsePath
 
     // This function will create the return object for a file.  This keeps it consistent and
@@ -180,7 +182,7 @@ module.exports = function () {
     function getIndividualFileInfo(pp, files, loopInfo, callback, $index) {
         parsePath(paths.posix.join(pp.uiPath, files[$index]), function (err, ipp) {
             if (err) {
-                callback(err);
+                return callback(err);
             } else {
                 getinfo(ipp, function (result) {
                     // console.log("config -> ", config.security.allowedFileTypes.indexOf(result.fileType), " and ", result);
@@ -188,10 +190,12 @@ module.exports = function () {
                         loopInfo.results.push(result);
                     }
                     if ($index + 1 >= loopInfo.total) {
-                        callback(loopInfo.results);
+                        return callback(loopInfo.results);
                     }//if
+                    return false;
                 });//getinfo
             }//if
+            return false;
         });//parsePath
     }//getIndividualFileInfo
 
@@ -199,29 +203,31 @@ module.exports = function () {
         fs.stat(pp.osFullPath, function (err) {
             if (err) {
                 console.log("err -> ", err);
-                callback(errors(err));
+                return callback(errors(err));
             } else {
                 fs.readdir(pp.osFullPath, function (err, files) {
+                    var loopInfo = {
+                            results: [],
+                            total: files.length
+                        },
+                        i;
                     if (err) {
                         //console.log("err -> ", err);
-                        callback(errors(err));
+                        return callback(errors(err));
                     } else {
-                        var loopInfo = {
-                                results: [],
-                                total: files.length
-                            },
-                            i;
 
                         if (loopInfo.total === 0) {
-                            callback(loopInfo.results);
+                            return callback(loopInfo.results);
                         }
 
                         for (i = 0; i < loopInfo.total; i++) {
                             getIndividualFileInfo(pp, files, loopInfo, callback, i);
                         }//for
                     }//if
+                    return false;
                 });//fs.readdir
             }//if
+            return false;
         });//fs.stat
     }//getinfo
 
@@ -231,17 +237,17 @@ module.exports = function () {
             if (pp.isDirectory === true) {
                 fs.rmdir(pp.osFullPath, function (err) {
                     if (err) {
-                        callback(errors(err));
+                        return callback(errors(err));
                     } else {
-                        callback(item);//callback
+                        return callback(item);//callback
                     }//if
                 });//fs.rmdir
             } else {
                 fs.unlink(pp.osFullPath, function (err) {
                     if (err) {
-                        callback(errors(err));
+                        return callback(errors(err));
                     } else {
-                        callback(item);//callback
+                        return callback(item);//callback
                     }//if
                 });//fs.unlink
             }//if
@@ -252,12 +258,13 @@ module.exports = function () {
     function addfolder(pp, name, callback) {
         fs.mkdir(paths.join(pp.osFullPath, name), function (err) {
             if (err) {
-                callback(errors(err));
+                return callback(errors(err));
             } else {
                 getinfo(pp, function (ipp) {
                     callback(ipp);//callback
                 });
             }//if
+            return false;
         });//fs.mkdir
     }//addfolder
 
@@ -275,9 +282,9 @@ module.exports = function () {
         fs.rename(oldfilename, newfilename, function (err) {
             if (err) {
                 console.log("replacefile error -> ", err);
-                callback(errors(err));
+                return callback(errors(err));
             } else {
-                callback({
+                return callback({
                     "path": pp.uiPath,
                     "name": pp.isDirectory ? file.originalname : pp.filename
                 });//callback
@@ -299,9 +306,9 @@ module.exports = function () {
         fs.rename(oldfilename, newfilename, function (err) {
             if (err) {
                 console.log("savefiles error -> ", err);
-                callback(errors(err));
+                return callback(errors(err));
             } else {
-                callback({
+                return callback({
                     "path": pp.uiPath,
                     "name": pp.isDirectory ? file.originalname : pp.filename
                 });//callback
@@ -314,18 +321,20 @@ module.exports = function () {
         console.log("rename old -> ", old, " new -> ", newish);
         fs.rename(old.osFullPath, newish.osFullPath, function (err) {
             if (err) {
-                callback(errors(err));
+                return callback(errors(err));
             } else {
                 parsePath(newish.uiPath, function (err, pp) {
                     if (err) {
-                        callback(err);
+                        return callback(err);
                     } else {
                         getinfo(pp, function (ipp) {
                             callback(ipp);
                         });//getinfo
                     } //if
+                    return false;
                 });//parsePath
             }//if
+            return false;
         }); //fs.rename
     }//rename
 
@@ -383,7 +392,7 @@ module.exports = function () {
         }); //put
 
     router.route("/item")
-        .get(function (req,res) {
+        .get(function (req, res) {
             parsePath(req.query.path, function (err, pp) {
                 if (err) {
                     respond(res, err);

@@ -76,7 +76,6 @@ require.config({
         // "clipboard": "scripts/zeroclipboard/copy",
         "filesize": "node_modules/filesize/lib/filesize",
         "jquery": "node_modules/jquery/dist/jquery",
-        "jqueryContextMenu": "scripts/jquery.contextmenu/jquery.contextMenu-1.01",
         "jqueryfancytree": "node_modules/jquery.fancytree/dist/jquery.fancytree",
         "jquerySplitter": "node_modules/jquery.splitter/js/jquery.splitter",
         "jqueryMCustomScrollbar": "node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar",
@@ -84,7 +83,6 @@ require.config({
         "knockout": "node_modules/knockout/build/output/knockout-latest.debug",
         "knockout.contextmenu": "node_modules/knockout.contextmenu/dist/js/knockout.contextmenu",
         "knockoutPunches": "node_modules/knockout-punches/knockout.punches",
-        "livesearch": "scripts/filemanager.liveSearch.min",
         "sweetalert": "node_modules/sweetalert/dist/sweetalert-dev",
         "text": "node_modules/text/text",
         "toastr": "node_modules/toastr/build/toastr.min"
@@ -95,14 +93,12 @@ require.config({
         "jquery": {
             exports: "$"
         },
-        "jqueryContextMenu": ["jquery"],
         "jqueryfancytree": ["jquery", "jquery.ui"],
         "jquerySplitter": ["jquery"],
         "jqueryMCustomScrollbar": ["jquery"],
         "jquery.ui": ["jquery"],
         "knockout.contextmenu": ["knockout"],
         "knockoutPunches": ["knockout"],
-        "livesearch": ["jquery"],
         "toastr": {
             exports: "toastr"
         }
@@ -137,9 +133,7 @@ define(function (require) {
 
     //load libraries
     require("dropzone");
-    require("livesearch");
     require("bootstrap");
-    // require("clipboard");
 
     //load knockout and related
     var ko = require("knockout");
