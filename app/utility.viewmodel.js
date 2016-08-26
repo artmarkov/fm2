@@ -113,7 +113,7 @@ define(function (require) {
                 break;
             default:
                 theme = "themes/default/styles/filemanager.css";
-            }
+            }//switch theme
 
             var cssLink = $("<link rel='stylesheet' type='text/css' href='" + theme + "'>");
             $("head").append(cssLink);
@@ -121,30 +121,28 @@ define(function (require) {
             return theme;
         };//loadTheme
 
-        // return filename extension
+        // return filename extension, I bet there is a robust library for this somewhere?
         self.getExtension = function (filename) {
             if (filename.split(".").length === 1) {
                 return "";
-            }
+            }//if
             return filename.split(".").pop().toLowerCase();
-        };
+        };//getExtension
 
-        // function to retrieve GET params
+        // function to retrieve GET params, I bet there is a robust library for this somewhere?
         self.urlParameters = function (name) {
             var results = new RegExp("[\\?&]" + name + "=([^&#]*)").exec(window.location.href);
             if (results) {
                 return results[1];
-            }
+            }//if
             return 0;
         };//urlParameters
 
         // Handle ajax request error.
         var handleAjaxError = function (err) {
-            console.log("handle it?");
             $.each(err, function (ignore, e) {
-                console.log("e -> ", e);
                 toastr.error(e.title + ": " + e.code, e.detail, {"positionClass": "toast-bottom-right"});
-            });
+            });//each error
         };//handleAjaxError
 
         // This is our main access point for the api, everything should pass through this call that is a GET
@@ -160,9 +158,7 @@ define(function (require) {
                         + "&new=" + options.new
                         + "&name=" + encodeURIComponent(options.foldername)
                         + "&time=" + Date.now();
-            }
-
-            // console.log("apiGet url -> ", url);
+            }//if url, everything should have a url now
 
             var ajaxOptions = {
                 "url": url,
@@ -172,28 +168,25 @@ define(function (require) {
                         handleAjaxError(data.errors);
                     } else {
                         options.success(data.data);
-                    }
-                },
+                    }//if
+                }, //success
                 "error": function (err) {
                     if (options.error) {
                         options.error(err);
                     } else {
                         handleAjaxError(err);
-                    }
-                }
-            };
+                    }//f
+                }//error
+            }; //ajaxOptions
 
-            // console.log("appVM.config -> ", appVM.config.options.getParams);
-            // console.log("ajaxOptions before -> ", ajaxOptions);
             if (appVM.config.options.getParams) {
                 $.extend(ajaxOptions, appVM.config.options.getParams);
-            }
-            //console.log("ajaxOptions after -> ", ajaxOptions);
+            }//if getParams
 
             $.ajax(ajaxOptions);
         };//apiGet
 
-        // This is our main access point for the api, everything should pass through this call that is a GET
+        // This is our main access point for the api, everything should pass through this call that is a POST
         self.apiPost = function (options) {
             var url = appVM.config.options.fileConnector
                     + options.url
@@ -209,29 +202,25 @@ define(function (require) {
                         handleAjaxError(data.errors);
                     } else {
                         options.success(data.data);
-                    }
-                },
+                    } //if
+                }, //success
                 "error": function (err) {
                     if (options.error) {
                         options.error(err);
                     } else {
                         handleAjaxError(err);
-                    }
-                }
-            };
-            // console.log("apiPost url -> ", url);
+                    }//if
+                }//error
+            }; //ajaxOptions
 
-            // console.log("appVM.config -> ", appVM.config.options.getParams);
-            // console.log("ajaxOptions before -> ", ajaxOptions);
             if (appVM.config.options.getParams) {
                 $.extend(ajaxOptions, appVM.config.options.getParams);
-            }
-            //console.log("ajaxOptions after -> ", ajaxOptions);
+            }//if
 
             $.ajax(ajaxOptions);
         };//apiPost
 
-        // This is our main access point for the api, everything should pass through this call that is a GET
+        // This is our main access point for the api, everything should pass through this call that is a PUT
         self.apiPut = function (options) {
             var url = appVM.config.options.fileConnector + options.url + "?path=" + options.path + "&new=" + options.new;
 
@@ -244,28 +233,25 @@ define(function (require) {
                         handleAjaxError(data.errors);
                     } else {
                         options.success(data.data);
-                    }
-                },
+                    }//if
+                }, //success
                 "error": function (err) {
                     if (options.error) {
                         options.error(err);
                     } else {
                         handleAjaxError(err);
-                    }
-                }
-            };
+                    }//if
+                }//error
+            }; //ajaxOptions
 
-            // console.log("appVM.config -> ", appVM.config.options.getParams);
-            // console.log("ajaxOptions before -> ", ajaxOptions);
             if (appVM.config.options.getParams) {
                 $.extend(ajaxOptions, appVM.config.options.getParams);
-            }
-            //console.log("ajaxOptions after -> ", ajaxOptions);
+            }//if
 
             $.ajax(ajaxOptions);
         };//apiPut
 
-        // This is our main access point for the api, everything should pass through this call that is a GET
+        // This is our main access point for the api, everything should pass through this call that is a PATCH
         self.apiPatch = function (options) {
             var url = appVM.config.options.fileConnector
                     + options.url
@@ -283,28 +269,25 @@ define(function (require) {
                         handleAjaxError(data.errors);
                     } else {
                         options.success(data.data);
-                    }
-                },
+                    }//if
+                }, //success
                 "error": function (err) {
                     if (options.error) {
                         options.error(err);
                     } else {
                         handleAjaxError(err);
-                    }
-                }
-            };
+                    }//if
+                }//error
+            }; //ajaxOptions
 
-            // console.log("appVM.config -> ", appVM.config.options.getParams);
-            // console.log("ajaxOptions before -> ", ajaxOptions);
             if (appVM.config.options.getParams) {
                 $.extend(ajaxOptions, appVM.config.options.getParams);
-            }
-            //console.log("ajaxOptions after -> ", ajaxOptions);
+            }//if
 
             $.ajax(ajaxOptions);
         };//apiPatch
 
-        // This is our main access point for the api, everything should pass through this call that is a GET
+        // This is our main access point for the api, everything should pass through this call that is a DELETE
         self.apiDelete = function (options) {
             var url = appVM.config.options.fileConnector
                     + options.url
@@ -319,30 +302,25 @@ define(function (require) {
                         handleAjaxError(data.errors);
                     } else {
                         options.success(data.data);
-                    }
-                },
+                    }//if
+                }, //success
                 "error": function (err) {
                     if (options.error) {
                         options.error(err);
                     } else {
                         handleAjaxError(err);
-                    }
-                }
-            };
+                    }//if
+                }//error
+            }; //ajaxOptions
 
-            // console.log("appVM.config -> ", appVM.config.options.getParams);
-            // console.log("ajaxOptions before -> ", ajaxOptions);
             if (appVM.config.options.getParams) {
                 $.extend(ajaxOptions, appVM.config.options.getParams);
-            }
-            //console.log("ajaxOptions after -> ", ajaxOptions);
+            }//if
 
             $.ajax(ajaxOptions);
         };//apiGet
 
         self.setDimensions = function () {
-
-            // console.log("setDimensions: uploader -> ", $("#uploader").height(), " offset? -> ", $("#uploader").offset().top, " footer -> ", $("#footer").height(), " window -> ", $(window).height());
             var windowHeight = $(window).height(),
                 $uploader = $("#uploader"),
                 headerHeight = $uploader.height(),
@@ -352,11 +330,12 @@ define(function (require) {
 
             if (self.urlParameters("CKEditorCleanUpFuncNum")) {
                 ckEditorExtraHeight += 60;
-            }
+            }//if
 
             var newH = windowHeight - headerHeight - footerHeight - headerOffset - ckEditorExtraHeight;
             $("#splitter, #filetree, #fileinfo, .vsplitbar").height(newH);
-        };
+        };//setDimensions
+
         $(window).resize(self.setDimensions);
     };//function
 });//define
