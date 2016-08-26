@@ -3,6 +3,7 @@
 // grab our gulp packages
 var gulp = require("gulp"),
     gutil = require("gulp-util"),
+    extend = require("gulp-multi-extend"),
     eslint = require("gulp-eslint");
 
 gulp.task("lint", function () {
@@ -23,8 +24,15 @@ gulp.task("lint", function () {
         .pipe(eslint.failAfterError());
 });
 
+gulp.task("language", function () {
+    "use strict";
+    return gulp.src(["./scripts/languages/*.json"])
+        .pipe(extend("./scripts/languages/en.json"))
+        .pipe(gulp.dest("./dist/lang"));
+});
+
 // create a default task and just log a message
-gulp.task("default", ["lint"], function () {
+gulp.task("default", ["lint", "language"], function () {
     "use strict";
     return gutil.log("Gulp is running!");
 });

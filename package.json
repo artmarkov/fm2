@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
+    "gulp-multi-extend": "0.0.2",
     "gulp-util": "^3.0.7"
   },
   "scripts": {
