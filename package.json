@@ -25,12 +25,47 @@
     "toastr": "^2.1.2"
   },
   "devDependencies": {
+    "browserify-css": "^0.9.1",
+    "browserify-shim": "^3.8.12",
     "gulp": "^3.9.1",
     "gulp-multi-extend": "0.0.2",
-    "gulp-util": "^3.0.7"
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^2.0.0",
+    "gulp-util": "^3.0.7",
+    "pump": "^1.0.1",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.7.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "buildProd": "browserify -g browserify-css app/filemanager.js > dist/filemanager.js"
+  },
+  "browser": {
+    "app.viewmodel": "./app/app.viewmodel.js",
+    "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js",
+    "dropzone": "./node_modules/dropzone/dist/dropzone.js",
+    "jquery": "./node_modules/jquery/dist/jquery.js",
+    "jquery.fancytree": "./node_modules/jquery.fancytree/dist/jquery.fancytree.js",
+    "jquery.splitter": "./node_modules/jquery.splitter/js/jquery.splitter.js",
+    "jquery-ui-dist": "./node_modules/jquery-ui-dist/jquery-ui.js",
+    "knockout": "./node_modules/knockout/build/output/knockout-latest.debug.js",
+    "knockout.contextmenu": "./node_modules/knockout.contextmenu/dist/js/knockout.contextmenu.js",
+    "knockout-punches": "./node_modules/knockout-punches/knockout.punches.js"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "jquery": "$",
+    "jq-ui": {
+      "exports": "jq-ui",
+      "depends": [
+        "jquery:jQuery"
+      ]
+    }
   },
   "repository": {
     "type": "git",

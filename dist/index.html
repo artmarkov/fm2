@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>File Manager</title>
+
+    <style type="text/css">
+        #loading-wrap {
+            position:fixed;
+            height:100%;
+            width:100%;
+            overflow:hidden;
+            top:0;
+            left:0;
+            display:block;
+            background: white url(./images/wait30trans.gif) no-repeat center center;
+            z-index:999;
+        }
+    </style>
+
+    <!-- CSS dynamically added using 'config.options.theme' defined in config file -->
+</head>
+<body>
+<div id="loading-wrap" data-bind="visible: loading"><!-- loading wrapper / removed when loaded --></div>
+<div>
+    <div id="uploader" method="post">
+        <div class="pull-left">
+            <h6 data-bind="text: language.current_folder + currentPath()"></h6>
+        </div>
+        <div class="pull-right">
+            <button type="button" class="btn btn-default" data-bind="click: goLevelUp, visible: currentPath() !== config.options.fileRoot || currentView() === 'details'"><span class="glyphicon glyphicon-level-up"></span></button>
+            <button type="button" class="btn btn-default" data-bind="click: goHome, visible: notHome"><span class="glyphicon glyphicon-home"></span></button>
+            <button type="button" class="btn btn-default" data-bind="click: function (){currentView('uploads');}, visible: canUpload"><span class="glyphicon glyphicon-upload"> {{language.upload}}</span></button>
+            <button type="button" class="btn btn-default" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> {{language.new_folder}}</button>
+            <button type="button" data-bind="title: language.list_view, click: switchViews" class="btn btn-default"><span data-bind="css: viewButtonClass"></span></button>
+        </div>
+
+        <div class="clearfix"></div>
+    </div>
+
+    <div id="splitter">
+        <div id="tree">
+        </div>
+        <div id="fileinfo">
+            <div data-bind="template: {name: templateName, afterRender: afterRender}">
+            </div>
+        </div>
+    </div>
+
+    <div id="footer">
+        <div class="pull-left">
+            <p data-bind="text: language.version + config.version"></p>
+        </div>
+        <div class="pull-right">
+            <a data-bind="attr: {href: config.url}" id="link-to-project"></a>
+            <div id="folder-info">
+                <span id="items-counter">{{folderCount}}</span> {{language.items}} - {{language.size}} : <span id="items-size">{{folderSize}}</span>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+
+
+    <script type="text/html" id="uploads-template">
+        <form action="/file-upload"
+              class="dropzone"
+              id="my-awesome-dropzone"></form>
+    </script>
+
+    <script type="text/html" id="grid-template">
+        <div class="container-fluid">
+            <div class="row">
+                <div id="contents" class="" data-bind="foreach: {data: currentFolder, as: 'item'}">
+                    <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2 col-fix grid-border text-center" data-bind="click: $root.browseToItem, contextMenu: menu">
+                        <img width="64" data-bind="attr: {src: getIconUrl, alt: getIconUrl, dataPath: getIconUrl}"/>
+                        <p class="text-center" data-bind="text: item.filename"></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </script>
+
+    <script type="text/html" id="list-template">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>{{$root.language.name}}</th>
+                <th>{{$root.language.dimensions}}</th>
+                <th>{{$root.language.size}}</th>
+                <th>{{$root.language.modified}}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: {data: currentFolder, as: 'item'}">
+            <tr class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.browseToItem, contextMenu: menu">
+                <td><span data-bind="css: item.isDirectory() ? 'glyphicon glyphicon-folder-close' : 'glyphicon glyphicon-file'">  {{item.filename}}</span> </td>
+                <td>{{item.properties().height}}x{{item.properties().width}}</td>
+                <td>{{item.properties().size}}</td>
+                <td>{{item.properties().dateModified}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </script>
+
+    <script type="text/html" id="details-template">
+        <div class="text-center" data-bind="with: currentItem">
+            <div data-bind="template: {name: templateName}"></div>
+            <div>
+                <button class="btn" data-bind="click: selectMe, visible: $root.canSelect">{{$root.language.select}}</button>
+                <button class="btn" data-bind="click: download, visible: canDownload">{{$root.language.download}}</button>
+                <button class="btn" data-bind="click: rename, visible: $root.canRename">{{$root.language.rename}}</button>
+                <button class="btn" data-bind="click: move, visible: $root.canMove">{{$root.language.move}}</button>
+                <button class="btn" data-bind="click: removeMe, visible: $root.canDelete">{{$root.language.del}}</button>
+                <button class="btn" data-bind="click: replaceMe, visible: canReplace" id="replaceMe">{{$root.language.replace}}</button>
+                <form id="my-replace-dropzone" style="display: none;" class="dropzone"></form>
+                <h1 class="h1">{{filename}}</h1>
+                <!--<div id="tools"></div>-->
+            </div>
+            <dl>
+                <dt>{{$root.language.dimensions}}</dt>
+                <dd>{{properties().height}}x{{properties().width}}</dd>
+                <dt>{{$root.language.created}}</dt>
+                <dd>{{properties().dateCreated}}</dd>
+                <dt>{{$root.language.modified}}</dt>
+                <dd>{{properties().dateModified}}</dd>
+                <dt>{{$root.language.size}}</dt>
+                <dd>{{properties().size}}</dd>
+            </dl>
+        </div>
+    </script>
+
+    <script type="text/html" id="image-template">
+        <img id="detailImage" data-bind="attr: {src: getDownloadUrl, alt: getDownloadUrl}, visible: isImageFile" class="img-thumbnail center-block">
+    </script>
+
+    <script type="text/html" id="video-player-template">
+        <video data-bind="attr: {width: $root.config.videos.videosPlayerWidth, height: $root.config.videos.videosPlayerHeight, src: getDownloadUrl}" controls='controls'>
+            <img data-bind="attr: {src: getPreviewUrl}" />
+        </video>
+    </script>
+
+    <script type="text/html" id="audio-player-template">
+        <audio data-bind="attr: {src: getDownloadUrl}" controls='controls'>
+            <img data-bind="attr: {src: getPreviewUrl}" />
+        </audio>
+    </script>
+
+    <script type="text/html" id="pdf-viewer-template">
+        <iframe id='fm-pdf-viewer' data-bind="attr: {src: 'scripts/ViewerJS/index.html#' + getDownloadUrl(), width: $root.config.pdfs.pdfsReaderWidth,
+        height: $root.config.pdfs.pdfsReaderHeight}"
+                allowfullscreen webkitallowfullscreen></iframe>
+    </script>
+
+
+    <script type="text/javascript" src="filemanager.js"></script>
+</div>
+</body>
+</html>

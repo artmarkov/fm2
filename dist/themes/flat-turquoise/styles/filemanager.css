@@ -1,0 +1,28 @@
+/*
+    20160823 - jlaustill As of now, this file is theming only.  This should only be colors and maybe small adjusts to appearance, ie, rounding corners etc
+*/
+
+span.fancytree-title {
+	color: #000000;
+}
+
+body {
+	background-color:#ACC1BB;
+}
+
+#tree {
+	background-color: #B3C9C2;
+}
+
+#fileinfo {
+	background-color: #E0E0E0;
+	color: black;
+}
+
+#uploader {
+	color: #ffffff;
+}
+
+#footer {
+	color: #000000;
+}
