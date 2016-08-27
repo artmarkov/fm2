@@ -34,7 +34,7 @@ require("bootstrap");
 //load knockout and related
 var ko = require("knockout");
 require("knockout-punches");
-require("knockout.contextmenu");
+require("knockout.contextmenu")(ko, document);
 
 //load knockout punches, here goes the magic :)
 ko.punches.enableAll();
