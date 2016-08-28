@@ -1,6 +1,6 @@
 {
   "name": "filemanager-2.0",
-  "version": "2.0.1",
+  "version": "2.4.0",
   "description": "FM2 is an open-source file manager released under MIT license.",
   "main": "scripts/filemanager2.js",
   "dependencies": {
