@@ -31,6 +31,21 @@ gulp.task("uglify", ["browserify"], function (callback) {
     callback);
 });
 
+gulp.task("static", function () {
+    "use strict";
+    return gulp.src([
+        "./images/wait30trans.gif",
+        "./images/fileicons/**",
+        "./index.html",
+        "./themes/**",
+        "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2",
+        "./node_modules/jquery.fancytree/dist/skin-lion/icons.gif",
+        "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff",
+        "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf"
+    ], {base: "./"})
+        .pipe(gulp.dest("./dist"));
+});
+
 gulp.task("lint", function () {
     "use strict";
     // ESLint ignores files with "node_modules" paths.
@@ -57,7 +72,7 @@ gulp.task("language", function () {
 });
 
 // create a default task and just log a message
-gulp.task("default", ["lint", "language", "browserify", "uglify"], function () {
+gulp.task("default", ["lint", "language", "browserify", "uglify", "static"], function () {
     "use strict";
     return gutil.log("Gulp is running!");
 });
