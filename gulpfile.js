@@ -38,6 +38,7 @@ gulp.task("static", function () {
         "./images/fileicons/**",
         "./index.html",
         "./themes/**",
+        "./app/config/filemanager.config.json",
         "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2",
         "./node_modules/jquery.fancytree/dist/skin-lion/icons.gif",
         "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff",
@@ -64,6 +65,12 @@ gulp.task("lint", function () {
         .pipe(eslint.failAfterError());
 });
 
+gulp.task("config", function () {
+    "use strict";
+    return gulp.src(["./app/config/*.json"])
+        .pipe(gulp.dest("./dist/config"));
+});
+
 gulp.task("language", function () {
     "use strict";
     return gulp.src(["./app/lang/*.json"])
@@ -72,7 +79,7 @@ gulp.task("language", function () {
 });
 
 // create a default task and just log a message
-gulp.task("default", ["lint", "language", "browserify", "uglify", "static"], function () {
+gulp.task("default", ["lint", "language", "browserify", "uglify", "static", "config"], function () {
     "use strict";
     return gutil.log("Gulp is running!");
 });

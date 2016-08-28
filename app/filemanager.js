@@ -41,28 +41,32 @@ ko.punches.enableAll();
 
 //load our viewmodels
 var AppViewModel = require("app.viewmodel");
-var appVM = new AppViewModel();
-ko.applyBindings(appVM);
+var appVM;
+$.getJSON("config/filemanager.config.json", function (config) {
+    "use strict";
+    appVM = new AppViewModel(config);
+    ko.applyBindings(appVM);
+    var start;
 
-var start;
+    /*---------------------------------------------------------
+     Setup, Layout, and Status Functions
+     ---------------------------------------------------------*/
 
-/*---------------------------------------------------------
- Setup, Layout, and Status Functions
- ---------------------------------------------------------*/
+    //noinspection JSUnresolvedVariable
+    if (appVM.config.options.logger) {
+        start = Date.now();
+    }
 
-//noinspection JSUnresolvedVariable
-if (appVM.config.options.logger) {
-    start = Date.now();
-}
+    $("#splitter").height(100).split({
+        position: appVM.config.options.splitPercentage,
+        orientation: "vertical",
+        limit: 200
+    });
 
-$("#splitter").height(100).split({
-    position: appVM.config.options.splitPercentage,
-    orientation: "vertical",
-    limit: 200
+    if (appVM.config.options.logger) {
+        var end = Date.now();
+        var time = end - start;
+        console.log("Total execution time: " + time + " ms");
+    }
+
 });
-
-if (appVM.config.options.logger) {
-    var end = Date.now();
-    var time = end - start;
-    console.log("Total execution time: " + time + " ms");
-}

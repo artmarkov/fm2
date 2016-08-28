@@ -102,16 +102,16 @@ module.exports = function (appVM) {
 
         switch (appVM.config.options.theme) {
         case "flat-dark":
-            theme = "themes/flat-dark/styles/filemanager.css";
+            theme = "./themes/flat-dark.css";
             break;
         case "flat-oil":
-            theme = "themes/flat-oil/styles/filemanager.css";
+            theme = "./themes/flat-oil.css";
             break;
         case "flat-turquoise":
-            theme = "themes/flat-turquoise/styles/filemanager.css";
+            theme = "./themes/flat-turquoise.css";
             break;
         default:
-            theme = "themes/default/styles/filemanager.css";
+            theme = "./themes/default.css";
         }//switch theme
 
         var cssLink = $("<link rel='stylesheet' type='text/css' href='" + theme + "'>");

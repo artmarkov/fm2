@@ -4,7 +4,7 @@
 // our viewmodel for our app
 var ko = require("knockout");
 var $ = require("jquery");
-var config = require("../scripts/filemanager.config.json");
+// var config = require("./config/filemanager.config.json");
 var Utility = require("./utility.viewmodel.js");
 var Item = require("./item.datamodel.js");
 var swal = require("sweetalert");
@@ -12,7 +12,7 @@ var filesize = require("filesize");
 var toastr = require("toastr");
 // require("jqueryfancytree");
 
-module.exports = function () {
+module.exports = function (config) {
     "use strict";
     var self = this;
     //configuration stuff first :)
