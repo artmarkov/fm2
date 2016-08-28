@@ -1,0 +1,24 @@
+{
+  "name": "Filemanager-2.0",
+  "description": "FM2 is an open-source file manager released under MIT license.",
+  "main": "dist/index.html",
+  "authors": [
+    "Joshua Austill <jlaustill@gmail.com>"
+  ],
+  "license": "MIT",
+  "moduleType": "node",
+  "keywords": [
+    "filemanager"
+  ],
+  "homepage": "https://github.com/jlaustill/Filemanager-2.0",
+  "ignore": [
+    "**/.*",
+    "*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "!dist/.*",
+    "!ReadMe.md"
+  ]
+}
