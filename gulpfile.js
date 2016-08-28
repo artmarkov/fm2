@@ -38,7 +38,7 @@ gulp.task("static", function () {
         "./images/fileicons/**",
         "./index.html",
         "./themes/**",
-        "./app/config/filemanager.config.json",
+        // "./app/config/filemanager.config.json",
         "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2",
         "./node_modules/jquery.fancytree/dist/skin-lion/icons.gif",
         "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff",
