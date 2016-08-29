@@ -24,6 +24,7 @@
     "splitPercentage": 80,
     "dateFormat": "d M Y H:i",
     "fileRoot": "/",
+    "startingPath": "/",
     "fileRootSizeLimit": false,
     "capabilities": [ "select", "upload", "download", "rename", "move", "replace", "delete" ],
     "logger": true,

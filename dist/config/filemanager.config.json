@@ -5,7 +5,7 @@
     "culture": "en",
     "lang": "nodejs",
     "fileConnector": "http://localhost:3000/filemanager",
-    "theme": "flat-dark",
+    "theme": "flat-oil",
     "defaultViewMode": "grid",
     "localizeGUI": true,
     "showFullPath": false,
@@ -24,6 +24,7 @@
     "splitPercentage": 80,
     "dateFormat": "d M Y H:i",
     "fileRoot": "/",
+    "startingPath": "/",
     "fileRootSizeLimit": false,
     "capabilities": [ "select", "upload", "download", "rename", "move", "replace", "delete" ],
     "logger": true,
@@ -183,6 +184,6 @@
         "directory": "_Open.png",
         "default": "default.png"
     },
-    "url": "https://github.com/jlaustill/Filemanager-2.0",
+    "url": "https://github.com/jlaustill/Filemanager",
     "version": "2.4.0"
 }

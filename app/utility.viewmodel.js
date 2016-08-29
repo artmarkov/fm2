@@ -137,6 +137,45 @@ module.exports = function (appVM) {
         return 0;
     };//urlParameters
 
+    // function to parse and return the exclusive path
+    self.getExclusiveFolder = function () {
+        var ef = decodeURI(self.urlParameters("exclusiveFolder"));
+        // first we check if the parameter even exists
+        ef = ef === "0" ? "/" : ef;
+
+        // path needs to begin with a slash
+        if (ef !== "/" && ef.substr(0, 1) !== "/") {
+            ef = "/" + ef;
+        }
+        // path shouldn't include trailing slash
+        if (ef !== "/" && ef.substr(-1) === "/") {
+            ef = ef.slice(0, -1);
+        }
+        return ef;
+    };//getExclusiveFolder
+
+    self.getRelativePath = function (ef, path) {
+        // First, if the exclusive folder is simply the root, just return the path
+        if (ef === "/") {
+            return path;
+        } else if (path.indexOf(ef) === -1) { //path is already relative
+            return path;
+        }
+        // otherwise, remove the exclusive folder from the path
+        return path.replace(ef, "");
+    };//getRelativePath
+
+    self.getFullPath = function (ef, path) {
+        // First, if the exclusive folder is simply the root, just return the path
+        if (ef === "/") {
+            return path;
+        } else if (path.indexOf(ef) === -1) { //path is relative, so add the exclusive folder
+            return ef + path;
+        }
+        // Path is already the full path if it contains the exclusive folder
+        return path;
+    };//getFullPath
+
     // Handle ajax request error.
     var handleAjaxError = function (err) {
         $.each(err, function (ignore, e) {

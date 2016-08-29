@@ -29,7 +29,7 @@ require("jquery.splitter"); // Seems to be working well
 
 //load libraries
 require("dropzone");
-require("bootstrap");
+require("../node_modules/bootstrap/dist/js/bootstrap");
 
 //load knockout and related
 var ko = require("knockout");
@@ -42,12 +42,15 @@ ko.punches.enableAll();
 //load our viewmodels
 var AppViewModel = require("app.viewmodel");
 var appVM;
+
+
 $.getJSON("config/filemanager.config.json", function (config) {
     "use strict";
     appVM = new AppViewModel(config);
     ko.applyBindings(appVM);
     var start;
 
+    console.log("exclusiveFolder? -> ", decodeURI(appVM.util.urlParameters("exclusiveFolder")) === "0" ? "/" : decodeURI(appVM.util.urlParameters("exclusiveFolder")) );
     /*---------------------------------------------------------
      Setup, Layout, and Status Functions
      ---------------------------------------------------------*/

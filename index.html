@@ -25,7 +25,7 @@
 <div>
     <div id="uploader" method="post">
         <div class="pull-left">
-            <h6 data-bind="text: language.current_folder + currentPath()"></h6>
+            <h6 data-bind="text: language.current_folder + currentRelativePath()"></h6>
             </div>
         <div class="pull-right">
             <button type="button" class="btn btn-default" data-bind="click: goLevelUp, visible: currentPath() !== config.options.fileRoot || currentView() === 'details'"><span class="glyphicon glyphicon-level-up"></span></button>
@@ -153,7 +153,7 @@
 </script>
 
 
-<script type="text/javascript" src="filemanager.min.js"></script>
+<script type="text/javascript" src="filemanager.js"></script>
 </div>
 </body>
 </html>
