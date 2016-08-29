@@ -50,7 +50,7 @@ $.getJSON("config/filemanager.config.json", function (config) {
     ko.applyBindings(appVM);
     var start;
 
-    console.log("exclusiveFolder? -> ", decodeURI(appVM.util.urlParameters("exclusiveFolder")) === "0" ? "/" : decodeURI(appVM.util.urlParameters("exclusiveFolder")) );
+    // console.log("exclusiveFolder? -> ", decodeURI(appVM.util.urlParameters("exclusiveFolder")) === "0" ? "/" : decodeURI(appVM.util.urlParameters("exclusiveFolder")) );
     /*---------------------------------------------------------
      Setup, Layout, and Status Functions
      ---------------------------------------------------------*/

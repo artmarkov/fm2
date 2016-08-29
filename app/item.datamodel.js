@@ -19,6 +19,7 @@ module.exports = function (appVM, item) {
     self.fileType = ko.observable(item.fileType);
     self.isDirectory = ko.observable(item.isDirectory);
     self.path = ko.observable(item.path);
+    self.key = ko.observable(item.key);
     self.dir = ko.observable(item.dir);
     self.directPath = ko.observable(item.directPath);
     self.preview = ko.observable(item.preview);
@@ -41,6 +42,7 @@ module.exports = function (appVM, item) {
                 self.fileType(item.fileType);
                 self.isDirectory(item.isDirectory);
                 self.path(item.path);
+                self.key(item.key);
                 self.dir(item.dir);
                 self.path(item.directPath);
                 self.preview(item.preview);
@@ -254,7 +256,7 @@ module.exports = function (appVM, item) {
             }//if
             appVM.util.apiPatch({
                 url: "/item",
-                newPath: inputValue,
+                newPath: appVM.util.getFullPath(appVM.exclusiveFolder, inputValue),
                 path: self.path(),
                 success: function (result) {
                     self.path(result.path);

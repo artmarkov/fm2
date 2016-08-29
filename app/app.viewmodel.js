@@ -65,12 +65,13 @@ module.exports = function (config) {
     self.util.loadTheme();
 
     // Now we start our data processing
-    self.exclusiveFolder = decodeURI(self.util.getExclusiveFolder());
+    self.exclusiveFolder = self.util.getExclusiveFolder();
     self.homePath = self.util.getFullPath(self.exclusiveFolder, self.config.options.startingPath);
     self.currentPath = ko.observable(self.util.getFullPath(self.exclusiveFolder, self.config.options.startingPath));
     self.currentRelativePath = ko.computed(function () {
         return self.util.getRelativePath(self.exclusiveFolder, self.currentPath());
     });//currentRelativePath
+    // console.log("appvm init currenPath -> ", self.currentPath(), " currentRelativePath -> ", self.currentRelativePath());
     self.currentFolder = ko.observableArray([]);
     self.folderSize = ko.observable(0);
     self.folderCount = ko.observable(0);
@@ -121,6 +122,7 @@ module.exports = function (config) {
 
     // I think this needs to be broken out into 2 different functions, one for initialization, the other for reloading
     self.loadCurrentFolder = function (init) {
+        // console.log("loadCurrent folder path -> ", self.currentPath());
         var newItems = [],
             newSize = 0,
             newCount = 0,
@@ -130,6 +132,8 @@ module.exports = function (config) {
             path: self.currentPath(),
             success: function (data) {
                 $.each(data, function (i, d) {
+                    // console.log("fancytree data -> ", d);
+                    d.key = self.util.getRelativePath(self.exclusiveFolder, d.key);
                     newSize += d.properties.size;
                     newCount++;
                     newItems.push(new Item(self, d));
@@ -144,7 +148,7 @@ module.exports = function (config) {
                         source: [{title: config.options.fileRoot, children: data, key: config.options.fileRoot, folder: true, expanded: true}],
                         activate: function (ignore, data) {
                             if (data.node.folder === true) {
-                                self.currentPath(data.node.key);
+                                self.currentPath(self.util.getFullPath(self.exclusiveFolder, data.node.key));
                                 self.loadCurrentFolder();
                             } else {
                                 self.currentItem(new Item(self, data.node.data));
@@ -152,9 +156,10 @@ module.exports = function (config) {
                             } //if
                         } //activate
                     }); //fancytree
-                    console.log("tree -> ", $tree.fancytree());
+                    // console.log("tree -> ", $tree.fancytree());
                     $tree.fancytree("getTree").getNodeByKey(self.currentRelativePath()).setActive();
                 } else {
+                    // console.log("loadcurrentfolder fancytree currentRelativePath -> ", self.currentRelativePath());
                     var node = $tree.fancytree("getTree").getNodeByKey(self.currentRelativePath());
                     if (node.hasChildren()) {
                         node.removeChildren();
@@ -206,7 +211,7 @@ module.exports = function (config) {
     };//createFolder
 
     self.goHome = function () {
-        $("#tree").fancytree("getTree").getNodeByKey(config.options.fileRoot).setActive();
+        $("#tree").fancytree("getTree").getNodeByKey(self.util.getRelativePath(self.exclusiveFolder, self.homePath)).setActive();
         self.currentPath(self.homePath);
         if (self.currentView() !== "grid" && self.currentView() !== "list") {
             self.currentView(self.lastView());
@@ -219,7 +224,7 @@ module.exports = function (config) {
     }); //notHome
 
     self.browseToItem = function (data) {
-        $("#tree").fancytree("getTree").getNodeByKey(data.path()).setActive();
+        $("#tree").fancytree("getTree").getNodeByKey(data.key()).setActive();
         if (data.isDirectory()) {
             self.currentPath(data.path());
             self.loadCurrentFolder();
@@ -242,7 +247,7 @@ module.exports = function (config) {
         if (self.currentView() !== "grid" && self.currentView() !== "list") {
             self.currentView(self.lastView());
             self.loadCurrentFolder();
-            $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
+            $("#tree").fancytree("getTree").getNodeByKey(self.currentRelativePath()).setActive();
             self.loading(false);
         } else {
             var cpath = self.currentPath();
@@ -252,11 +257,11 @@ module.exports = function (config) {
                     ? "/"
                     : newPath);
                 self.loadCurrentFolder();
-                $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
+                $("#tree").fancytree("getTree").getNodeByKey(self.currentRelativePath()).setActive();
                 self.loading(false);
             } else {
                 self.loadCurrentFolder();
-                $("#tree").fancytree("getTree").getNodeByKey(self.currentPath()).setActive();
+                $("#tree").fancytree("getTree").getNodeByKey(self.currentRelativePath()).setActive();
                 self.loading(false);
             } //if
         } //if

@@ -137,27 +137,40 @@ module.exports = function (appVM) {
         return 0;
     };//urlParameters
 
+    self.normalizePath = function (path) {
+        // Firstly, if path is just "/", just return it
+        if (path === "/") {
+            return path;
+        }
+        // First character needs to be a slash
+        if (path.substr(0, 1) !== "/") {
+            path = "/" + path;
+        }
+        // Last character should not be a slash
+        if (path.substr(-1) === "/") {
+            path = path.slice(0, -1);
+        }
+        return path;
+    };//normalizePath
+
     // function to parse and return the exclusive path
     self.getExclusiveFolder = function () {
         var ef = decodeURI(self.urlParameters("exclusiveFolder"));
         // first we check if the parameter even exists
         ef = ef === "0" ? "/" : ef;
 
-        // path needs to begin with a slash
-        if (ef !== "/" && ef.substr(0, 1) !== "/") {
-            ef = "/" + ef;
-        }
-        // path shouldn't include trailing slash
-        if (ef !== "/" && ef.substr(-1) === "/") {
-            ef = ef.slice(0, -1);
-        }
-        return ef;
+        return self.normalizePath(ef);
     };//getExclusiveFolder
 
     self.getRelativePath = function (ef, path) {
+        ef = self.normalizePath(ef);
+        path = self.normalizePath(path);
+
         // First, if the exclusive folder is simply the root, just return the path
         if (ef === "/") {
             return path;
+        } else if (ef === path) {
+            return "/";
         } else if (path.indexOf(ef) === -1) { //path is already relative
             return path;
         }
@@ -166,11 +179,14 @@ module.exports = function (appVM) {
     };//getRelativePath
 
     self.getFullPath = function (ef, path) {
+        ef = self.normalizePath(ef);
+        path = self.normalizePath(path);
+
         // First, if the exclusive folder is simply the root, just return the path
         if (ef === "/") {
             return path;
         } else if (path.indexOf(ef) === -1) { //path is relative, so add the exclusive folder
-            return ef + path;
+            return self.normalizePath(ef + path);
         }
         // Path is already the full path if it contains the exclusive folder
         return path;
