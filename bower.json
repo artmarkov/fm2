@@ -20,6 +20,7 @@
     "tests",
     "!dist/.*",
     "!dist/**",
+    "!dist/node_modules/**",
     "!ReadMe.md"
   ]
 }

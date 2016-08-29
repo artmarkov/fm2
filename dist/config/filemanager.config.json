@@ -5,7 +5,7 @@
     "culture": "en",
     "lang": "nodejs",
     "fileConnector": "http://localhost:3000/filemanager",
-    "theme": "flat-oil",
+    "theme": "flat-dark",
     "defaultViewMode": "grid",
     "localizeGUI": true,
     "showFullPath": false,
@@ -183,6 +183,6 @@
         "directory": "_Open.png",
         "default": "default.png"
     },
-    "url": "https://github.com/jlaustill/Filemanager",
+    "url": "https://github.com/jlaustill/Filemanager-2.0",
     "version": "2.4.0"
 }
