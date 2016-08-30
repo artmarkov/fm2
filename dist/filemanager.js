@@ -3119,84 +3119,84 @@ module.exports = function (appVM) {
         var culture;
 
         switch (appVM.config.options.culture) {
-        case "ar":
-            culture = require("./lang/ar.json");
-            break;
-        case "bs":
-            culture = require("./lang/bs.json");
-            break;
-        case "ca":
-            culture = require("./lang/ca.json");
-            break;
-        case "cs":
-            culture = require("./lang/cs.json");
-            break;
-        case "da":
-            culture = require("./lang/da.json");
-            break;
-        case "de":
-            culture = require("./lang/de.json");
-            break;
-        case "el":
-            culture = require("./lang/el.json");
-            break;
-        case "en":
-            culture = require("./lang/en.json");
-            break;
-        case "en-gb":
-            culture = require("./lang/en-gb.json");
-            break;
-        case "es":
-            culture = require("./lang/es.json");
-            break;
-        case "fi":
-            culture = require("./lang/fi.json");
-            break;
-        case "fr":
-            culture = require("./lang/fr.json");
-            break;
-        case "he":
-            culture = require("./lang/he.json");
-            break;
-        case "hu":
-            culture = require("./lang/hu.json");
-            break;
-        case "it":
-            culture = require("./lang/it.json");
-            break;
-        case "ja":
-            culture = require("./lang/ja.json");
-            break;
-        case "nl":
-            culture = require("./lang/nl.json");
-            break;
-        case "pl":
-            culture = require("./lang/pl.json");
-            break;
-        case "pt":
-            culture = require("./lang/pt.json");
-            break;
-        case "ru":
-            culture = require("./lang/ru.json");
-            break;
-        case "sv":
-            culture = require("./lang/sv.json");
-            break;
-        case "tr":
-            culture = require("./lang/tr.json");
-            break;
-        case "vn":
-            culture = require("./lang/vn.json");
-            break;
-        case "zh-cn":
-            culture = require("./lang/zh-cn.json");
-            break;
-        case "zh-tw":
-            culture = require("./lang/zh-tw.json");
-            break;
-        default:
-            culture = require("./lang/en.json");
-            break;
+            case "ar":
+                culture = require("./lang/ar.json");
+                break;
+            case "bs":
+                culture = require("./lang/bs.json");
+                break;
+            case "ca":
+                culture = require("./lang/ca.json");
+                break;
+            case "cs":
+                culture = require("./lang/cs.json");
+                break;
+            case "da":
+                culture = require("./lang/da.json");
+                break;
+            case "de":
+                culture = require("./lang/de.json");
+                break;
+            case "el":
+                culture = require("./lang/el.json");
+                break;
+            case "en":
+                culture = require("./lang/en.json");
+                break;
+            case "en-gb":
+                culture = require("./lang/en-gb.json");
+                break;
+            case "es":
+                culture = require("./lang/es.json");
+                break;
+            case "fi":
+                culture = require("./lang/fi.json");
+                break;
+            case "fr":
+                culture = require("./lang/fr.json");
+                break;
+            case "he":
+                culture = require("./lang/he.json");
+                break;
+            case "hu":
+                culture = require("./lang/hu.json");
+                break;
+            case "it":
+                culture = require("./lang/it.json");
+                break;
+            case "ja":
+                culture = require("./lang/ja.json");
+                break;
+            case "nl":
+                culture = require("./lang/nl.json");
+                break;
+            case "pl":
+                culture = require("./lang/pl.json");
+                break;
+            case "pt":
+                culture = require("./lang/pt.json");
+                break;
+            case "ru":
+                culture = require("./lang/ru.json");
+                break;
+            case "sv":
+                culture = require("./lang/sv.json");
+                break;
+            case "tr":
+                culture = require("./lang/tr.json");
+                break;
+            case "vn":
+                culture = require("./lang/vn.json");
+                break;
+            case "zh-cn":
+                culture = require("./lang/zh-cn.json");
+                break;
+            case "zh-tw":
+                culture = require("./lang/zh-tw.json");
+                break;
+            default:
+                culture = require("./lang/en.json");
+                break;
         }//switch language
 
         return culture;
@@ -3206,17 +3206,17 @@ module.exports = function (appVM) {
         var theme;
 
         switch (appVM.config.options.theme) {
-        case "flat-dark":
-            theme = "./themes/flat-dark.css";
-            break;
-        case "flat-oil":
-            theme = "./themes/flat-oil.css";
-            break;
-        case "flat-turquoise":
-            theme = "./themes/flat-turquoise.css";
-            break;
-        default:
-            theme = "./themes/default.css";
+            case "flat-dark":
+                theme = "./themes/flat-dark.css";
+                break;
+            case "flat-oil":
+                theme = "./themes/flat-oil.css";
+                break;
+            case "flat-turquoise":
+                theme = "./themes/flat-turquoise.css";
+                break;
+            default:
+                theme = "./themes/default.css";
         }//switch theme
 
         var cssLink = $("<link rel='stylesheet' type='text/css' href='" + theme + "'>");

@@ -53,7 +53,8 @@
     "no-mixed-spaces-and-tabs": 2,
     "no-trailing-spaces": [2,{"skipBlankLines":false}],
     "quotes": "error",
-    "semi": ["error", "always"]
+    "semi": ["error", "always"],
+    "indent": ["error", 4, {"SwitchCase": 1}]
   },
   "env": {
     "node": true,
