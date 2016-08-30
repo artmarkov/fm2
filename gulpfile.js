@@ -10,11 +10,20 @@ var gulp = require("gulp"),
     source = require("vinyl-source-stream"),
     pump = require("pump"),
     eslint = require("gulp-eslint");
+// console.log("_ -> ", _);
 
 gulp.task("browserify", function () {
     "use strict";
     return browserify("./app/filemanager.js")
-        .transform({global: true}, require("browserify-css"))
+        .transform({
+            global: true,
+            minify: true,
+            processRelativeUrl: function(relativeUrl) {
+                console.log("processRelativeUrl contains -> ", relativeUrl.split("?")[0].split("#")[0]);
+                var DataUri = require("datauri");
+                var dUri = new DataUri(relativeUrl.split("?")[0].split("#")[0]);
+                return dUri.content;
+            }}, require("browserify-css"))
         .bundle()
         .pipe(source("filemanager.js"))
         .pipe(gulp.dest("./dist"));
@@ -37,12 +46,7 @@ gulp.task("static", function () {
         "./images/wait30trans.gif",
         "./images/fileicons/**",
         "./index.html",
-        "./themes/**",
-        // "./app/config/filemanager.config.json",
-        "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2",
-        "./node_modules/jquery.fancytree/dist/skin-lion/icons.gif",
-        "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff",
-        "./node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf"
+        "./themes/**"
     ], {base: "./"})
         .pipe(gulp.dest("./dist"));
 });

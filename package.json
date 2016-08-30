@@ -28,12 +28,14 @@
   "devDependencies": {
     "browserify-css": "^0.9.1",
     "browserify-shim": "^3.8.12",
+    "datauri": "^1.0.4",
     "gulp": "^3.9.1",
     "gulp-multi-extend": "0.0.2",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.7",
+    "lodash": "^4.15.0",
     "pump": "^1.0.1",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0"
