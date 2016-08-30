@@ -20,6 +20,8 @@ module.exports = function (appVM, item) {
     self.isDirectory = ko.observable(item.isDirectory);
     self.path = ko.observable(item.path);
     self.key = ko.observable(item.key);
+    self.title = ko.observable(item.title);
+    self.folder = ko.observable(item.isDirectory);
     self.dir = ko.observable(item.dir);
     self.directPath = ko.observable(item.directPath);
     self.preview = ko.observable(item.preview);
@@ -41,8 +43,10 @@ module.exports = function (appVM, item) {
                 self.filename(item.filename);
                 self.fileType(item.fileType);
                 self.isDirectory(item.isDirectory);
+                self.folder(item.isDirectory);
                 self.path(item.path);
                 self.key(item.key);
+                self.title(item.title);
                 self.dir(item.dir);
                 self.path(item.directPath);
                 self.preview(item.preview);
@@ -229,7 +233,7 @@ module.exports = function (appVM, item) {
                 success: function (result) {
                     self.path(result.path);
                     self.reloadSelf();
-                    appVM.loadCurrentFolder();
+                    appVM.initializeFolder();
                     toastr.success(appVM.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
                 }//success
             });//apiGet
@@ -262,7 +266,7 @@ module.exports = function (appVM, item) {
                     self.path(result.path);
                     self.reloadSelf();
                     appVM.currentPath(result.dir);
-                    appVM.loadCurrentFolder();
+                    // appVM.loadCurrentFolder();
                     toastr.success(appVM.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
                 }
             });//apiGet
@@ -289,7 +293,7 @@ module.exports = function (appVM, item) {
                     if (appVM.currentView() === "details") {
                         appVM.goLevelUp();
                     } else {
-                        appVM.loadCurrentFolder();
+                        appVM.initializeFolder();
                     }
                 }//success
             });//apiGet

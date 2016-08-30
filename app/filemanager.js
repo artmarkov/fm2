@@ -23,6 +23,7 @@ require("../styles/fm2.css");
 
 //load jquery and related
 var $ = require("jquery"); //updated to 3.0
+// require("jquery-migrate");
 require("jquery-ui-dist");
 require("jquery.fancytree"); //replace with fancyTree
 require("jquery.splitter"); // Seems to be working well
@@ -38,6 +39,8 @@ require("knockout.contextmenu")(ko, document);
 
 //load knockout punches, here goes the magic :)
 ko.punches.enableAll();
+
+require("./fancytree.binding.js");
 
 //load our viewmodels
 var AppViewModel = require("app.viewmodel");
