@@ -34,11 +34,34 @@ var express = require("express");
 var router = express.Router();
 var fs = require("fs");
 var paths = require("path");
-var multer  = require("multer");
-var upload = multer({ dest: "upload/"});
+var multer  = require('multer');
+var upload = multer({ dest: 'upload/'});
 var config = require("../config/fm2.api.config.json");
 
 paths.posix = require("path-posix");
+
+function ensureAuthenticated(req, res, next) {
+    "use strict";
+    // First we check to see if passport is enabled, if not, allow access, but log it
+    if (req.isAuthenticated === undefined) {
+        console.log("I HIGHLY recommend you configure passport and auth :)");
+        return next();
+    }
+    // Otherwise, if user is authenticated in the session, carry on
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    // Otherwise return an error
+    return res.json({
+        errors: [
+            {
+                status: "401",
+                title: "Unauthenticated Access",
+                detail: "You must be logged in to access this resource.  If you are unable to login, or don't have a login, contact the help desk to request access."
+            }
+        ]
+    });
+}
 
 module.exports = function () {
     "use strict";
@@ -318,7 +341,6 @@ module.exports = function () {
 
     // function to rename files
     function rename(old, newish, callback) {
-        console.log("rename old -> ", old, " new -> ", newish);
         fs.rename(old.osFullPath, newish.osFullPath, function (err) {
             if (err) {
                 return callback(errors(err));
@@ -355,7 +377,7 @@ module.exports = function () {
 
     // This route will return the servers rules to the ui
     router.route("/")
-        .get(function (req, res) {
+        .get(ensureAuthenticated, function (req, res) {
             res.json({
                 data: [{
                     security: {
@@ -367,7 +389,7 @@ module.exports = function () {
         });
 
     router.route("/file")
-        .post(upload.single("file"), function (req, res) {
+        .post(ensureAuthenticated, upload.single("file"), function (req, res) {
             parsePath(req.body.path, function (err, pp) {
                 if (err) {
                     respond(res, err);
@@ -378,7 +400,7 @@ module.exports = function () {
                 }
             });//parsePath
         })//post
-        .put(upload.single("file"), function (req, res) {
+        .put(ensureAuthenticated, upload.single("file"), function (req, res) {
             parsePath(req.body.path, function (err, pp) {
                 if (err) {
                     respond(res, err);
@@ -392,7 +414,7 @@ module.exports = function () {
         }); //put
 
     router.route("/item")
-        .get(function (req, res) {
+        .get(ensureAuthenticated, function (req, res) {
             parsePath(req.query.path, function (err, pp) {
                 if (err) {
                     respond(res, err);
@@ -403,7 +425,7 @@ module.exports = function () {
                 }
             });//parsePath
         })//get
-        .patch(function (req, res) {
+        .patch(ensureAuthenticated, function (req, res) {
             // console.log("PATCH /item -> ", req.query);
             parsePath(req.query.path, function (err, opp) {
                 if (err) {
@@ -417,7 +439,7 @@ module.exports = function () {
                 }//if
             });//parsePath
         })//patch
-        .delete(function (req, res) {
+        .delete(ensureAuthenticated, function (req, res) {
             parsePath(req.query.path, function (err, pp) {
                 if (err) {
                     respond(res, err);
@@ -430,7 +452,7 @@ module.exports = function () {
         });// route: /item
 
     router.route("/item/meta")
-        .get(function (req, res) {
+        .get(ensureAuthenticated, function (req, res) {
             parsePath(req.query.path, function (err, pp) {
                 if (err) {
                     respond(res, err);
@@ -444,13 +466,16 @@ module.exports = function () {
         });// /item/meta
 
     router.route("/item/meta/name")
-        .put(function (req, res) {
+        .put(ensureAuthenticated, function (req, res) {
             parsePath(req.query.path, function (err, opp) {
                 if (err) {
                     respond(res, err);
                 } else {
+                    // We want to make sure people don't move files with relative renames, such as ../newname.ext
+                    // or change extensions, so we will parse out just the name from the new string, and reuse
+                    // the directory and extension from the old name
                     var newPath = paths.posix.parse(opp.uiPath).dir,
-                        newish = paths.posix.join(newPath, req.query.new);
+                        newish = paths.posix.join(newPath, paths.posix.parse(req.query.new).name + paths.posix.parse(opp.uiPath).ext);
 
                     parseNewPath(newish, function (npp) {
                         rename(opp, npp, function (result) {
@@ -464,7 +489,7 @@ module.exports = function () {
     // For now this is just returning the entire file.  In future, it will need to handle creating thumbnails
     // and whatever is appropiate
     router.route("/item/preview")
-        .get(function (req, res) {
+        .get(ensureAuthenticated, function (req, res) {
             parsePath(req.query.path, function (err, pp) {
                 if (err) {
                     respond(res, err);
@@ -477,7 +502,7 @@ module.exports = function () {
         });// route: /item/preview
 
     router.route("/folder")
-        .get(function (req, res) {
+        .get(ensureAuthenticated, function (req, res) {
             // console.log("getfolder -> ", req.query.path);
             parsePath(req.query.path, function (err, pp) {
                 if (err) {
@@ -489,7 +514,7 @@ module.exports = function () {
                 }
             });//parsePath
         })//get
-        .post(function (req, res) {
+        .post(ensureAuthenticated, function (req, res) {
             // console.log("addfolder query -> ", req.query);
             parsePath(req.query.path, function (err, pp) {
                 if (err) {

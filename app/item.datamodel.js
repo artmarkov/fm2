@@ -308,6 +308,7 @@ module.exports = function (appVM, item) {
         dz.dropzone({
             url: appVM.config.options.fileConnector + "/file",
             dictCancelUpload: appVM.language.cancel,
+            withCredentials: true,
             dictRemoveFile: appVM.language.del,
             dictDefaultMessage: appVM.language.dz_dictDefaultMessage,
             dictInvalidFileType: appVM.language.dz_dictInvalidFileType,
@@ -315,7 +316,7 @@ module.exports = function (appVM, item) {
             maxFiles: 1,
             method: "put",
             success: function (ignore, res) {
-                if (res.error) {
+                if (res.errors) {
                     toastr.error(appVM.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
                 } else {
                     dz.hide();
