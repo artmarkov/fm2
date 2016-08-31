@@ -23,6 +23,8 @@ require("../styles/fm2.css");
 
 //load jquery and related
 var $ = require("jquery"); //updated to 3.0
+require("jquery-mousewheel")($);
+require("malihu")($);
 // require("jquery-migrate");
 require("jquery-ui-dist");
 require("jquery.fancytree"); //replace with fancyTree
@@ -41,6 +43,7 @@ require("knockout.contextmenu")(ko, document);
 ko.punches.enableAll();
 
 require("./fancytree.binding.js");
+require("./scrollbar.binding");
 
 //load our viewmodels
 var AppViewModel = require("app.viewmodel");

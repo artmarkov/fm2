@@ -10,6 +10,7 @@
     "gulp-eslint": "^3.0.1",
     "jquery": "^1.12.1",
     "jquery-migrate": "^1.4.1",
+    "jquery-mousewheel": "^3.1.13",
     "jquery-ui-dist": "^1.12.0",
     "jquery.fancytree": "^2.19.0",
     "jquery.splitter": "^0.23.0",
@@ -50,11 +51,13 @@
     "dropzone": "./node_modules/dropzone/dist/dropzone.js",
     "jquery": "./node_modules/jquery/dist/jquery.js",
     "jquery.fancytree": "./node_modules/jquery.fancytree/dist/jquery.fancytree.js",
+    "jquery-mousewheel": "./node_modules/jquery-mousewheel/jquery.mousewheel.js",
     "jquery.splitter": "./node_modules/jquery.splitter/js/jquery.splitter.js",
     "jquery-ui-dist": "./node_modules/jquery-ui-dist/jquery-ui.js",
     "knockout": "./node_modules/knockout/build/output/knockout-latest.debug.js",
     "knockout.contextmenu": "./node_modules/knockout.contextmenu/dist/js/knockout.contextmenu.js",
-    "knockout-punches": "./node_modules/knockout-punches/knockout.punches.js"
+    "knockout-punches": "./node_modules/knockout-punches/knockout.punches.js",
+    "malihu": "./node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js"
   },
   "browserify": {
     "transform": [
@@ -65,6 +68,11 @@
     "jquery": "$",
     "jq-ui": {
       "exports": "jq-ui",
+      "depends": [
+        "jquery:jQuery"
+      ]
+    },
+    "malihu": {
       "depends": [
         "jquery:jQuery"
       ]

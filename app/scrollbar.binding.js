@@ -4,6 +4,7 @@
 
 var ko = require("knockout");
 var $ = require("jquery");
+
 ko.bindingHandlers.scrolly = {
     init: function (element) {
         "use strict";
