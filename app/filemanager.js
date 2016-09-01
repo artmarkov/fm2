@@ -16,7 +16,6 @@ require("../node_modules/dropzone/dist/dropzone.css");
 require("../node_modules/toastr/build/toastr.css");
 require("../node_modules/bootstrap/dist/css/bootstrap.css");
 require("../node_modules/sweetalert/dist/sweetalert.css");
-require("../node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css");
 // Load theme last so nothing overwrites our colors :)
 require("../styles/fm2.css");
 
