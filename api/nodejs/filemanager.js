@@ -34,11 +34,25 @@ var express = require("express");
 var router = express.Router();
 var fs = require("fs");
 var paths = require("path");
-var multer  = require('multer');
-var upload = multer({ dest: 'upload/'});
+var multer  = require("multer");
+var upload = multer({ dest: "upload/"});
 var config = require("../config/fm2.api.config.json");
 
 paths.posix = require("path-posix");
+
+function unauthorized(code) {
+    "use strict";
+    return {
+        errors: [
+            {
+                status: "403",
+                code: code,
+                title: "Unauthorized Access",
+                detail: "You do not have access to this resource.  If you require access, contact the help desk to request access."
+            }
+        ]
+    };
+} // unauthorized
 
 function ensureAuthenticated(req, res, next) {
     "use strict";
@@ -60,7 +74,25 @@ function ensureAuthenticated(req, res, next) {
                 detail: "You must be logged in to access this resource.  If you are unable to login, or don't have a login, contact the help desk to request access."
             }
         ]
-    });
+    }); // return
+} // ensureAuthenticated
+
+function ensureAccess(req, path) {
+    "use strict";
+    if (req.isAuthenticated === undefined) {
+        console.log("I HIGHLY recommend you configure passport and auth :)");
+        return true;
+    }
+    if (req.isAuthenticated() && req.user.roles === undefined) {
+        console.log("I HIGHLY recommend you configure roles for folder access :)");
+        return true;
+    }
+    return req.isAuthenticated() && req.user.roles.indexOf(path.split("/")[1]) !== -1;
+}
+
+function actionAllowed(action) {
+    "use strict";
+    return (config.security.capabilities.indexOf(action) !== -1);
 }
 
 module.exports = function () {
@@ -202,14 +234,14 @@ module.exports = function () {
 
     // This function exists merely to capture the index and and pp(parsedPath) information in the for loop
     // otherwise the for loop would finish before our async functions
-    function getIndividualFileInfo(pp, files, loopInfo, callback, $index) {
+    function getIndividualFileInfo(pp, files, loopInfo, callback, $index, req) {
         parsePath(paths.posix.join(pp.uiPath, files[$index]), function (err, ipp) {
             if (err) {
                 return callback(err);
             } else {
                 getinfo(ipp, function (result) {
                     // console.log("config -> ", config.security.allowedFileTypes.indexOf(result.fileType), " and ", result);
-                    if (config.security.allowedFileTypes.indexOf(result.fileType) !== -1 || result.isDirectory) {
+                    if ((config.security.allowedFileTypes.indexOf(result.fileType) !== -1 || result.isDirectory) && ensureAccess(req, ipp.uiPath)) {
                         loopInfo.results.push(result);
                     }
                     if ($index + 1 >= loopInfo.total) {
@@ -222,7 +254,7 @@ module.exports = function () {
         });//parsePath
     }//getIndividualFileInfo
 
-    function getfolder(pp, callback) {
+    function getfolder(pp, callback, req) {
         fs.stat(pp.osFullPath, function (err) {
             if (err) {
                 console.log("err -> ", err);
@@ -244,7 +276,7 @@ module.exports = function () {
                         }
 
                         for (i = 0; i < loopInfo.total; i++) {
-                            getIndividualFileInfo(pp, files, loopInfo, callback, i);
+                            getIndividualFileInfo(pp, files, loopInfo, callback, i, req);
                         }//for
                     }//if
                     return false;
@@ -376,6 +408,7 @@ module.exports = function () {
      */
 
     // This route will return the servers rules to the ui
+    // Access: authenticated only
     router.route("/")
         .get(ensureAuthenticated, function (req, res) {
             res.json({
@@ -385,148 +418,207 @@ module.exports = function () {
                         allowedFileTypes: config.security.allowedFileTypes
                     }
                 }]
-            });
-        });
+            }); // res.json
+        }); // route "/"
 
+    // This endpoint will deal with specific files
     router.route("/file")
+    // This route saves a new file
+    // Access: Authenticated, allowed and folder access
         .post(ensureAuthenticated, upload.single("file"), function (req, res) {
-            parsePath(req.body.path, function (err, pp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    savefile(pp, req.file, function (result) {
-                        respond(res, result);
-                    });//savefiles
-                }
-            });//parsePath
+            if (actionAllowed("upload") && ensureAccess(req, req.body.path)) {
+                parsePath(req.body.path, function (err, pp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        savefile(pp, req.file, function (result) {
+                            respond(res, result);
+                        });//savefiles
+                    } // if err
+                }); //parsePath
+            } else {
+                respond(res, unauthorized(req.body.path));
+            } //if allowed
         })//post
+        // This route replaces a file, it uses the replace name so no changing of extensions is permitted
+        // Access: Authenticated, allowed, and folder access
         .put(ensureAuthenticated, upload.single("file"), function (req, res) {
-            parsePath(req.body.path, function (err, pp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    console.log("/replace pp -> ", pp, " req.file -> ", req.file);
-                    replacefile(pp, req.file, function (result) {
-                        respond(res, result);
-                    });//savefiles
-                }//if err
-            });//parsePath
+            if (actionAllowed("replace") && ensureAccess(req, req.body.path)) {
+                parsePath(req.body.path, function (err, pp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        replacefile(pp, req.file, function (result) {
+                            respond(res, result);
+                        }); //savefiles
+                    } //if err
+                });//parsePath
+            } else {
+                respond(res, unauthorized(req.body.path));
+            } //if allowed
         }); //put
 
+    // This endpoint accepts actions on "items", this can be either a file OR a folder
     router.route("/item")
+    // This route will download the item, currently only handling files
+    // Access: Authenticated and folder access, in future I need to seperate preview and download to enforce download at the api level
         .get(ensureAuthenticated, function (req, res) {
-            parsePath(req.query.path, function (err, pp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    res.setHeader("content-disposition", "attachment; filename=" + pp.filename);
-                    res.setHeader("content-type", "application/octet-stream");
-                    res.sendFile(pp.osFullPath);
-                }
-            });//parsePath
-        })//get
+            if (ensureAccess(req, req.query.path)) {
+                parsePath(req.query.path, function (err, pp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        res.setHeader("content-disposition", "attachment; filename=" + pp.filename);
+                        res.setHeader("content-type", "application/octet-stream");
+                        res.sendFile(pp.osFullPath);
+                    } // if err
+                }); //parsePath
+            } else {
+                respond(res, unauthorized(req.query.path));
+            } //if allowed
+        }) //get
+        // This action will move an item
+        // Access: Authenticated, action allowed, and folder access
         .patch(ensureAuthenticated, function (req, res) {
-            // console.log("PATCH /item -> ", req.query);
-            parsePath(req.query.path, function (err, opp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    parseNewPath(paths.posix.join("/", req.query.newPath, opp.filename), function (npp) {
-                        rename(opp, npp, function (result) {
-                            respond(res, result);
-                        });//rename
-                    });//parseNewPath
-                }//if
-            });//parsePath
-        })//patch
+            if (actionAllowed("move") && ensureAccess(req, req.query.newPath)) {
+                parsePath(req.query.path, function (err, opp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        parseNewPath(paths.posix.join("/", req.query.newPath, opp.filename), function (npp) {
+                            rename(opp, npp, function (result) {
+                                respond(res, result);
+                            }); //rename
+                        }); //parseNewPath
+                    } //if
+                }); //parsePath
+            } else {
+                respond(res, unauthorized(req.query.newPath));
+            } //if allowed
+        }) //patch
+        // This action will delete the item
+        // Access: Authenticated, action allowed, and folder access
         .delete(ensureAuthenticated, function (req, res) {
-            parsePath(req.query.path, function (err, pp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    deleteItem(pp, function (result) {
-                        respond(res, result);
-                    });//parsePath
-                }//if
-            });//parsePath
-        });// route: /item
-
-    router.route("/item/meta")
-        .get(ensureAuthenticated, function (req, res) {
-            parsePath(req.query.path, function (err, pp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    //console.log("getinfo pp -> ", pp);
-                    getinfo(pp, function (result) {
-                        respond(res, result);
-                    });//getinfo
-                }
-            });//parsePath
-        });// /item/meta
-
-    router.route("/item/meta/name")
-        .put(ensureAuthenticated, function (req, res) {
-            parsePath(req.query.path, function (err, opp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    // We want to make sure people don't move files with relative renames, such as ../newname.ext
-                    // or change extensions, so we will parse out just the name from the new string, and reuse
-                    // the directory and extension from the old name
-                    var newPath = paths.posix.parse(opp.uiPath).dir,
-                        newish = paths.posix.join(newPath, paths.posix.parse(req.query.new).name + paths.posix.parse(opp.uiPath).ext);
-
-                    parseNewPath(newish, function (npp) {
-                        rename(opp, npp, function (result) {
+            if (actionAllowed("delete") && ensureAccess(req, req.query.path)) {
+                parsePath(req.query.path, function (err, pp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        deleteItem(pp, function (result) {
                             respond(res, result);
-                        });//rename
-                    });//parseNewPath
-                }
-            });//parsePath
-        });// route /item/meta/name
+                        }); //parsePath
+                    } //if
+                }); //parsePath
+            } else {
+                respond(res, unauthorized(req.query.path));
+            } //if allowed
+        }); // route: /item
+
+    // This endpoint deal with meta information about the item
+    router.route("/item/meta")
+    // The action just gets the meta data
+    // Access: Authenticated and folder access
+        .get(ensureAuthenticated, function (req, res) {
+            if (ensureAccess(req, req.query.path)) {
+                parsePath(req.query.path, function (err, pp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        getinfo(pp, function (result) {
+                            respond(res, result);
+                        }); //getinfo
+                    } // if err
+                }); //parsePath
+            } else {
+                respond(res, unauthorized(req.query.path));
+            } //if allowed
+        }); // /item/meta
+
+    // This endpoind deals specifically with an items name
+    router.route("/item/meta/name")
+    // This action will rename the item, it will not allow moving or changing the extension
+    // Access: Authenticated, action allowed, and folder access
+        .put(ensureAuthenticated, function (req, res) {
+            if (actionAllowed("rename") && ensureAccess(req, req.query.path)) {
+                parsePath(req.query.path, function (err, opp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        // We want to make sure people don't move files with relative renames, such as ../newname.ext
+                        // or change extensions, so we will parse out just the name from the new string, and reuse
+                        // the directory and extension from the old name
+                        var newPath = paths.posix.parse(opp.uiPath).dir,
+                            newish = paths.posix.join(newPath, paths.posix.parse(req.query.new).name + paths.posix.parse(opp.uiPath).ext);
+
+                        parseNewPath(newish, function (npp) {
+                            rename(opp, npp, function (result) {
+                                respond(res, result);
+                            }); //rename
+                        }); //parseNewPath
+                    } // if err
+                }); //parsePath
+            } else {
+                respond(res, unauthorized(req.query.path));
+            } //if allowed
+        }); // route /item/meta/name
 
     // For now this is just returning the entire file.  In future, it will need to handle creating thumbnails
     // and whatever is appropiate
     router.route("/item/preview")
+    // This action just downloads the preview
+    // Access: Authenticated, and folder access
         .get(ensureAuthenticated, function (req, res) {
-            parsePath(req.query.path, function (err, pp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    res.setHeader("content-disposition", "attachment; filename=" + pp.filename);
-                    res.setHeader("content-type", "application/octet-stream");
-                    res.sendFile(pp.osFullPath);
-                }
-            });//parsePath
-        });// route: /item/preview
+            if (ensureAccess(req, req.query.path)) {
+                parsePath(req.query.path, function (err, pp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        res.setHeader("content-disposition", "attachment; filename=" + pp.filename);
+                        res.setHeader("content-type", "application/octet-stream");
+                        res.sendFile(pp.osFullPath);
+                    } // if err
+                }); //parsePath
+            } else {
+                respond(res, unauthorized(req.query.path));
+            } //if allowed
+        }); // route: /item/preview
 
+    // This endpoint will deal with folders specifically
     router.route("/folder")
+    // This action will get the folders contents as an array, also could be called a directory listing
+    // Access: Authenticated and folder access
         .get(ensureAuthenticated, function (req, res) {
-            // console.log("getfolder -> ", req.query.path);
-            parsePath(req.query.path, function (err, pp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    getfolder(pp, function (result) {
-                        respond(res, result);
-                    });//getfolder
-                }
-            });//parsePath
-        })//get
+            if (ensureAccess(req, req.query.path)) {
+                parsePath(req.query.path, function (err, pp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        getfolder(pp, function (result) {
+                            respond(res, result);
+                        }, req); //getfolder
+                    } // if err
+                }); //parsePath
+            } else {
+                respond(res, unauthorized(req.query.path));
+            } //if allowed
+        }) //get
+        // This action will create a new folder
+        // Access: Authenticated and folder access
         .post(ensureAuthenticated, function (req, res) {
-            // console.log("addfolder query -> ", req.query);
-            parsePath(req.query.path, function (err, pp) {
-                if (err) {
-                    respond(res, err);
-                } else {
-                    console.log("addfolder path -> ", req.query.path, " pp -> ", pp);
-                    addfolder(pp, req.query.name, function (result) {
-                        respond(res, result);
-                    });//addfolder
-                }
-            });//parsePath
-        });//router /folder
+            if (ensureAccess(req, req.query.path)) {
+                parsePath(req.query.path, function (err, pp) {
+                    if (err) {
+                        respond(res, err);
+                    } else {
+                        addfolder(pp, req.query.name, function (result) {
+                            respond(res, result);
+                        }); //addfolder
+                    } // if err
+                }); //parsePath
+            } else {
+                respond(res, unauthorized(req.query.path));
+            } //if allowed
+        }); //router /folder
 
     return router;
-};//module.exports
+}; //module.exports
