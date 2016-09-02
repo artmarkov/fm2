@@ -73,6 +73,7 @@ module.exports = function (config) {
         write: function (data) {
             if (data.node.folder === true) {
                 self.currentPath(self.util.getFullPath(self.exclusiveFolder, data.node.key));
+                self.returnToFolderView();
             } else {
                 self.currentItem(new Item(self, data.node.data));
                 self.currentView("details");

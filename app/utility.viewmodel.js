@@ -201,18 +201,7 @@ module.exports = function (appVM) {
 
     // This is our main access point for the api, everything should pass through this call that is a GET
     self.apiGet = function (options) {
-        var url = "";
-        if (options.url) {
-            url = appVM.config.options.fileConnector + options.url + "?path=" + options.path;
-        } else {
-            url = appVM.config.options.fileConnector
-                    + "?mode=" + options.mode
-                    + "&path=" + options.path
-                    + "&old=" + options.old
-                    + "&new=" + options.new
-                    + "&name=" + encodeURIComponent(options.foldername)
-                    + "&time=" + Date.now();
-        }//if url, everything should have a url now
+        var url = appVM.config.options.fileConnector + options.url + "?path=" + options.path;
 
         var ajaxOptions = {
             "url": url,

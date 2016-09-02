@@ -74,6 +74,7 @@ module.exports = function (config) {
         write: function (data) {
             if (data.node.folder === true) {
                 self.currentPath(self.util.getFullPath(self.exclusiveFolder, data.node.key));
+                self.returnToFolderView();
             } else {
                 self.currentItem(new Item(self, data.node.data));
                 self.currentView("details");
@@ -287,6 +288,7 @@ ko.bindingHandlers.fancytree = {
     "init": function (element, valueAccessor, allBindingsAccessor) {
         "use strict";
         var $el = $(element),
+            item = allBindingsAccessor().item,
             folder = allBindingsAccessor().folder;
 
         $el.fancytree({
@@ -296,6 +298,11 @@ ko.bindingHandlers.fancytree = {
                 valueAccessor()(data);
             } //activate
         }); //fancytree
+
+        item.subscribe(function (selectItem) {
+            console.log("item.subscribe -> ", selectItem);
+            $el.fancytree("getTree").getNodeByKey(selectItem.path()).setActive({noEvents: true});
+        });
 
         folder.subscribe(function (newFolder) {
             var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap(valueAccessor()));
@@ -3359,18 +3366,7 @@ module.exports = function (appVM) {
 
     // This is our main access point for the api, everything should pass through this call that is a GET
     self.apiGet = function (options) {
-        var url = "";
-        if (options.url) {
-            url = appVM.config.options.fileConnector + options.url + "?path=" + options.path;
-        } else {
-            url = appVM.config.options.fileConnector
-                    + "?mode=" + options.mode
-                    + "&path=" + options.path
-                    + "&old=" + options.old
-                    + "&new=" + options.new
-                    + "&name=" + encodeURIComponent(options.foldername)
-                    + "&time=" + Date.now();
-        }//if url, everything should have a url now
+        var url = appVM.config.options.fileConnector + options.url + "?path=" + options.path;
 
         var ajaxOptions = {
             "url": url,

@@ -40,7 +40,7 @@
 
     <div id="splitter">
         <div>
-            <div id="tree2" data-bind="fancytree: currentRelativePath, folder: currentFolder">
+            <div id="tree2" data-bind="fancytree: currentRelativePath, folder: currentFolder, item: currentItem">
             </div>
         </div>
         <div id="fileinfo">
@@ -149,9 +149,6 @@
 </script>
 
 <script type="text/html" id="pdf-viewer-template">
-    <iframe id='fm-pdf-viewer' data-bind="attr: {src: 'ViewerJS/index.html#' + getDownloadUrl(), width: $root.config.pdfs.pdfsReaderWidth,
-        height: $root.config.pdfs.pdfsReaderHeight}"
-        allowfullscreen webkitallowfullscreen></iframe>
 </script>
 
 

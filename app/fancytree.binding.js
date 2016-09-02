@@ -10,6 +10,7 @@ ko.bindingHandlers.fancytree = {
     "init": function (element, valueAccessor, allBindingsAccessor) {
         "use strict";
         var $el = $(element),
+            item = allBindingsAccessor().item,
             folder = allBindingsAccessor().folder;
 
         $el.fancytree({
@@ -19,6 +20,11 @@ ko.bindingHandlers.fancytree = {
                 valueAccessor()(data);
             } //activate
         }); //fancytree
+
+        item.subscribe(function (selectItem) {
+            console.log("item.subscribe -> ", selectItem);
+            $el.fancytree("getTree").getNodeByKey(selectItem.path()).setActive({noEvents: true});
+        });
 
         folder.subscribe(function (newFolder) {
             var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap(valueAccessor()));
