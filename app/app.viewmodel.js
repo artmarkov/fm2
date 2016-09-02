@@ -75,7 +75,7 @@ module.exports = function (config) {
                 self.currentPath(self.util.getFullPath(self.exclusiveFolder, data.node.key));
                 self.returnToFolderView();
             } else {
-                self.currentItem(new Item(self, data.node.data));
+                self.currentItem(new Item(self, $.extend(data.node.data, data.node)));
                 self.currentView("details");
             } //if
         }

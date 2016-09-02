@@ -17,16 +17,18 @@ ko.bindingHandlers.fancytree = {
             "focusOnSelect": true,
             source: [{title: ko.unwrap(valueAccessor()), children: null, key: ko.unwrap(valueAccessor()), folder: true, expanded: true}],
             activate: function (ignore, data) {
+                // console.log("activate data -> ", data);
                 valueAccessor()(data);
             } //activate
         }); //fancytree
 
         item.subscribe(function (selectItem) {
-            console.log("item.subscribe -> ", selectItem);
-            $el.fancytree("getTree").getNodeByKey(selectItem.path()).setActive({noEvents: true});
+            // console.log("item.subscribe -> ", selectItem);
+            $el.fancytree("getTree").getNodeByKey(selectItem.key()).setActive({noEvents: true});
         });
 
         folder.subscribe(function (newFolder) {
+            // console.log("newFolder -> ", ko.toJS(newFolder));
             var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap(valueAccessor()));
             if (node.hasChildren()) {
                 node.removeChildren();
