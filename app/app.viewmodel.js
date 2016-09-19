@@ -118,7 +118,7 @@ module.exports = function (config) {
     self.afterRender = function () {
         if (self.currentView() === "uploads") {
             $("#my-awesome-dropzone").dropzone({
-                url: config.options.fileConnector + "/file",
+                url: self.util.apiUrl + "/file",
                 withCredentials: true,
                 dictCancelUpload: self.language.cancel,
                 dictRemoveFile: self.language.del,

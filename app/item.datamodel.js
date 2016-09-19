@@ -140,7 +140,7 @@ module.exports = function (appVM, item) {
             if (self.isDirectory()) {
                 return false;
             }//if
-            return appVM.config.options.fileConnector
+            return appVM.util.apiUrl
                     + self.directPath();
         }//if
         return false;
@@ -151,7 +151,7 @@ module.exports = function (appVM, item) {
             if (self.isDirectory()) {
                 return appVM.config.icons.path + appVM.config.icons.directory;
             }//if
-            return appVM.config.options.fileConnector
+            return appVM.util.apiUrl
                     + self.preview();
         }//if
         return false;
@@ -308,7 +308,7 @@ module.exports = function (appVM, item) {
         dz.show();
         button.hide();
         dz.dropzone({
-            url: appVM.config.options.fileConnector + "/file",
+            url: appVM.util.apiUrl + "/file",
             dictCancelUpload: appVM.language.cancel,
             withCredentials: true,
             dictRemoveFile: appVM.language.del,
@@ -350,7 +350,7 @@ module.exports = function (appVM, item) {
     // contextual menu option in list views.
     // NOTE: closes the window when finished.
     self.selectMe = function () {
-        var url = appVM.config.options.fileConnector
+        var url = appVM.util.apiUrl
                 + self.directPath();
 
         if (window.opener || window.tinyMCEPopup || appVM.util.urlParameters("field_name") || appVM.util.urlParameters("CKEditorCleanUpFuncNum") || appVM.util.urlParameters("CKEditor")) {
