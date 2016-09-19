@@ -481,7 +481,9 @@ module.exports = function (appVM, item) {
     // This is our context menu for each item, so simple :)
     self.menu = ko.observableArray([{
         text: "<span class='glyphicon glyphicon-info-sign'></span>  " + appVM.language.details,
-        action: function () {
+        action: function (ignore, e) {
+            console.log("e -> ", e);
+            e.preventDefault();
             appVM.goToItem(self);
         }//self.menu.push
     }]);//self.menu
@@ -3176,6 +3178,7 @@ var toastr = require("toastr");
 module.exports = function (appVM) {
     "use strict";
     var self = this;
+    self.apiUrl = "";
 
     self.getLanguage = function () {
         var culture;
@@ -3366,168 +3369,104 @@ module.exports = function (appVM) {
         });//each error
     };//handleAjaxError
 
-    // This is our main access point for the api, everything should pass through this call that is a GET
-    self.apiGet = function (options) {
-        var url = appVM.config.options.fileConnector + options.url + "?path=" + options.path;
+    // Function to get the proper api url
+    var setApiUrl = function () {
+        var cfg = appVM.config.api;
+        if (cfg.production) {
+            if (cfg.production.hostnames.indexOf(window.location.hostname) !== -1) {
+                return self.apiUrl = cfg.production.url;
+            }
+            if (cfg.qa.hostnames.indexOf(window.location.hostname) !== -1) {
+                return self.apiUrl = cfg.qa.url;
+            }
+            if (cfg.development.hostnames.indexOf(window.location.hostname) !== -1) {
+                return self.apiUrl = cfg.development.url;
+            }
+            if (cfg.local.hostnames.indexOf(window.location.hostname) !== -1) {
+                return self.apiUrl=  cfg.local.url;
+            }
+        }
+        return self.apiUrl = appVM.config.api.local.url;
+    }; // apiUrl
+    setApiUrl();
 
+    // There was to much duplicate code in these methods, this should help clean them up.
+    self.apiExecute = function (url, method, options) {
         var ajaxOptions = {
             "url": url,
+            "method": method,
             "dataType": options.dataType || "json",
             "success": function (data) {
                 if (data.errors) {
                     handleAjaxError(data.errors);
                 } else {
                     options.success(data.data);
-                }//if
-            }, //success
+                } // if
+            }, // success
             "error": function (err) {
                 if (options.error) {
                     options.error(err);
                 } else {
                     handleAjaxError(err);
-                }//f
-            }//error
-        }; //ajaxOptions
+                } // if
+            } // error
+        }; // ajaxOptions
 
         if (appVM.config.options.getParams) {
             $.extend(ajaxOptions, appVM.config.options.getParams);
-        }//if getParams
+        } // if
 
         $.ajax(ajaxOptions);
+    }; // apiExecute
+
+    // This is our main access point for the api, everything should pass through this call that is a GET
+    self.apiGet = function (options) {
+        var url = self.apiUrl
+            + options.url
+            + "?path=" + options.path;
+
+        self.apiExecute(url, "GET", options);
     };//apiGet
 
     // This is our main access point for the api, everything should pass through this call that is a POST
     self.apiPost = function (options) {
-        var url = appVM.config.options.fileConnector
+        var url = self.apiUrl
                 + options.url
                 + "?path=" + encodeURIComponent(options.path)
                 + "&name=" + encodeURIComponent(options.name);
 
-        var ajaxOptions = {
-            "url": url,
-            "method": "POST",
-            "dataType": options.dataType || "json",
-            "success": function (data) {
-                if (data.errors) {
-                    handleAjaxError(data.errors);
-                } else {
-                    options.success(data.data);
-                } //if
-            }, //success
-            "error": function (err) {
-                if (options.error) {
-                    options.error(err);
-                } else {
-                    handleAjaxError(err);
-                }//if
-            }//error
-        }; //ajaxOptions
-
-        if (appVM.config.options.getParams) {
-            $.extend(ajaxOptions, appVM.config.options.getParams);
-        }//if
-
-        $.ajax(ajaxOptions);
+        self.apiExecute(url, "POST", options);
     };//apiPost
 
     // This is our main access point for the api, everything should pass through this call that is a PUT
     self.apiPut = function (options) {
-        var url = appVM.config.options.fileConnector + options.url + "?path=" + options.path + "&new=" + options.new;
+        var url = self.apiUrl
+            + options.url
+            + "?path=" + options.path
+            + "&new=" + options.new;
 
-        var ajaxOptions = {
-            "url": url,
-            "method": "PUT",
-            "dataType": options.dataType || "json",
-            "success": function (data) {
-                if (data.errors) {
-                    handleAjaxError(data.errors);
-                } else {
-                    options.success(data.data);
-                }//if
-            }, //success
-            "error": function (err) {
-                if (options.error) {
-                    options.error(err);
-                } else {
-                    handleAjaxError(err);
-                }//if
-            }//error
-        }; //ajaxOptions
-
-        if (appVM.config.options.getParams) {
-            $.extend(ajaxOptions, appVM.config.options.getParams);
-        }//if
-
-        $.ajax(ajaxOptions);
+        self.apiExecute(url, "PUT", options);
     };//apiPut
 
     // This is our main access point for the api, everything should pass through this call that is a PATCH
     self.apiPatch = function (options) {
-        var url = appVM.config.options.fileConnector
+        var url = self.apiUrl
                 + options.url
                 + "?path="
                 + options.path
                 + "&newPath="
                 + options.newPath;
 
-        var ajaxOptions = {
-            "url": url,
-            "method": "PATCH",
-            "dataType": options.dataType || "json",
-            "success": function (data) {
-                if (data.errors) {
-                    handleAjaxError(data.errors);
-                } else {
-                    options.success(data.data);
-                }//if
-            }, //success
-            "error": function (err) {
-                if (options.error) {
-                    options.error(err);
-                } else {
-                    handleAjaxError(err);
-                }//if
-            }//error
-        }; //ajaxOptions
-
-        if (appVM.config.options.getParams) {
-            $.extend(ajaxOptions, appVM.config.options.getParams);
-        }//if
-
-        $.ajax(ajaxOptions);
+        self.apiExecute(url, "PATCH", options);
     };//apiPatch
 
     // This is our main access point for the api, everything should pass through this call that is a DELETE
     self.apiDelete = function (options) {
-        var url = appVM.config.options.fileConnector
+        var url = self.apiUrl
                 + options.url
                 + "?path=" + options.path;
 
-        var ajaxOptions = {
-            "url": url,
-            "method": "DELETE",
-            "dataType": options.dataType || "json",
-            "success": function (data) {
-                if (data.errors) {
-                    handleAjaxError(data.errors);
-                } else {
-                    options.success(data.data);
-                }//if
-            }, //success
-            "error": function (err) {
-                if (options.error) {
-                    options.error(err);
-                } else {
-                    handleAjaxError(err);
-                }//if
-            }//error
-        }; //ajaxOptions
-
-        if (appVM.config.options.getParams) {
-            $.extend(ajaxOptions, appVM.config.options.getParams);
-        }//if
-
-        $.ajax(ajaxOptions);
+        self.apiExecute(url, "DELETE", options);
     };//apiGet
 
     self.setDimensions = function () {

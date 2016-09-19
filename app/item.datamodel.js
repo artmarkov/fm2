@@ -73,7 +73,9 @@ module.exports = function (appVM, item) {
     // This is our context menu for each item, so simple :)
     self.menu = ko.observableArray([{
         text: "<span class='glyphicon glyphicon-info-sign'></span>  " + appVM.language.details,
-        action: function () {
+        action: function (ignore, e) {
+            console.log("e -> ", e);
+            e.preventDefault();
             appVM.goToItem(self);
         }//self.menu.push
     }]);//self.menu

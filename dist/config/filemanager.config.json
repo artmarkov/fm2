@@ -35,6 +35,24 @@
         "withCredentials": true
       }}
   },
+  "api": {
+    "local": {
+      "url": "http://localhost:3000/filemanager",
+      "hostnames": ["localhost"]
+    },
+    "development": {
+      "url": "http://dev.api.com:3000/filemanager",
+      "hostnames": ["dev.mySite.com", "dev.mySite.net"]
+    },
+    "qa": {
+      "url": "http://qa.api.com:3000/filemanager",
+      "hostnames": ["qa.mySite.com", "qa.mySite.net"]
+    },
+    "production": {
+      "url": "http://www.api.com:3000/filemanager",
+      "hostnames": ["www.mySite.com", "www.mySite.net"]
+    }
+  },
     "security": {
         "capabilities": [ "select", "upload", "download", "rename", "move", "replace", "delete" ],
         "allowFolderDownload": false,
