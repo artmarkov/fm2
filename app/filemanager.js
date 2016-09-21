@@ -47,7 +47,7 @@ var AppViewModel = require("app.viewmodel");
 var appVM;
 
 
-$.getJSON("config/filemanager.config.json", function (config) {
+$.getJSON("config/fm2.ui.config.json", function (config) {
     "use strict";
     appVM = new AppViewModel(config);
     ko.applyBindings(appVM);
