@@ -28,11 +28,11 @@
             <h6 data-bind="text: language.current_folder + currentRelativePath()"></h6>
             </div>
         <div class="pull-right">
-            <button type="button" class="btn btn-default" data-bind="click: goLevelUp, visible: currentPath() !== config.options.fileRoot || currentView() === 'details'"><span class="glyphicon glyphicon-level-up"></span></button>
+            <button type="button" class="btn btn-default" data-bind="click: goLevelUp, visible: notHome"><span class="glyphicon glyphicon-level-up"></span></button>
             <button type="button" class="btn btn-default" data-bind="click: goHome, visible: notHome"><span class="glyphicon glyphicon-home"></span></button>
             <button type="button" class="btn btn-default" data-bind="click: function (){currentView('uploads');}, visible: canUpload"><span class="glyphicon glyphicon-upload"> {{language.upload}}</span></button>
             <button type="button" class="btn btn-default" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> {{language.new_folder}}</button>
-            <button type="button" data-bind="title: language.list_view, click: switchViews" class="btn btn-default"><span data-bind="css: viewButtonClass"></span></button>
+            <button type="button" data-bind="title: language.list_view, click: switchViews" class="btn btn-default"><span data-bind="css: mainSubViewButtonClass"></span></button>
         </div>
 
         <div class="clearfix"></div>
@@ -44,7 +44,7 @@
             </div>
         </div>
         <div id="fileinfo">
-            <div data-bind="template: {name: templateName, afterRender: afterRender}">
+            <div data-bind="template: {name: mainView, afterRender: afterRender}">
             </div>
         </div>
     </div>
@@ -103,6 +103,10 @@
         </tr>
         </tbody>
     </table>
+</script>
+
+<script type="text/html" id="main-template">
+    <div data-bind="template: {name: mainSubView}"></div>
 </script>
 
 <script type="text/html" id="details-template">

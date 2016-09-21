@@ -84,37 +84,36 @@ module.exports = function (config) {
     self.currentFolder = ko.observableArray([]);
     self.folderSize = ko.observable(0);
     self.folderCount = ko.observable(0);
-    self.lastView = ko.observable(config.options.defaultViewMode);
-    self.activeView = ko.observable(config.options.defaultViewMode);
-    self.currentView = ko.pureComputed({
-        read: function () {
-            return self.activeView();
-        }, //read
-        write: function (value) {
-            if ((self.activeView() === "grid" || self.activeView() === "list") && value !== "grid" && value !== "list") {
-                self.lastView(self.activeView());
-            }
-            self.activeView(value);
-        }, //write
-        owner: self
-    }); //currentView
+
+    self.currentView = ko.observable("main");
+    self.currentSubView = ko.observable(config.options.defaultViewMode);
+
     self.currentItem = ko.observable(new Item(self));
     self.loading = ko.observable(true);
 
-    self.templateName = function () {
+    self.mainView = function () {
         if (self.config) {
-            if (self.currentView() === "grid") {
-                return "grid-template";
-            }//if
-            if (self.currentView() === "list") {
-                return "list-template";
+            if (self.currentView() === "uploads") {
+                return "uploads-template";
             }//if
             if (self.currentView() === "details") {
                 return "details-template";
             }//if
         }//if config
-        return "uploads-template";
-    };//templateName
+        return "main-template";
+    }; // mainView
+
+    self.mainSubView = function () {
+        if (self.config) {
+            if (self.currentSubView() === "grid") {
+                return "grid-template";
+            }//if
+            if (self.currentSubView() === "list") {
+                return "list-template";
+            }//if
+        }//if config
+        return "grid-template";
+    }; // mainView
 
     self.afterRender = function () {
         if (self.currentView() === "uploads") {
@@ -180,8 +179,8 @@ module.exports = function (config) {
     };//loadCurrentFolder
 
     self.returnToFolderView = function () {
-        if (self.currentView !== "grid" && self.currentView() !== "list") {
-            self.currentView(self.lastView());
+        if (self.currentView !== "main") {
+            self.currentView("main");
         } //if
     }; //returnToFolderView
 
@@ -217,10 +216,13 @@ module.exports = function (config) {
 
     self.goHome = function () {
         self.currentPath(self.homePath);
+        if (self.currentView() !== "main") {
+            self.currentView("main");
+        }
     };//goHome
 
     self.notHome = ko.pureComputed(function () {
-        return self.currentPath() !== self.homePath || self.currentView() === "uploads";
+        return self.currentPath() !== self.homePath || self.currentView() !== "main";
     }); //notHome
 
     self.browseToItem = function (data) {
@@ -239,8 +241,9 @@ module.exports = function (config) {
 
     self.goLevelUp = function () {
         self.loading(true);
-        if (self.currentView() !== "grid" && self.currentView() !== "list") {
-            self.currentView(self.lastView());
+        if (self.currentView() !== "main") {
+            self.currentView("main");
+            // self.currentPath().valueHasMutated();
             self.initializeFolder();
             self.loading(false);
         } else {
@@ -258,17 +261,15 @@ module.exports = function (config) {
     }; //goLevelUp
 
     self.switchViews = function () {
-        if (self.currentView() !== "list" && self.currentView() !== "grid") {
-            self.currentView(self.lastView());
-        } else if (self.currentView() === "grid") {
-            self.currentView("list");
+        if (self.currentSubView() === "list") {
+            self.currentSubView("grid");
         } else {
-            self.currentView("grid");
+            self.currentSubView("list");
         } //if
     };//switchViews
 
-    self.viewButtonClass = ko.pureComputed(function () {
-        return self.currentView() === "grid"
+    self.mainSubViewButtonClass = ko.pureComputed(function () {
+        return self.currentSubView() === "grid"
             ? "glyphicon glyphicon-th-list"
             : "glyphicon glyphicon-th";
     });//viewButtonClass

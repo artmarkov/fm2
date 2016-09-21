@@ -71,6 +71,7 @@
       "delete"
     ]
   },
+  "version": "2.4.0",
   "videos": {
     "videosExt": [
       "ogv",
