@@ -1,0 +1,82 @@
+{
+  "options": {
+    "culture": "en",
+    "defaultViewMode": "grid",
+    "getParams": {
+      "crossDomain": true,
+      "xhrFields": {
+        "withCredentials": true
+      }
+    },
+    "logger": true,
+    "splitPercentage": 80,
+    "startingPath": "/",
+    "theme": "flat-dark"
+  },
+  "api": {
+    "local": {
+      "url": "http://localhost:3000/filemanager",
+      "hostnames": ["localhost"]
+    },
+    "development": {
+      "url": "http://dev.api.com:3000/filemanager",
+      "hostnames": ["dev.mySite.com", "dev.mySite.net"]
+    },
+    "qa": {
+      "url": "http://qa.api.com:3000/filemanager",
+      "hostnames": ["qa.mySite.com", "qa.mySite.net"]
+    },
+    "production": {
+      "url": "http://www.api.com:3000/filemanager",
+      "hostnames": ["www.mySite.com", "www.mySite.net"]
+    }
+  },
+  "audios": {
+    "audiosExt": [
+      "ogg",
+      "mp3",
+      "wav"
+    ]
+  },
+  "icons": {
+    "path": "images/fileicons/",
+    "directory": "_Open.png"
+  },
+  "images": {
+    "imagesExt": [
+      "jpg",
+      "jpe",
+      "jpeg",
+      "gif",
+      "png",
+      "svg"
+    ]
+  },
+  "pdfs": {
+    "pdfsExt": [
+      "pdf",
+      "odt",
+      "odp",
+      "ods"
+    ]
+  },
+  "security": {
+    "capabilities": [
+      "select",
+      "upload",
+      "download",
+      "rename",
+      "move",
+      "replace",
+      "delete"
+    ]
+  },
+  "videos": {
+    "videosExt": [
+      "ogv",
+      "mp4",
+      "webm",
+      "m4v"
+    ]
+  }
+}
