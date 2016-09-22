@@ -10,41 +10,44 @@ ko.bindingHandlers.fancytree = {
     "init": function (element, valueAccessor, allBindingsAccessor) {
         "use strict";
         var $el = $(element),
-            item = allBindingsAccessor().item,
-            folder = allBindingsAccessor().folder;
+            $folder = valueAccessor(),
+            $browseToItem = allBindingsAccessor().browseToItem;
 
         $el.fancytree({
             "focusOnSelect": true,
-            source: [{title: ko.unwrap(valueAccessor()), children: null, key: ko.unwrap(valueAccessor()), folder: true, expanded: true}],
+            source: [{title: ko.unwrap($folder().path()), children: null, key: ko.unwrap($folder().path()), folder: true, expanded: true}],
             activate: function (ignore, data) {
                 // console.log("activate data -> ", data);
-                valueAccessor()(data);
-            } //activate
-        }); //fancytree
+                if (typeof data.node.data.isDirectory !== "undefined") {
+                    $browseToItem(data.node.data);
+                } else {
+                    $folder().path("/");
+                }
+            } // activate
+        }); // fancytree
 
-        item.subscribe(function (selectItem) {
-            // console.log("item.subscribe -> ", selectItem);
+        $folder().currentItem.subscribe(function (selectItem) {
             $el.fancytree("getTree").getNodeByKey(selectItem.key()).setActive({noEvents: true});
         });
 
-        folder.subscribe(function (newFolder) {
-            // console.log("newFolder -> ", ko.toJS(newFolder));
-            var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap(valueAccessor()));
+        $folder().items.subscribe(function (newFolder) {
+            var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap($folder().path()));
             if (node.hasChildren()) {
                 node.removeChildren();
-                node.render();
-            } //if
+            } // if
             node.addChildren(ko.toJS(newFolder));
             node.setExpanded(true);
         });
     },
     "update": function (element, valueAccessor) {
         "use strict";
-        var $el = $(element);
+        var $el = $(element),
+            $folder = valueAccessor();
+
         if ($el.fancytree) {
             // we set no events on this one because we simply want to select it, not kick off the chain of activate events that normally
             // happen when you physically click a node
-            $el.fancytree("getTree").getNodeByKey(ko.unwrap(valueAccessor())).setActive({noEvents: true});
+            $el.fancytree("getTree").getNodeByKey(ko.unwrap($folder().path())).setActive({noEvents: true});
         }
     }
 };

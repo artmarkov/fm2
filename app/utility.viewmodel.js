@@ -163,9 +163,9 @@ module.exports = function (appVM) {
         return self.normalizePath(ef);
     };//getExclusiveFolder
 
-    self.getRelativePath = function (ef, path) {
-        ef = self.normalizePath(ef);
-        path = self.normalizePath(path);
+    self.getRelativePath = function (path) {
+        var ef = self.normalizePath(self.getExclusiveFolder());
+        path = self.normalizePath(path || "/");
 
         // First, if the exclusive folder is simply the root, just return the path
         if (ef === "/") {
@@ -179,8 +179,8 @@ module.exports = function (appVM) {
         return path.replace(ef, "");
     };//getRelativePath
 
-    self.getFullPath = function (ef, path) {
-        ef = self.normalizePath(ef);
+    self.getFullPath = function (path) {
+        var ef = self.normalizePath(self.getExclusiveFolder());
         path = self.normalizePath(path);
 
         // First, if the exclusive folder is simply the root, just return the path
@@ -222,9 +222,12 @@ module.exports = function (appVM) {
     setApiUrl();
 
     // There was to much duplicate code in these methods, this should help clean them up.
-    self.apiExecute = function (url, method, options) {
+    self.apiExecute = function (urlExtra, method, options) {
         var ajaxOptions = {
-            "url": url,
+            "url": self.apiUrl
+                + options.url
+                + "?path=" + encodeURIComponent(self.getFullPath(options.path || "/"))
+                + urlExtra,
             "method": method,
             "dataType": options.dataType || "json",
             "success": function (data) {
@@ -247,57 +250,43 @@ module.exports = function (appVM) {
             $.extend(ajaxOptions, appVM.config.options.getParams);
         } // if
 
+        if (typeof ajaxOptions.url === "undefined") {
+            debugger;
+        }
+
         $.ajax(ajaxOptions);
     }; // apiExecute
 
     // This is our main access point for the api, everything should pass through this call that is a GET
     self.apiGet = function (options) {
-        var url = self.apiUrl
-            + options.url
-            + "?path=" + options.path;
-
-        self.apiExecute(url, "GET", options);
+        // debugger;
+        self.apiExecute("", "GET", options);
     };//apiGet
 
     // This is our main access point for the api, everything should pass through this call that is a POST
     self.apiPost = function (options) {
-        var url = self.apiUrl
-                + options.url
-                + "?path=" + encodeURIComponent(options.path)
-                + "&name=" + encodeURIComponent(options.name);
+        var urlExtra = "&name=" + encodeURIComponent(options.name);
 
-        self.apiExecute(url, "POST", options);
+        self.apiExecute(urlExtra, "POST", options);
     };//apiPost
 
     // This is our main access point for the api, everything should pass through this call that is a PUT
     self.apiPut = function (options) {
-        var url = self.apiUrl
-            + options.url
-            + "?path=" + options.path
-            + "&new=" + options.new;
+        var urlExtra = "&new=" + encodeURIComponent(options.new);
 
-        self.apiExecute(url, "PUT", options);
+        self.apiExecute(urlExtra, "PUT", options);
     };//apiPut
 
     // This is our main access point for the api, everything should pass through this call that is a PATCH
     self.apiPatch = function (options) {
-        var url = self.apiUrl
-                + options.url
-                + "?path="
-                + options.path
-                + "&newPath="
-                + options.newPath;
+        var urlExtra = "&newPath=" + encodeURIComponent(options.newPath);
 
-        self.apiExecute(url, "PATCH", options);
+        self.apiExecute(urlExtra, "PATCH", options);
     };//apiPatch
 
     // This is our main access point for the api, everything should pass through this call that is a DELETE
     self.apiDelete = function (options) {
-        var url = self.apiUrl
-                + options.url
-                + "?path=" + options.path;
-
-        self.apiExecute(url, "DELETE", options);
+        self.apiExecute("", "DELETE", options);
     };//apiGet
 
     self.setDimensions = function () {

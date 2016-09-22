@@ -25,13 +25,13 @@
 <div>
     <div id="uploader" method="post">
         <div class="pull-left">
-            <h6 data-bind="text: language.current_folder + currentRelativePath()"></h6>
+            <h6 data-bind="text: language.current_folder + currentFolder().path()"></h6>
             </div>
         <div class="pull-right">
             <button type="button" class="btn btn-default" data-bind="click: goLevelUp, visible: notHome"><span class="glyphicon glyphicon-level-up"></span></button>
             <button type="button" class="btn btn-default" data-bind="click: goHome, visible: notHome"><span class="glyphicon glyphicon-home"></span></button>
             <button type="button" class="btn btn-default" data-bind="click: function (){currentView('uploads');}, visible: canUpload"><span class="glyphicon glyphicon-upload"> {{language.upload}}</span></button>
-            <button type="button" class="btn btn-default" data-bind="click: createFolder"><span class="glyphicon glyphicon-folder-open"></span> {{language.new_folder}}</button>
+            <button type="button" class="btn btn-default" data-bind="click: currentFolder().createFolder"><span class="glyphicon glyphicon-folder-open"></span> {{language.new_folder}}</button>
             <button type="button" data-bind="title: language.list_view, click: switchViews" class="btn btn-default"><span data-bind="css: mainSubViewButtonClass"></span></button>
         </div>
 
@@ -40,7 +40,7 @@
 
     <div id="splitter">
         <div>
-            <div id="tree2" data-bind="fancytree: currentRelativePath, folder: currentFolder, item: currentItem">
+            <div id="tree2" data-bind="fancytree: currentFolder, browseToItem: browseToItem">
             </div>
         </div>
         <div id="fileinfo">
@@ -56,7 +56,7 @@
     <div class="pull-right">
         <a data-bind="attr: {href: config.url}" id="link-to-project"></a>
         <div id="folder-info">
-            <span id="items-counter">{{folderCount}}</span> {{language.items}} - {{language.size}} : <span id="items-size">{{folderSize}}</span>
+            <span id="items-counter" data-bind="with: currentFolder">{{itemCount}}</span> {{language.items}} - {{language.size}} : <span id="items-size">{{currentFolder().itemSize | sizeInKb:10}}</span>
         </div>
     </div>
     <div class="clearfix"></div>
@@ -72,8 +72,8 @@
 
 <script type="text/html" id="grid-template">
     <div class="container-fluid">
-        <div class="row">
-            <div id="contents" class="" data-bind="foreach: {data: currentFolder, as: 'item'}">
+        <div class="row" data-bind="with: currentFolder">
+            <div id="contents" class="" data-bind="foreach: {data: items, as: 'item'}">
                 <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2 col-fix grid-border text-center" data-bind="click: $root.browseToItem, contextMenu: menu">
                     <img width="64" data-bind="attr: {src: getIconUrl, alt: getIconUrl, dataPath: getIconUrl}"/>
                     <p class="text-center" data-bind="text: item.filename"></p>
@@ -85,20 +85,20 @@
 </script>
 
 <script type="text/html" id="list-template">
-    <table class="table">
+    <table class="table" data-bind="with: currentFolder">
         <thead>
         <tr>
             <th>{{$root.language.name}}</th>
-            <th>{{$root.language.dimensions}}</th>
+            <!--<th>{{$root.language.dimensions}}</th>-->
             <th>{{$root.language.size}}</th>
             <th>{{$root.language.modified}}</th>
         </tr>
         </thead>
-        <tbody data-bind="foreach: {data: currentFolder, as: 'item'}">
+        <tbody data-bind="foreach: {data: items, as: 'item'}">
         <tr class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.browseToItem, contextMenu: menu">
             <td><span data-bind="css: item.isDirectory() ? 'glyphicon glyphicon-folder-close' : 'glyphicon glyphicon-file'">  {{item.filename}}</span> </td>
-            <td>{{item.properties().height}}x{{item.properties().width}}</td>
-            <td>{{item.properties().size}}</td>
+            <!--<td>{{item.properties().height}}x{{item.properties().width}}</td>-->
+            <td>{{item.properties().size | sizeInKb:10}}</td>
             <td>{{item.properties().dateModified}}</td>
         </tr>
         </tbody>
@@ -110,7 +110,7 @@
 </script>
 
 <script type="text/html" id="details-template">
-    <div class="text-center" data-bind="with: currentItem">
+    <div class="text-center" data-bind="with: currentFolder().currentItem">
         <div data-bind="template: {name: templateName}"></div>
         <div>
             <button class="btn" data-bind="click: selectMe, visible: $root.canSelect">{{$root.language.select}}</button>
@@ -124,14 +124,14 @@
             <!--<div id="tools"></div>-->
         </div>
         <dl>
-            <dt>{{$root.language.dimensions}}</dt>
-            <dd>{{properties().height}}x{{properties().width}}</dd>
+            <!--<dt>{{$root.language.dimensions}}</dt>-->
+            <!--<dd>{{properties().height}}x{{properties().width}}</dd>-->
             <dt>{{$root.language.created}}</dt>
             <dd>{{properties().dateCreated}}</dd>
             <dt>{{$root.language.modified}}</dt>
             <dd>{{properties().dateModified}}</dd>
             <dt>{{$root.language.size}}</dt>
-            <dd>{{properties().size}}</dd>
+            <dd>{{properties().size | sizeInKb:10}}</dd>
         </dl>
     </div>
 </script>

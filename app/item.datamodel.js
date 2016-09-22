@@ -4,7 +4,7 @@
  */
 var ko = require("knockout");
 var $ = require("jquery");
-var filesize = require("filesize");
+// var filesize = require("filesize");
 var swal = require("sweetalert");
 var toastr = require("toastr");
 
@@ -13,13 +13,14 @@ module.exports = function (appVM, item) {
     var self = this;
     item = item || {};
     item.properties = item.properties || {};
+    // console.log(item);
 
     // Lets make the entire item into observables
     self.filename = ko.observable(item.filename);
     self.fileType = ko.observable(item.fileType);
     self.isDirectory = ko.observable(item.isDirectory);
-    self.path = ko.observable(item.path);
-    self.key = ko.observable(item.key);
+    self.path = ko.observable(appVM.util.getRelativePath(item.path));
+    self.key = ko.observable(appVM.util.getRelativePath(item.key || item.path));
     self.title = ko.observable(item.title);
     self.folder = ko.observable(item.isDirectory);
     self.dir = ko.observable(item.dir);
@@ -31,7 +32,7 @@ module.exports = function (appVM, item) {
         dateModified: item.properties.dateModified,
         height: item.properties.height,
         width: item.properties.width,
-        size: filesize(parseInt(item.properties.size || 0, 10))
+        size: parseInt(item.properties.size || 0, 10)
     });//self.properties
 
     //This function makes a call to the api to reload the current item.  Used after replacing,renaming,moving, etc to ensure success
@@ -44,8 +45,8 @@ module.exports = function (appVM, item) {
                 self.fileType(item.fileType);
                 self.isDirectory(item.isDirectory);
                 self.folder(item.isDirectory);
-                self.path(item.path);
-                self.key(item.key);
+                self.path(appVM.util.getRelativePath(item.path));
+                self.key(appVM.util.getRelativePath(item.key || item.path));
                 self.title(item.title);
                 self.dir(item.dir);
                 self.path(item.directPath);
@@ -56,7 +57,7 @@ module.exports = function (appVM, item) {
                     dateModified: item.properties.dateModified,
                     height: item.properties.height,
                     width: item.properties.width,
-                    size: filesize(parseInt(item.properties.size || 0, 10))
+                    size: parseInt(item.properties.size || 0, 10)
                 });//self.properties
             }//success
         });//apiGet
@@ -235,7 +236,7 @@ module.exports = function (appVM, item) {
                 success: function (result) {
                     self.path(result.path);
                     self.reloadSelf();
-                    appVM.initializeFolder();
+                    appVM.currentFolder().loadPath();
                     toastr.success(appVM.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
                 }//success
             });//apiGet
@@ -262,12 +263,12 @@ module.exports = function (appVM, item) {
             }//if
             appVM.util.apiPatch({
                 url: "/item",
-                newPath: appVM.util.getFullPath(appVM.exclusiveFolder, inputValue),
+                newPath: appVM.util.getFullPath(inputValue),
                 path: self.path(),
                 success: function (result) {
                     self.path(result.path);
                     self.reloadSelf();
-                    appVM.currentPath(result.dir);
+                    appVM.currentFolder().path(result.dir);
                     // appVM.loadCurrentFolder();
                     toastr.success(appVM.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
                 }
@@ -295,7 +296,7 @@ module.exports = function (appVM, item) {
                     if (appVM.currentView() === "details") {
                         appVM.goLevelUp();
                     } else {
-                        appVM.initializeFolder();
+                        appVM.currentFolder().loadPath();
                     }
                 }//success
             });//apiGet
@@ -314,7 +315,7 @@ module.exports = function (appVM, item) {
             dictRemoveFile: appVM.language.del,
             dictDefaultMessage: appVM.language.dz_dictDefaultMessage,
             dictInvalidFileType: appVM.language.dz_dictInvalidFileType,
-            params: {path: self.path()},
+            params: {path: appVM.util.getFullPath(self.path())},
             maxFiles: 1,
             method: "put",
             success: function (ignore, res) {

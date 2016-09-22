@@ -35,6 +35,13 @@ require("../node_modules/bootstrap/dist/js/bootstrap");
 var ko = require("knockout");
 require("knockout-punches");
 require("knockout.contextmenu")(ko, document);
+var filesize = require("filesize");
+
+// Custom filter can be used like "| sizeInKb:10"
+ko.filters.sizeInKb = function(value, arg1) {
+    "use strict";
+    return filesize(parseInt(ko.unwrap(value) || 0, 10), arg1 || 10);
+};
 
 //load knockout punches, here goes the magic :)
 ko.punches.enableAll();
@@ -46,22 +53,15 @@ require("./scrollbar.binding");
 var AppViewModel = require("app.viewmodel");
 var appVM;
 
-
 $.getJSON("config/fm2.ui.config.json", function (config) {
     "use strict";
-    appVM = new AppViewModel(config);
-    ko.applyBindings(appVM);
     var start;
-
-    // console.log("exclusiveFolder? -> ", decodeURI(appVM.util.urlParameters("exclusiveFolder")) === "0" ? "/" : decodeURI(appVM.util.urlParameters("exclusiveFolder")) );
-    /*---------------------------------------------------------
-     Setup, Layout, and Status Functions
-     ---------------------------------------------------------*/
-
-    //noinspection JSUnresolvedVariable
-    if (appVM.config.options.logger) {
+    if (config.options.logger) {
         start = Date.now();
     }
+
+    appVM = new AppViewModel(config);
+    ko.applyBindings(appVM);
 
     $("#splitter").height(100).split({
         position: appVM.config.options.splitPercentage,
@@ -74,5 +74,4 @@ $.getJSON("config/fm2.ui.config.json", function (config) {
         var time = end - start;
         console.log("Total execution time: " + time + " ms");
     }
-
 });
