@@ -17,18 +17,19 @@ ko.bindingHandlers.fancytree = {
             "focusOnSelect": true,
             source: [{title: ko.unwrap($folder().path()), children: null, key: ko.unwrap($folder().path()), folder: true, expanded: true}],
             activate: function (ignore, data) {
-                // console.log("activate data -> ", data);
-                if (typeof data.node.data.isDirectory !== "undefined") {
-                    $browseToItem(data.node.data);
+                var _item = data.node.data;
+                if (typeof _item.isDirectory !== "undefined") {
+                    // console.log("lets figure this out :) _item.path -> ", _item.path, " $folder().currentItem().path() -> ", $folder().currentItem().path());
+                    if (_item.path !== $folder().currentItem().path()) {
+                        $browseToItem(_item);
+                    }
                 } else {
-                    $folder().path("/");
+                    if ($folder().currentItem().path() !== "/") {
+                        $browseToItem({isDirectory: ko.observable(true), path: ko.observable("/")});
+                    }
                 }
             } // activate
         }); // fancytree
-
-        $folder().currentItem.subscribe(function (selectItem) {
-            $el.fancytree("getTree").getNodeByKey(selectItem.key()).setActive({noEvents: true});
-        });
 
         $folder().items.subscribe(function (newFolder) {
             var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap($folder().path()));
@@ -41,13 +42,23 @@ ko.bindingHandlers.fancytree = {
     },
     "update": function (element, valueAccessor) {
         "use strict";
-        var $el = $(element),
-            $folder = valueAccessor();
+        var _el = $(element),
+            _folder = valueAccessor(),
+            _currentItem = _folder().currentItem(),
+            _firedNode = _el.fancytree("getTree").getNodeByKey(_currentItem.path());
 
-        if ($el.fancytree) {
+        if (_el.fancytree && _firedNode) {
             // we set no events on this one because we simply want to select it, not kick off the chain of activate events that normally
             // happen when you physically click a node
-            $el.fancytree("getTree").getNodeByKey(ko.unwrap($folder().path())).setActive({noEvents: true});
+
+            // Only set the node active if it isn't already
+            if (_firedNode.isActive() === false) {
+                _firedNode.setActive({noEvents: true});
+            }
+            // Only set the node focused if it isn't already
+            if (_firedNode.isSelected() === false) {
+                _firedNode.setFocus();
+            }
         }
     }
 };

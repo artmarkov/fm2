@@ -12,7 +12,7 @@ module.exports = function (appVM, path) {
     "use strict";
     var self = this,
         _currentItem = ko.observable(new Item(appVM));
-    self.path = ko.observable(path);
+    self.path = ko.observable("");
     self.items = ko.observableArray([]);
 
     self.currentItem = ko.pureComputed({
@@ -20,10 +20,17 @@ module.exports = function (appVM, path) {
             return _currentItem();
         }, // read
         write: function (value) {
-            _currentItem(value);
-            if (self.path() !== _currentItem().dir()) {
-                self.path(_currentItem().dir());
-            } // if
+            if (value.isDirectory()) {
+                self.loadPath(value.path(), function () {
+                    _currentItem(value);
+                }); // loadPath
+            } else if (self.path() !== value.dir()) {
+                self.loadPath(value.dir(), function () {
+                    _currentItem(value);
+                }); // loadPath
+            } else {
+                _currentItem(value);
+            }// if
         }, // write
         owner: self
     }); // currentItem
@@ -42,17 +49,24 @@ module.exports = function (appVM, path) {
         return s;
     }); // itemSize
 
+    self.setRootActive = function () {
+        self.currentItem().path(self.path());
+        self.currentItem().reloadSelf();
+    }; // setRootActive
+
     self.levelUp = function () {
         var cpath = self.path();
-        if (cpath !== appVM.homePath) {
+        if (cpath !== appVM.homePath && self.currentItem().isDirectory()) {
             var newPath = cpath.substring(0, cpath.slice(0, -1).lastIndexOf("/"));
-            self.path(newPath === ""
+            newPath = newPath === ""
                 ? "/"
-                : newPath);
-            appVM.loading(false);
+                : newPath;
+            self.loadPath(newPath);
         } else {
-            appVM.loading(false);
+            self.setRootActive();
         } // if
+
+        appVM.loading(false);
     }; // levelUp
 
     self.createFolder = function () {
@@ -85,25 +99,39 @@ module.exports = function (appVM, path) {
         }); // swal
     }; // createFolder
 
-    self.loadPath = function () {
+    self.loadPath = function (__path, callback) {
+        // debugger;
         var newItems = [];
+        __path = __path || self.path();
 
-        appVM.util.apiGet({
-            url: "/folder",
-            path: self.path(),
-            success: function (data) {
-                $.each(data, function (i, d) {
-                    newItems.push(new Item(appVM, d));
-                }); //each
+        if (self.path() !== __path) {
+            self.path(__path);
 
-                self.items(newItems);
-            } // success
-        }); // apiGet
+            appVM.util.apiGet({
+                url: "/folder",
+                path: __path || self.path(),
+                success: function (data) {
+                    $.each(data, function (i, d) {
+                        newItems.push(new Item(appVM, d));
+                    }); //each
+
+                    self.items(newItems);
+                    if (typeof callback === "function") {
+                        return callback();
+                    } else {
+                        return 0;
+                    }
+                } // success
+            }); // apiGet
+        } else {
+            if (typeof callback === "function") {
+                return callback();
+            } else {
+                return 0;
+            } // if
+        } // if
+        return callback;
     }; // loadPath
 
-    self.path.subscribe(function () {
-        self.loadPath();
-    }); // path.subscribe
-
-    self.loadPath();
+    self.loadPath(path);
 }; // folder.datamodel

@@ -117,10 +117,13 @@ module.exports = function (config) {
     }; //returnToFolderView
 
     self.goHome = function () {
-        self.currentFolder().path(self.homePath);
+        if (self.currentFolder().path() !== self.homePath) {
+            self.currentFolder().loadPath(self.homePath);
+        }
+        self.currentFolder().setRootActive();
+
         if (self.currentView() !== "main") {
             self.currentView("main");
-            self.currentFolder().loadPath();
         }
     };//goHome
 
@@ -130,11 +133,10 @@ module.exports = function (config) {
 
     self.browseToItem = function (data) {
         var newItem = new Item(self, ko.toJS(data));
+        self.currentFolder().currentItem(newItem);
         if (newItem.isDirectory()) {
-            self.currentFolder().path(newItem.path());
             self.currentView("main");
         } else {
-            self.currentFolder().currentItem(newItem);
             self.currentView("details");
         } //if
     }; //browseToItem
@@ -149,11 +151,9 @@ module.exports = function (config) {
         self.loading(true);
         if (self.currentView() !== "main") {
             self.currentView("main");
-            self.currentFolder().loadPath();
-            self.loading(false);
-        } else {
-            self.currentFolder().levelUp();
         } //if
+        self.currentFolder().levelUp();
+        self.loading(false);
     }; //goLevelUp
 
     self.switchViews = function () {

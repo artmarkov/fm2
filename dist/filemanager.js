@@ -118,10 +118,13 @@ module.exports = function (config) {
     }; //returnToFolderView
 
     self.goHome = function () {
-        self.currentFolder().path(self.homePath);
+        if (self.currentFolder().path() !== self.homePath) {
+            self.currentFolder().loadPath(self.homePath);
+        }
+        self.currentFolder().setRootActive();
+
         if (self.currentView() !== "main") {
             self.currentView("main");
-            self.currentFolder().loadPath();
         }
     };//goHome
 
@@ -131,11 +134,11 @@ module.exports = function (config) {
 
     self.browseToItem = function (data) {
         var newItem = new Item(self, ko.toJS(data));
+        self.currentFolder().currentItem(newItem);
         if (newItem.isDirectory()) {
-            self.currentFolder().path(newItem.path());
+            // self.currentFolder().path(newItem.path());
             self.currentView("main");
         } else {
-            self.currentFolder().currentItem(newItem);
             self.currentView("details");
         } //if
     }; //browseToItem
@@ -150,11 +153,13 @@ module.exports = function (config) {
         self.loading(true);
         if (self.currentView() !== "main") {
             self.currentView("main");
-            self.currentFolder().loadPath();
-            self.loading(false);
+            // self.currentFolder().loadPath();
+            // self.loading(false);
         } else {
-            self.currentFolder().levelUp();
+            // self.currentFolder().levelUp();
         } //if
+        self.currentFolder().levelUp();
+        self.loading(false);
     }; //goLevelUp
 
     self.switchViews = function () {
@@ -191,18 +196,25 @@ ko.bindingHandlers.fancytree = {
             "focusOnSelect": true,
             source: [{title: ko.unwrap($folder().path()), children: null, key: ko.unwrap($folder().path()), folder: true, expanded: true}],
             activate: function (ignore, data) {
-                // console.log("activate data -> ", data);
-                if (typeof data.node.data.isDirectory !== "undefined") {
-                    $browseToItem(data.node.data);
+                var _item = data.node.data;
+                if (typeof _item.isDirectory !== "undefined") {
+                    // console.log("lets figure this out :) _item.path -> ", _item.path, " $folder().currentItem().path() -> ", $folder().currentItem().path());
+                    if (_item.path !== $folder().currentItem().path()) {
+                        $browseToItem(_item);
+                    }
                 } else {
-                    $folder().path("/");
+                    if ($folder().currentItem().path() !== "/") {
+                        $browseToItem({isDirectory: ko.observable(true), path: ko.observable("/")});
+                    }
                 }
             } // activate
         }); // fancytree
 
-        $folder().currentItem.subscribe(function (selectItem) {
-            $el.fancytree("getTree").getNodeByKey(selectItem.key()).setActive({noEvents: true});
-        });
+        // $folder().currentItem.subscribe(function (selectItem) {
+        //     var _firedNode = $el.fancytree("getTree").getNodeByKey(selectItem.key());
+        //     // console.log("it fired, what now? selectItem.key() -> ", selectItem.key(), " fireNode -> ", _firedNode);
+        //     _firedNode.setActive({noEvents: true});
+        // });
 
         $folder().items.subscribe(function (newFolder) {
             var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap($folder().path()));
@@ -211,17 +223,38 @@ ko.bindingHandlers.fancytree = {
             } // if
             node.addChildren(ko.toJS(newFolder));
             node.setExpanded(true);
+
+            // after redrawing the current folder, we need to ensure the currentItem is focused
+            // var _currentItem = $folder().currentItem(),
+                // _activeNode = $el.fancytree("getTree").getNodeByKey(_currentItem.path());
+            // console.log("hmmm _activeNode -> ", _activeNode, " _currentItem -> ", _currentItem);
+            // if (_activeNode.isActive() === false) {
+            //     _activeNode.setActive({noEvents: true});
+            // }
+            // if (_activeNode.isSelected() === false) {
+            //     _activeNode.setFocus();
+            // }
         });
     },
     "update": function (element, valueAccessor) {
         "use strict";
-        var $el = $(element),
-            $folder = valueAccessor();
+        var _el = $(element),
+            _folder = valueAccessor(),
+            _currentItem = _folder().currentItem(),
+            _firedNode = _el.fancytree("getTree").getNodeByKey(_currentItem.path());
 
-        if ($el.fancytree) {
+        if (_el.fancytree && _firedNode) {
             // we set no events on this one because we simply want to select it, not kick off the chain of activate events that normally
             // happen when you physically click a node
-            $el.fancytree("getTree").getNodeByKey(ko.unwrap($folder().path())).setActive({noEvents: true});
+
+            // Only set the node active if it isn't already
+            if (_firedNode.isActive() === false) {
+                _firedNode.setActive({noEvents: true});
+            }
+            // Only set the node focused if it isn't already
+            if (_firedNode.isSelected() === false) {
+                _firedNode.setFocus();
+            }
         }
     }
 };
@@ -318,7 +351,7 @@ module.exports = function (appVM, path) {
     "use strict";
     var self = this,
         _currentItem = ko.observable(new Item(appVM));
-    self.path = ko.observable(path);
+    self.path = ko.observable("");
     self.items = ko.observableArray([]);
 
     self.currentItem = ko.pureComputed({
@@ -326,10 +359,22 @@ module.exports = function (appVM, path) {
             return _currentItem();
         }, // read
         write: function (value) {
-            _currentItem(value);
-            if (self.path() !== _currentItem().dir()) {
-                self.path(_currentItem().dir());
-            } // if
+            if (value.isDirectory()) {
+                // self.path(value.path());
+                self.loadPath(value.path(), function () {
+                    // console.log("loadPath success");
+                    _currentItem(value);
+                }); // loadPath
+            } else if (self.path() !== value.dir()) {
+                // self.path(value.dir());
+                self.loadPath(value.dir(), function () {
+                    // console.log("loadPath success");
+                    _currentItem(value);
+                }); // loadPath
+            } else {
+                // console.log("same path");
+                _currentItem(value);
+            }// if
         }, // write
         owner: self
     }); // currentItem
@@ -348,17 +393,24 @@ module.exports = function (appVM, path) {
         return s;
     }); // itemSize
 
+    self.setRootActive = function () {
+        self.currentItem().path(self.path());
+        self.currentItem().reloadSelf();
+    }; // setRootActive
+
     self.levelUp = function () {
         var cpath = self.path();
-        if (cpath !== appVM.homePath) {
+        if (cpath !== appVM.homePath && self.currentItem().isDirectory()) {
             var newPath = cpath.substring(0, cpath.slice(0, -1).lastIndexOf("/"));
-            self.path(newPath === ""
+            newPath = newPath === ""
                 ? "/"
-                : newPath);
-            appVM.loading(false);
+                : newPath;
+            self.loadPath(newPath);
         } else {
-            appVM.loading(false);
+            self.setRootActive();
         } // if
+
+        appVM.loading(false);
     }; // levelUp
 
     self.createFolder = function () {
@@ -391,27 +443,48 @@ module.exports = function (appVM, path) {
         }); // swal
     }; // createFolder
 
-    self.loadPath = function () {
+    self.loadPath = function (__path, callback) {
+        // debugger;
         var newItems = [];
+        __path = __path || self.path();
 
-        appVM.util.apiGet({
-            url: "/folder",
-            path: self.path(),
-            success: function (data) {
-                $.each(data, function (i, d) {
-                    newItems.push(new Item(appVM, d));
-                }); //each
+        if (self.path() !== __path) {
+            self.path(__path);
 
-                self.items(newItems);
-            } // success
-        }); // apiGet
+            appVM.util.apiGet({
+                url: "/folder",
+                path: __path || self.path(),
+                success: function (data) {
+                    $.each(data, function (i, d) {
+                        newItems.push(new Item(appVM, d));
+                    }); //each
+
+                    self.items(newItems);
+                    // debugger;
+                    // console.log("typeof callback -> ", typeof callback);
+                    if (typeof callback === "function") {
+                        return callback();
+                    } else {
+                        return 0;
+                    }
+                } // success
+            }); // apiGet
+        } else {
+            if (typeof callback === "function") {
+                return callback();
+            } else {
+                return 0;
+            } // if
+        } // if
+        return callback;
     }; // loadPath
 
-    self.path.subscribe(function () {
-        self.loadPath();
-    }); // path.subscribe
+    // self.path.subscribe(function () {
+    //     // self.loadPath();
+    //     // self.setRootActive();
+    // }); // path.subscribe
 
-    self.loadPath();
+    self.loadPath(path);
 }; // folder.datamodel
 },{"./item.datamodel.js":5,"jquery":44,"knockout":48,"sweetalert":58,"toastr":60}],5:[function(require,module,exports){
 /*global data*/
