@@ -8,6 +8,7 @@
     "dropzone": "^4.3.0",
     "filesize": "^3.3.0",
     "gulp-eslint": "^3.0.1",
+    "gulp-sourcemaps": "^1.6.0",
     "jquery": "^1.12.1",
     "jquery-migrate": "^1.4.1",
     "jquery-ui-dist": "^1.12.0",

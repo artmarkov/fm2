@@ -38,6 +38,14 @@ ko.bindingHandlers.fancytree = {
             } // if
             node.addChildren(ko.toJS(newFolder));
             node.setExpanded(true);
+
+            //after reloading the folder, we need to ensure it is active and focused.
+            if (node.isActive() === false) {
+                node.setActive({noEvents: true});
+            }
+            if (node.isSelected() === false) {
+                node.setFocus();
+            }
         });
     },
     "update": function (element, valueAccessor) {

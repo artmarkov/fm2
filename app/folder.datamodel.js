@@ -19,12 +19,12 @@ module.exports = function (appVM, path) {
         read: function () {
             return _currentItem();
         }, // read
-        write: function (value) {
-            if (value.isDirectory()) {
+        write: function (value, onlySelect) {
+            if (value.isDirectory() && !onlySelect) {
                 self.loadPath(value.path(), function () {
                     _currentItem(value);
                 }); // loadPath
-            } else if (self.path() !== value.dir()) {
+            } else if (self.path() !== value.dir() && !onlySelect) {
                 self.loadPath(value.dir(), function () {
                     _currentItem(value);
                 }); // loadPath
@@ -91,7 +91,7 @@ module.exports = function (appVM, path) {
                 name: inputValue,
                 path: self.path(),
                 success: function () {
-                    self.loadPath();
+                    self.refreshCurrentPath();
                     toastr.success(appVM.language.successful_added_folder, inputValue, {"positionClass": "toast-bottom-right"});
                 } // success
             }); // apiGet
@@ -99,9 +99,23 @@ module.exports = function (appVM, path) {
         }); // swal
     }; // createFolder
 
+    self.refreshCurrentPath = function () {
+        appVM.util.apiGet({
+            url: "/folder",
+            path: self.path(),
+            success: function (data) {
+                var newItems = [];
+                $.each(data, function (i, d) {
+                    newItems.push(new Item(appVM, d));
+                }); //each
+
+                self.items(newItems);
+            } // success
+        }); // apiGet
+    }; // refreshCurrentPath
+
     self.loadPath = function (__path, callback) {
         // debugger;
-        var newItems = [];
         __path = __path || self.path();
 
         if (self.path() !== __path) {
@@ -111,6 +125,7 @@ module.exports = function (appVM, path) {
                 url: "/folder",
                 path: __path || self.path(),
                 success: function (data) {
+                    var newItems = [];
                     $.each(data, function (i, d) {
                         newItems.push(new Item(appVM, d));
                     }); //each

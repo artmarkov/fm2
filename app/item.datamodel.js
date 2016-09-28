@@ -296,7 +296,7 @@ module.exports = function (appVM, item) {
                     if (appVM.currentView() === "details") {
                         appVM.goLevelUp();
                     } else {
-                        appVM.currentFolder().loadPath();
+                        appVM.currentFolder().refreshCurrentPath();
                     }
                 }//success
             });//apiGet

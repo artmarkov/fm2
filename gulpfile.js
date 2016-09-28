@@ -9,6 +9,7 @@ var gulp = require("gulp"),
     browserify = require("browserify"),
     source = require("vinyl-source-stream"),
     pump = require("pump"),
+    sourcemaps = require("gulp-sourcemaps"),
     eslint = require("gulp-eslint");
 // console.log("_ -> ", _);
 
@@ -33,8 +34,10 @@ gulp.task("uglify", ["browserify"], function (callback) {
     "use strict";
     pump([
         gulp.src("./dist/filemanager.js"),
+        sourcemaps.init(),
         uglify(),
         rename({extname: ".min.js"}),
+        sourcemaps.write(),
         gulp.dest("./dist")
     ],
     callback);

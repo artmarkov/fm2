@@ -136,7 +136,6 @@ module.exports = function (config) {
         var newItem = new Item(self, ko.toJS(data));
         self.currentFolder().currentItem(newItem);
         if (newItem.isDirectory()) {
-            // self.currentFolder().path(newItem.path());
             self.currentView("main");
         } else {
             self.currentView("details");
@@ -145,7 +144,7 @@ module.exports = function (config) {
 
     self.goToItem = function (data) {
         console.log("goToItem data -> ", data);
-        self.currentFolder().currentItem(data);
+        self.currentFolder().currentItem(data, true);
         self.currentView("details");
     }; //goToItem
 
@@ -153,12 +152,10 @@ module.exports = function (config) {
         self.loading(true);
         if (self.currentView() !== "main") {
             self.currentView("main");
-            // self.currentFolder().loadPath();
-            // self.loading(false);
+            self.currentFolder().refreshCurrentPath();
         } else {
-            // self.currentFolder().levelUp();
-        } //if
-        self.currentFolder().levelUp();
+            self.currentFolder().levelUp();
+        }//if
         self.loading(false);
     }; //goLevelUp
 
@@ -210,12 +207,6 @@ ko.bindingHandlers.fancytree = {
             } // activate
         }); // fancytree
 
-        // $folder().currentItem.subscribe(function (selectItem) {
-        //     var _firedNode = $el.fancytree("getTree").getNodeByKey(selectItem.key());
-        //     // console.log("it fired, what now? selectItem.key() -> ", selectItem.key(), " fireNode -> ", _firedNode);
-        //     _firedNode.setActive({noEvents: true});
-        // });
-
         $folder().items.subscribe(function (newFolder) {
             var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap($folder().path()));
             if (node.hasChildren()) {
@@ -224,16 +215,13 @@ ko.bindingHandlers.fancytree = {
             node.addChildren(ko.toJS(newFolder));
             node.setExpanded(true);
 
-            // after redrawing the current folder, we need to ensure the currentItem is focused
-            // var _currentItem = $folder().currentItem(),
-                // _activeNode = $el.fancytree("getTree").getNodeByKey(_currentItem.path());
-            // console.log("hmmm _activeNode -> ", _activeNode, " _currentItem -> ", _currentItem);
-            // if (_activeNode.isActive() === false) {
-            //     _activeNode.setActive({noEvents: true});
-            // }
-            // if (_activeNode.isSelected() === false) {
-            //     _activeNode.setFocus();
-            // }
+            //after reloading the folder, we need to ensure it is active and focused.
+            if (node.isActive() === false) {
+                node.setActive({noEvents: true});
+            }
+            if (node.isSelected() === false) {
+                node.setFocus();
+            }
         });
     },
     "update": function (element, valueAccessor) {
@@ -358,21 +346,16 @@ module.exports = function (appVM, path) {
         read: function () {
             return _currentItem();
         }, // read
-        write: function (value) {
-            if (value.isDirectory()) {
-                // self.path(value.path());
+        write: function (value, onlySelect) {
+            if (value.isDirectory() && !onlySelect) {
                 self.loadPath(value.path(), function () {
-                    // console.log("loadPath success");
                     _currentItem(value);
                 }); // loadPath
-            } else if (self.path() !== value.dir()) {
-                // self.path(value.dir());
+            } else if (self.path() !== value.dir() && !onlySelect) {
                 self.loadPath(value.dir(), function () {
-                    // console.log("loadPath success");
                     _currentItem(value);
                 }); // loadPath
             } else {
-                // console.log("same path");
                 _currentItem(value);
             }// if
         }, // write
@@ -435,7 +418,7 @@ module.exports = function (appVM, path) {
                 name: inputValue,
                 path: self.path(),
                 success: function () {
-                    self.loadPath();
+                    self.refreshCurrentPath();
                     toastr.success(appVM.language.successful_added_folder, inputValue, {"positionClass": "toast-bottom-right"});
                 } // success
             }); // apiGet
@@ -443,9 +426,23 @@ module.exports = function (appVM, path) {
         }); // swal
     }; // createFolder
 
+    self.refreshCurrentPath = function () {
+        appVM.util.apiGet({
+            url: "/folder",
+            path: self.path(),
+            success: function (data) {
+                var newItems = [];
+                $.each(data, function (i, d) {
+                    newItems.push(new Item(appVM, d));
+                }); //each
+
+                self.items(newItems);
+            } // success
+        }); // apiGet
+    }; // refreshCurrentPath
+
     self.loadPath = function (__path, callback) {
         // debugger;
-        var newItems = [];
         __path = __path || self.path();
 
         if (self.path() !== __path) {
@@ -455,13 +452,12 @@ module.exports = function (appVM, path) {
                 url: "/folder",
                 path: __path || self.path(),
                 success: function (data) {
+                    var newItems = [];
                     $.each(data, function (i, d) {
                         newItems.push(new Item(appVM, d));
                     }); //each
 
                     self.items(newItems);
-                    // debugger;
-                    // console.log("typeof callback -> ", typeof callback);
                     if (typeof callback === "function") {
                         return callback();
                     } else {
@@ -478,11 +474,6 @@ module.exports = function (appVM, path) {
         } // if
         return callback;
     }; // loadPath
-
-    // self.path.subscribe(function () {
-    //     // self.loadPath();
-    //     // self.setRootActive();
-    // }); // path.subscribe
 
     self.loadPath(path);
 }; // folder.datamodel
@@ -785,7 +776,7 @@ module.exports = function (appVM, item) {
                     if (appVM.currentView() === "details") {
                         appVM.goLevelUp();
                     } else {
-                        appVM.currentFolder().loadPath();
+                        appVM.currentFolder().refreshCurrentPath();
                     }
                 }//success
             });//apiGet

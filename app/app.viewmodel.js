@@ -143,7 +143,7 @@ module.exports = function (config) {
 
     self.goToItem = function (data) {
         console.log("goToItem data -> ", data);
-        self.currentFolder().currentItem(data);
+        self.currentFolder().currentItem(data, true);
         self.currentView("details");
     }; //goToItem
 
@@ -151,8 +151,10 @@ module.exports = function (config) {
         self.loading(true);
         if (self.currentView() !== "main") {
             self.currentView("main");
-        } //if
-        self.currentFolder().levelUp();
+            self.currentFolder().refreshCurrentPath();
+        } else {
+            self.currentFolder().levelUp();
+        }//if
         self.loading(false);
     }; //goLevelUp
 
