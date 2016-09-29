@@ -67,9 +67,9 @@ module.exports = function (appVM, item) {
         return (appVM.canDownload() && !self.isDirectory());
     });//canDownload
 
-    self.canReplace = ko.pureComputed(function () {
-        return (appVM.canReplace() && !self.isDirectory());
-    });//canDownload
+    // self.canReplace = ko.pureComputed(function () {
+    //     return (appVM.canReplace() && !self.isDirectory());
+    // });//canDownload
 
     // This is our context menu for each item, so simple :)
     self.menu = ko.observableArray([{
@@ -234,9 +234,9 @@ module.exports = function (appVM, item) {
                 new: inputValue,
                 path: self.path(),
                 success: function (result) {
+                    appVM.currentFolder().refreshCurrentPath();
                     self.path(result.path);
                     self.reloadSelf();
-                    appVM.currentFolder().loadPath();
                     toastr.success(appVM.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
                 }//success
             });//apiGet
@@ -268,8 +268,8 @@ module.exports = function (appVM, item) {
                 success: function (result) {
                     self.path(result.path);
                     self.reloadSelf();
-                    appVM.currentFolder().path(result.dir);
-                    // appVM.loadCurrentFolder();
+                    appVM.currentFolder().loadPath(result.dir);
+                    // appVM.currentFolder().refreshCurrentPath();
                     toastr.success(appVM.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
                 }
             });//apiGet
@@ -303,46 +303,47 @@ module.exports = function (appVM, item) {
         });//swal
     };//delete
 
-    self.replaceMe = function () {
-        var dz = $("#my-replace-dropzone");
-        var button = $("#replaceMe");
-        dz.show();
-        button.hide();
-        dz.dropzone({
-            url: appVM.util.apiUrl + "/file",
-            dictCancelUpload: appVM.language.cancel,
-            withCredentials: true,
-            dictRemoveFile: appVM.language.del,
-            dictDefaultMessage: appVM.language.dz_dictDefaultMessage,
-            dictInvalidFileType: appVM.language.dz_dictInvalidFileType,
-            params: {path: appVM.util.getFullPath(self.path())},
-            maxFiles: 1,
-            method: "put",
-            success: function (ignore, res) {
-                if (res.errors) {
-                    toastr.error(appVM.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
-                } else {
-                    dz.hide();
-                    button.show();
-
-                    //This ensures the image is reloaded by appending a random number
-                    var img = $("#detailImage"),
-                        newImg = img.attr("src");
-                    newImg += img.attr("src").indexOf("?") === -1
-                        ? "?"
-                        : "&";
-                    newImg += Math.random();
-
-                    img.attr("src", newImg);
-
-                    toastr.success(appVM.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
-                }//if
-            }, //success
-            complete: function (file) {
-                this.removeFile(file);
-            }//complete
-        });//dropzone
-    };//replaceMe
+    // self.replaceMe = function () {
+    //     var dz = $("#my-replace-dropzone");
+    //     var button = $("#replaceMe");
+    //     dz.show();
+    //     button.hide();
+    //     dz.dropzone({
+    //         url: appVM.util.apiUrl + "/file",
+    //         dictCancelUpload: appVM.language.cancel,
+    //         withCredentials: true,
+    //         dictRemoveFile: appVM.language.del,
+    //         dictDefaultMessage: appVM.language.dz_dictDefaultMessage,
+    //         dictInvalidFileType: appVM.language.dz_dictInvalidFileType,
+    //         params: {path: appVM.util.getFullPath(self.path())},
+    //         maxFiles: 1,
+    //         method: "put",
+    //         success: function (ignore, res) {
+    //             if (res.errors) {
+    //                 toastr.error(appVM.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
+    //             } else {
+    //                 dz.hide();
+    //                 button.show();
+    //
+    //                 //This ensures the image is reloaded by appending a random number
+    //                 var img = $("#detailImage"),
+    //                     newImg = img.attr("src");
+    //                 newImg += img.attr("src").indexOf("?") === -1
+    //                     ? "?"
+    //                     : "&";
+    //                 newImg += Math.random();
+    //
+    //                 img.attr("src", newImg);
+    //                 // appVM.currentFolder().refreshCurrentPath();
+    //
+    //                 toastr.success(appVM.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
+    //             }//if
+    //         }, //success
+    //         complete: function (file) {
+    //             this.removeFile(file);
+    //         }//complete
+    //     });//dropzone
+    // };//replaceMe
 
     // Calls the SetUrl function for FCKEditor compatibility,
     // passes file path, dimensions, and alt text back to the

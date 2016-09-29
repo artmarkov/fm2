@@ -32,18 +32,21 @@ ko.bindingHandlers.fancytree = {
         }); // fancytree
 
         $folder().items.subscribe(function (newFolder) {
-            var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap($folder().path()));
-            if (node.hasChildren()) {
-                node.removeChildren();
-            } // if
-            node.addChildren(ko.toJS(newFolder));
-            node.setExpanded(true);
-
+            var p = ko.unwrap($folder().path());
+            var node = $el.fancytree("getTree").getNodeByKey(p);
+            if (node) {
+                if (node.hasChildren()) {
+                    node.removeChildren();
+                } // if
+                node.addChildren(ko.toJS(newFolder));
+                node.setExpanded(true);
+            }
             //after reloading the folder, we need to ensure it is active and focused.
-            if (node.isActive() === false) {
+            if (node.isActive() === false && (node.key === "/" || node.data.isDirectory === true)) {
                 node.setActive({noEvents: true});
             }
-            if (node.isSelected() === false) {
+            if (node.isSelected() === false && (node.key === "/" || node.data.isDirectory === true)) {
+                // console.log("item node -> ", node);
                 node.setFocus();
             }
         });

@@ -99,7 +99,7 @@ module.exports = function (appVM, path) {
         }); // swal
     }; // createFolder
 
-    self.refreshCurrentPath = function () {
+    self.refreshCurrentPath = function (callback) {
         appVM.util.apiGet({
             url: "/folder",
             path: self.path(),
@@ -110,34 +110,22 @@ module.exports = function (appVM, path) {
                 }); //each
 
                 self.items(newItems);
+                if (typeof callback === "function") {
+                    return callback();
+                } else {
+                    return 0;
+                }
             } // success
         }); // apiGet
     }; // refreshCurrentPath
 
     self.loadPath = function (__path, callback) {
-        // debugger;
         __path = __path || self.path();
 
         if (self.path() !== __path) {
             self.path(__path);
 
-            appVM.util.apiGet({
-                url: "/folder",
-                path: __path || self.path(),
-                success: function (data) {
-                    var newItems = [];
-                    $.each(data, function (i, d) {
-                        newItems.push(new Item(appVM, d));
-                    }); //each
-
-                    self.items(newItems);
-                    if (typeof callback === "function") {
-                        return callback();
-                    } else {
-                        return 0;
-                    }
-                } // success
-            }); // apiGet
+            self.refreshCurrentPath(callback);
         } else {
             if (typeof callback === "function") {
                 return callback();

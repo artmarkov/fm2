@@ -118,7 +118,7 @@
             <button class="btn" data-bind="click: rename, visible: $root.canRename">{{$root.language.rename}}</button>
             <button class="btn" data-bind="click: move, visible: $root.canMove">{{$root.language.move}}</button>
             <button class="btn" data-bind="click: removeMe, visible: $root.canDelete">{{$root.language.del}}</button>
-            <button class="btn" data-bind="click: replaceMe, visible: canReplace" id="replaceMe">{{$root.language.replace}}</button>
+            <!--<button class="btn" data-bind="click: replaceMe, visible: canReplace" id="replaceMe">{{$root.language.replace}}</button>-->
             <form id="my-replace-dropzone" style="display: none;" class="dropzone"></form>
             <h1 class="h1">{{filename}}</h1>
             <!--<div id="tools"></div>-->
@@ -156,7 +156,7 @@
 </script>
 
 
-<script type="text/javascript" src="filemanager.min.js"></script>
+<script type="text/javascript" src="filemanager.js"></script>
 </div>
 </body>
 </html>

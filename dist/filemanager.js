@@ -21,7 +21,7 @@ module.exports = function (config) {
     self.canRename = ko.observable(false);
     self.canMove = ko.observable(false);
     self.canDelete = ko.observable(false);
-    self.canReplace = ko.observable(false);
+    // self.canReplace = ko.observable(false);
     self.canSelect = ko.observable(false);
 
     self.util.apiGet({
@@ -49,9 +49,9 @@ module.exports = function (config) {
                 self.canDelete(true);
             }//if
 
-            if ($.inArray("replace", self.config.security.capabilities) !== -1) {
-                self.canReplace(true);
-            }//if
+            // if ($.inArray("replace", self.config.security.capabilities) !== -1) {
+            //     self.canReplace(true);
+            // }//if
 
             if ($.inArray("select", self.config.security.capabilities) !== -1 && (self.util.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self.util.urlParameters("field_name"))) {
                 self.canSelect(true);
@@ -208,18 +208,21 @@ ko.bindingHandlers.fancytree = {
         }); // fancytree
 
         $folder().items.subscribe(function (newFolder) {
-            var node = $el.fancytree("getTree").getNodeByKey(ko.unwrap($folder().path()));
-            if (node.hasChildren()) {
-                node.removeChildren();
-            } // if
-            node.addChildren(ko.toJS(newFolder));
-            node.setExpanded(true);
-
+            var p = ko.unwrap($folder().path());
+            var node = $el.fancytree("getTree").getNodeByKey(p);
+            if (node) {
+                if (node.hasChildren()) {
+                    node.removeChildren();
+                } // if
+                node.addChildren(ko.toJS(newFolder));
+                node.setExpanded(true);
+            }
             //after reloading the folder, we need to ensure it is active and focused.
-            if (node.isActive() === false) {
+            if (node.isActive() === false && (node.key === "/" || node.data.isDirectory === true)) {
                 node.setActive({noEvents: true});
             }
-            if (node.isSelected() === false) {
+            if (node.isSelected() === false && (node.key === "/" || node.data.isDirectory === true)) {
+                // console.log("item node -> ", node);
                 node.setFocus();
             }
         });
@@ -426,7 +429,7 @@ module.exports = function (appVM, path) {
         }); // swal
     }; // createFolder
 
-    self.refreshCurrentPath = function () {
+    self.refreshCurrentPath = function (callback) {
         appVM.util.apiGet({
             url: "/folder",
             path: self.path(),
@@ -437,34 +440,22 @@ module.exports = function (appVM, path) {
                 }); //each
 
                 self.items(newItems);
+                if (typeof callback === "function") {
+                    return callback();
+                } else {
+                    return 0;
+                }
             } // success
         }); // apiGet
     }; // refreshCurrentPath
 
     self.loadPath = function (__path, callback) {
-        // debugger;
         __path = __path || self.path();
 
         if (self.path() !== __path) {
             self.path(__path);
 
-            appVM.util.apiGet({
-                url: "/folder",
-                path: __path || self.path(),
-                success: function (data) {
-                    var newItems = [];
-                    $.each(data, function (i, d) {
-                        newItems.push(new Item(appVM, d));
-                    }); //each
-
-                    self.items(newItems);
-                    if (typeof callback === "function") {
-                        return callback();
-                    } else {
-                        return 0;
-                    }
-                } // success
-            }); // apiGet
+            self.refreshCurrentPath(callback);
         } else {
             if (typeof callback === "function") {
                 return callback();
@@ -547,9 +538,9 @@ module.exports = function (appVM, item) {
         return (appVM.canDownload() && !self.isDirectory());
     });//canDownload
 
-    self.canReplace = ko.pureComputed(function () {
-        return (appVM.canReplace() && !self.isDirectory());
-    });//canDownload
+    // self.canReplace = ko.pureComputed(function () {
+    //     return (appVM.canReplace() && !self.isDirectory());
+    // });//canDownload
 
     // This is our context menu for each item, so simple :)
     self.menu = ko.observableArray([{
@@ -714,9 +705,9 @@ module.exports = function (appVM, item) {
                 new: inputValue,
                 path: self.path(),
                 success: function (result) {
+                    appVM.currentFolder().refreshCurrentPath();
                     self.path(result.path);
                     self.reloadSelf();
-                    appVM.currentFolder().loadPath();
                     toastr.success(appVM.language.successful_rename, result.filename, {"positionClass": "toast-bottom-right"});
                 }//success
             });//apiGet
@@ -748,8 +739,8 @@ module.exports = function (appVM, item) {
                 success: function (result) {
                     self.path(result.path);
                     self.reloadSelf();
-                    appVM.currentFolder().path(result.dir);
-                    // appVM.loadCurrentFolder();
+                    appVM.currentFolder().loadPath(result.dir);
+                    // appVM.currentFolder().refreshCurrentPath();
                     toastr.success(appVM.language.successful_moved, result.filename, {"positionClass": "toast-bottom-right"});
                 }
             });//apiGet
@@ -783,46 +774,47 @@ module.exports = function (appVM, item) {
         });//swal
     };//delete
 
-    self.replaceMe = function () {
-        var dz = $("#my-replace-dropzone");
-        var button = $("#replaceMe");
-        dz.show();
-        button.hide();
-        dz.dropzone({
-            url: appVM.util.apiUrl + "/file",
-            dictCancelUpload: appVM.language.cancel,
-            withCredentials: true,
-            dictRemoveFile: appVM.language.del,
-            dictDefaultMessage: appVM.language.dz_dictDefaultMessage,
-            dictInvalidFileType: appVM.language.dz_dictInvalidFileType,
-            params: {path: appVM.util.getFullPath(self.path())},
-            maxFiles: 1,
-            method: "put",
-            success: function (ignore, res) {
-                if (res.errors) {
-                    toastr.error(appVM.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
-                } else {
-                    dz.hide();
-                    button.show();
-
-                    //This ensures the image is reloaded by appending a random number
-                    var img = $("#detailImage"),
-                        newImg = img.attr("src");
-                    newImg += img.attr("src").indexOf("?") === -1
-                        ? "?"
-                        : "&";
-                    newImg += Math.random();
-
-                    img.attr("src", newImg);
-
-                    toastr.success(appVM.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
-                }//if
-            }, //success
-            complete: function (file) {
-                this.removeFile(file);
-            }//complete
-        });//dropzone
-    };//replaceMe
+    // self.replaceMe = function () {
+    //     var dz = $("#my-replace-dropzone");
+    //     var button = $("#replaceMe");
+    //     dz.show();
+    //     button.hide();
+    //     dz.dropzone({
+    //         url: appVM.util.apiUrl + "/file",
+    //         dictCancelUpload: appVM.language.cancel,
+    //         withCredentials: true,
+    //         dictRemoveFile: appVM.language.del,
+    //         dictDefaultMessage: appVM.language.dz_dictDefaultMessage,
+    //         dictInvalidFileType: appVM.language.dz_dictInvalidFileType,
+    //         params: {path: appVM.util.getFullPath(self.path())},
+    //         maxFiles: 1,
+    //         method: "put",
+    //         success: function (ignore, res) {
+    //             if (res.errors) {
+    //                 toastr.error(appVM.language.ERROR_UPLOADING_FILE, res.error[0], {"positionClass": "toast-bottom-right"});
+    //             } else {
+    //                 dz.hide();
+    //                 button.show();
+    //
+    //                 //This ensures the image is reloaded by appending a random number
+    //                 var img = $("#detailImage"),
+    //                     newImg = img.attr("src");
+    //                 newImg += img.attr("src").indexOf("?") === -1
+    //                     ? "?"
+    //                     : "&";
+    //                 newImg += Math.random();
+    //
+    //                 img.attr("src", newImg);
+    //                 // appVM.currentFolder().refreshCurrentPath();
+    //
+    //                 toastr.success(appVM.language.successful_replace, res.data.name, {"positionClass": "toast-bottom-right"});
+    //             }//if
+    //         }, //success
+    //         complete: function (file) {
+    //             this.removeFile(file);
+    //         }//complete
+    //     });//dropzone
+    // };//replaceMe
 
     // Calls the SetUrl function for FCKEditor compatibility,
     // passes file path, dimensions, and alt text back to the

@@ -20,7 +20,7 @@ module.exports = function (config) {
     self.canRename = ko.observable(false);
     self.canMove = ko.observable(false);
     self.canDelete = ko.observable(false);
-    self.canReplace = ko.observable(false);
+    // self.canReplace = ko.observable(false);
     self.canSelect = ko.observable(false);
 
     self.util.apiGet({
@@ -48,9 +48,9 @@ module.exports = function (config) {
                 self.canDelete(true);
             }//if
 
-            if ($.inArray("replace", self.config.security.capabilities) !== -1) {
-                self.canReplace(true);
-            }//if
+            // if ($.inArray("replace", self.config.security.capabilities) !== -1) {
+            //     self.canReplace(true);
+            // }//if
 
             if ($.inArray("select", self.config.security.capabilities) !== -1 && (self.util.urlParameters("CKEditor") || window.opener || window.tinyMCEPopup || self.util.urlParameters("field_name"))) {
                 self.canSelect(true);
