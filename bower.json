@@ -1,5 +1,5 @@
 {
-  "name": "Filemanager-2.0",
+  "name": "fm2",
   "description": "FM2 is an open-source file manager released under MIT license.",
   "main": "dist/index.html",
   "authors": [
@@ -10,7 +10,7 @@
   "keywords": [
     "filemanager"
   ],
-  "homepage": "https://github.com/jlaustill/Filemanager-2.0",
+  "homepage": "https://github.com/jlaustill/fm2",
   "ignore": [
     "**/.*",
     "*",

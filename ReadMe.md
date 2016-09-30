@@ -7,7 +7,7 @@ FM2 is an open-source file manager released under MIT license. It is an alternat
 Support
 -------
 
-Filemanager-2.0 is under free license. If you want to support the filemanager development or just thank its main maintainer by paying for a glass of whiskey, you can make a donation by clicking the following button : 
+FM2 is under free license. If you want to support the filemanager development or just thank its main maintainer by paying for a glass of whiskey, you can make a donation by clicking the following button :
 [![Donate](https://www.paypal.com/en_US/i/btn/x-click-but21.gif)](http://paypal.me/jlaustill) 
 
 Main features 2.0
