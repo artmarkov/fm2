@@ -353,7 +353,7 @@ module.exports = function (appVM, item) {
     // NOTE: closes the window when finished.
     self.selectMe = function () {
         var url = appVM.util.apiUrl
-                + self.directPath();
+                + self.preview();
 
         if (window.opener || window.tinyMCEPopup || appVM.util.urlParameters("field_name") || appVM.util.urlParameters("CKEditorCleanUpFuncNum") || appVM.util.urlParameters("CKEditor")) {
             if (window.tinyMCEPopup) {

@@ -4,6 +4,7 @@
 
 var ko = require("knockout");
 var $ = require("jquery");
+var _ = require("lodash");
 require("jquery.fancytree");
 
 ko.bindingHandlers.fancytree = {
@@ -36,20 +37,37 @@ ko.bindingHandlers.fancytree = {
             var node = $el.fancytree("getTree").getNodeByKey(p);
             if (node) {
                 if (node.hasChildren()) {
-                    node.removeChildren();
+                    var $existingFolder = node.children;
+
+                    var newItems = _.differenceWith(newFolder, $existingFolder, function (newItem, existingItem) {
+                        return newItem.key() === existingItem.key;
+                    });
+
+                    var removedItems = _.differenceWith($existingFolder, newFolder, function (existingItem, newItem) {
+                        return newItem.key() === existingItem.key;
+                    });
+
+                    _.forEach(removedItems, function (item) {
+                        item.remove();
+                    });
+                    if (newItems.length > 0) {
+                        node.addChildren(ko.toJS(newItems));
+                    }
+                } else {
+                    node.addChildren(ko.toJS(newFolder));
                 } // if
-                node.addChildren(ko.toJS(newFolder));
+
                 node.setExpanded(true);
-            }
-            //after reloading the folder, we need to ensure it is active and focused.
-            if (node.isActive() === false && (node.key === "/" || node.data.isDirectory === true)) {
-                node.setActive({noEvents: true});
-            }
-            if (node.isSelected() === false && (node.key === "/" || node.data.isDirectory === true)) {
-                // console.log("item node -> ", node);
-                node.setFocus();
-            }
-        });
+                //after reloading the folder, we need to ensure it is active and focused.
+                if (node.isActive() === false && (node.key === "/" || node.data.isDirectory === true)) {
+                    node.setActive({noEvents: true});
+                }
+                if (node.isSelected() === false && (node.key === "/" || node.data.isDirectory === true)) {
+                    // console.log("item node -> ", node);
+                    node.setFocus();
+                }
+            } // if(node)
+        }); // $folder().items.subscribe
     },
     "update": function (element, valueAccessor) {
         "use strict";
