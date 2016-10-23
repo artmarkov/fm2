@@ -18,16 +18,21 @@ ko.bindingHandlers.fancytree = {
             "focusOnSelect": true,
             source: [{title: ko.unwrap($folder().path()), children: null, key: ko.unwrap($folder().path()), folder: true, expanded: true}],
             click: function (ignore, data) {
-                var _item = data.node.data;
-                if (typeof _item.isDirectory !== "undefined") {
-                    // console.log("lets figure this out :) _item.path -> ", _item.path, " $folder().currentItem().path() -> ", $folder().currentItem().path());
-                    if (_item.path !== $folder().currentItem().path()) {
-                        $browseToItem(_item);
-                    }
+                // If they click the expander, just expand, don't do anything else
+                if (data.targetType === "expander") {
+                    return true;
                 } else {
-                    if ($folder().currentItem().path() !== "/") {
-                        $browseToItem({isDirectory: ko.observable(true), path: ko.observable("/")});
+                    var _item = data.node.data;
+                    if (typeof _item.isDirectory !== "undefined") {
+                        if (_item.path !== $folder().currentItem().path()) {
+                            $browseToItem(_item);
+                        }
+                    } else {
+                        if ($folder().currentItem().path() !== "/") {
+                            $browseToItem({isDirectory: ko.observable(true), path: ko.observable("/")});
+                        }
                     }
+                    return true;
                 }
             } // activate
         }); // fancytree
