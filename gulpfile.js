@@ -34,10 +34,10 @@ gulp.task("uglify", ["browserify"], function (callback) {
     "use strict";
     pump([
         gulp.src("./dist/filemanager.js"),
-        sourcemaps.init(),
+        //sourcemaps.init(),
         uglify(),
         rename({extname: ".min.js"}),
-        sourcemaps.write(),
+        //sourcemaps.write(),
         gulp.dest("./dist")
     ],
     callback);

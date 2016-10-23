@@ -135,6 +135,7 @@ module.exports = function (config) {
     self.browseToItem = function (data) {
         var newItem = new Item(self, ko.toJS(data));
         self.currentFolder().currentItem(newItem);
+
         if (newItem.isDirectory()) {
             self.currentView("main");
         } else {
@@ -193,7 +194,7 @@ ko.bindingHandlers.fancytree = {
         $el.fancytree({
             "focusOnSelect": true,
             source: [{title: ko.unwrap($folder().path()), children: null, key: ko.unwrap($folder().path()), folder: true, expanded: true}],
-            activate: function (ignore, data) {
+            click: function (ignore, data) {
                 var _item = data.node.data;
                 if (typeof _item.isDirectory !== "undefined") {
                     // console.log("lets figure this out :) _item.path -> ", _item.path, " $folder().currentItem().path() -> ", $folder().currentItem().path());
@@ -237,9 +238,6 @@ ko.bindingHandlers.fancytree = {
                 //after reloading the folder, we need to ensure it is active and focused.
                 if (node.isActive() === false && (node.key === "/" || node.data.isDirectory === true)) {
                     node.setActive({noEvents: true});
-                }
-                if (node.isSelected() === false && (node.key === "/" || node.data.isDirectory === true)) {
-                    // console.log("item node -> ", node);
                     node.setFocus();
                 }
             } // if(node)

@@ -134,6 +134,7 @@ module.exports = function (config) {
     self.browseToItem = function (data) {
         var newItem = new Item(self, ko.toJS(data));
         self.currentFolder().currentItem(newItem);
+
         if (newItem.isDirectory()) {
             self.currentView("main");
         } else {
