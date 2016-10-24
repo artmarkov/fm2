@@ -7,6 +7,7 @@ var $ = require("jquery");
 var Item = require("./item.datamodel.js");
 var swal = require("sweetalert");
 var toastr = require("toastr");
+var _ = require("lodash");
 
 module.exports = function (appVM, path) {
     "use strict";
@@ -14,6 +15,36 @@ module.exports = function (appVM, path) {
         _currentItem = ko.observable(new Item(appVM));
     self.path = ko.observable("");
     self.items = ko.observableArray([]);
+
+    self.sortedItems = ko.pureComputed({
+        read: function () {
+            if (appVM.sortedBy() === "nameAsc") {
+                return _.sortBy(self.items(), function (i) {
+                    return i.key().toLowerCase();
+                });
+            } else if (appVM.sortedBy() === "nameDesc") {
+                return _.reverse(_.sortBy(self.items(), function (i) {
+                    return i.key().toLowerCase();
+                }));
+            } else if (appVM.sortedBy() === "dateAsc") {
+                return _.sortBy(self.items(), function (i) {
+                    return i.properties().dateModified;
+                });
+            } else if (appVM.sortedBy() === "dateDesc") {
+                return _.reverse(_.sortBy(self.items(), function (i) {
+                    return i.properties().dateModified;
+                }));
+            } else if (appVM.sortedBy() === "sizeAsc") {
+                return _.sortBy(self.items(), function (i) {
+                    return i.properties().size;
+                });
+            } else {
+                return _.reverse(_.sortBy(self.items(), function (i) {
+                    return i.properties().size;
+                }));
+            } // if
+        } // read
+    }); // self.sortedItems
 
     self.currentItem = ko.pureComputed({
         read: function () {

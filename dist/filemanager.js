@@ -23,6 +23,7 @@ module.exports = function (config) {
     self.canDelete = ko.observable(false);
     // self.canReplace = ko.observable(false);
     self.canSelect = ko.observable(false);
+    self.sortedBy = ko.observable("nameAsc");
 
     self.util.apiGet({
         url: "",
@@ -174,6 +175,7 @@ module.exports = function (config) {
             : "glyphicon glyphicon-th";
     });//viewButtonClass
 }; //app.viewmodel tst
+
 },{"./folder.datamodel.js":4,"./item.datamodel.js":5,"./utility.viewmodel.js":32,"jquery":44,"knockout":48}],2:[function(require,module,exports){
 /**
  * Created by joshuaaustill on 8/30/16.
@@ -359,6 +361,7 @@ var $ = require("jquery");
 var Item = require("./item.datamodel.js");
 var swal = require("sweetalert");
 var toastr = require("toastr");
+var _ = require("lodash");
 
 module.exports = function (appVM, path) {
     "use strict";
@@ -366,6 +369,36 @@ module.exports = function (appVM, path) {
         _currentItem = ko.observable(new Item(appVM));
     self.path = ko.observable("");
     self.items = ko.observableArray([]);
+
+    self.sortedItems = ko.pureComputed({
+        read: function () {
+            if (appVM.sortedBy() === "nameAsc") {
+                return _.sortBy(self.items(), function (i) {
+                    return i.key().toLowerCase();
+                });
+            } else if (appVM.sortedBy() === "nameDesc") {
+                return _.reverse(_.sortBy(self.items(), function (i) {
+                    return i.key().toLowerCase();
+                }));
+            } else if (appVM.sortedBy() === "dateAsc") {
+                return _.sortBy(self.items(), function (i) {
+                    return i.properties().dateModified;
+                });
+            } else if (appVM.sortedBy() === "dateDesc") {
+                return _.reverse(_.sortBy(self.items(), function (i) {
+                    return i.properties().dateModified;
+                }));
+            } else if (appVM.sortedBy() === "sizeAsc") {
+                return _.sortBy(self.items(), function (i) {
+                    return i.properties().size;
+                });
+            } else {
+                return _.reverse(_.sortBy(self.items(), function (i) {
+                    return i.properties().size;
+                }));
+            } // if
+        } // read
+    }); // self.sortedItems
 
     self.currentItem = ko.pureComputed({
         read: function () {
@@ -490,7 +523,8 @@ module.exports = function (appVM, path) {
 
     self.loadPath(path);
 }; // folder.datamodel
-},{"./item.datamodel.js":5,"jquery":44,"knockout":48,"sweetalert":59,"toastr":61}],5:[function(require,module,exports){
+
+},{"./item.datamodel.js":5,"jquery":44,"knockout":48,"lodash":49,"sweetalert":59,"toastr":61}],5:[function(require,module,exports){
 /*global data*/
 /**
  * Created by Joshua.Austill on 8/19/2016.

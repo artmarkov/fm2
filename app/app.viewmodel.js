@@ -22,6 +22,7 @@ module.exports = function (config) {
     self.canDelete = ko.observable(false);
     // self.canReplace = ko.observable(false);
     self.canSelect = ko.observable(false);
+    self.sortedBy = ko.observable("nameAsc");
 
     self.util.apiGet({
         url: "",

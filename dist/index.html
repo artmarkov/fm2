@@ -44,6 +44,26 @@
             </div>
         </div>
         <div id="fileinfo">
+						<div class="btn-group">
+	    				<button type="button" class="btn btn-default glyphicon glyphicon-sort-by-alphabet"
+					        data-toggle="tooltip" data-placement="top" title="Name Ascending"
+							data-bind="click: function (){sortedBy('nameAsc');}, css: { active: sortedBy() === 'nameAsc' }"></button>
+					    <button type="button" class="btn btn-default glyphicon glyphicon-sort-by-alphabet-alt"
+					        data-toggle="tooltip" data-placement="top" title="Name Descending"
+							data-bind="click: function (){sortedBy('nameDesc');}, css: { active: sortedBy() === 'nameDesc' }"></button>
+					    <button type="button" class="btn btn-default glyphicon glyphicon-sort-by-order"
+					        data-toggle="tooltip" data-placement="top" title="Size Ascending"
+							data-bind="click: function (){sortedBy('sizeAsc');}, css: { active: sortedBy() === 'sizeAsc' }"></button>
+					    <button type="button" class="btn btn-default glyphicon glyphicon-sort-by-order-alt"
+					        data-toggle="tooltip" data-placement="top" title="Size Descending"
+							data-bind="click: function (){sortedBy('sizeDesc');}, css: { active: sortedBy() === 'sizeDesc' }"></button>
+					    <button type="button" class="btn btn-default glyphicon glyphicon-sort-by-attributes"
+					        data-toggle="tooltip" data-placement="top" title="Date Ascending"
+							data-bind="click: function (){sortedBy('dateAsc');}, css: { active: sortedBy() === 'dateAsc' }"></button>
+					    <button type="button" class="btn btn-default glyphicon glyphicon-sort-by-attributes-alt"
+					        data-toggle="tooltip" data-placement="top" title="Date Descending"
+							data-bind="click: function (){sortedBy('dateDesc');}, css: { active: sortedBy() === 'dateDesc' }"></button>
+					  </div>
             <div data-bind="template: {name: mainView, afterRender: afterRender}">
             </div>
         </div>
@@ -73,7 +93,7 @@
 <script type="text/html" id="grid-template">
     <div class="container-fluid">
         <div class="row" data-bind="with: currentFolder">
-            <div id="contents" class="" data-bind="foreach: {data: items, as: 'item'}">
+            <div id="contents" class="" data-bind="foreach: {data: sortedItems, as: 'item'}">
                 <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2 col-fix grid-border text-center" data-bind="click: $root.browseToItem, contextMenu: menu">
                     <img width="64" data-bind="attr: {src: getIconUrl, alt: getIconUrl, dataPath: getIconUrl}"/>
                     <p class="text-center" data-bind="text: item.filename"></p>
@@ -94,7 +114,7 @@
             <th>{{$root.language.modified}}</th>
         </tr>
         </thead>
-        <tbody data-bind="foreach: {data: items, as: 'item'}">
+        <tbody data-bind="foreach: {data: sortedItems, as: 'item'}">
         <tr class="cap_select cap_download cap_rename cap_delete cap_replace" data-bind="click: $root.browseToItem, contextMenu: menu">
             <td><span data-bind="css: item.isDirectory() ? 'glyphicon glyphicon-folder-close' : 'glyphicon glyphicon-file'">  {{item.filename}}</span> </td>
             <!--<td>{{item.properties().height}}x{{item.properties().width}}</td>-->
