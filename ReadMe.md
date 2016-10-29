@@ -20,13 +20,12 @@ Main features 2.0
 * Fancy Tree replaces jquery.filetree
 * Sweetalert replaces jquery.impromptu
 * toastr replaces alerts
-* AMD loading with requirejs
+* Bundled with Browserify, built with gulp
 * api and ui seperate
 
 2.0 Future roadmap
 --------------
 
-* build process for better deployment
 * jquery extension $.fm2() instead of iframes
 * spotlight like search
 * drag and drop
@@ -34,55 +33,15 @@ Main features 2.0
 * same great themes
 * same great language support
 
-Main features 1.0
--------------
-
-* A Filemanager relying on jquery.
-* Available in more than 20 languages.
-* [Highly customizable](https://github.com/simogeo/Filemanager/wiki/Filemanager-configuration-file)
-* Can work as standalone application
-* Easy integration with RTE like CKEditor, TinyMCE and so on.
-* Easy integration with [colorbox jquery plugin](https://github.com/simogeo/Filemanager/wiki/How-to-use-the-filemanager-with-colorbox-%3F) or [HTML simple textfield](https://github.com/simogeo/Filemanager/wiki/How-to-use-the-filemanager-from-a-simple-textfield-%3F)
-* Several computer language connectors available. **PHP is up-to-date**
-* Ability to upload, delete, modify, download and move files
-* Ability to create folders
-* Support user permissions - based on session
-* Handle system permissions
-* Ability to pass config user file in URL
-* Multiple uploads support - based on [dropzonejs](http://www.dropzonejs.com)
-* Online text / code edition - based on [codeMirror](http://codemirror.net/)
-* Online documents viewer - based on [viewerJS](http://viewerjs.org/)
-* [Opening a given folder](https://github.com/simogeo/Filemanager/wiki/How-to-open-a-given-folder-different-from-root-folder-when-opening-the-filemanager%3F)
-* [Opening exclusively a given folder](https://github.com/simogeo/Filemanager/wiki/How-to-open-%28exclusively%29-a-given-subfolder-%3F)
-* [Passing parameters to the FM](https://github.com/simogeo/Filemanager/wiki/Passing-parameters-to-the-FM)
-* [File types restriction](https://github.com/simogeo/Filemanager/wiki/Set-up-upload-restriction-on-file-type)
-* Video and audio player relying on web browser capabilities
-* Textbox Search filter
-* Thumbnails generation
-* Image auto-resize
-* File size limit
-* File exclusion based on name and patterns
-* Images files only
-* Prevent files overwriting (or not)
-* Switch from list to grid view and vice-versa
-* Copy direct file URL
-* [CSS Themes](https://github.com/simogeo/Filemanager/wiki/Create-your-own-theme) - **Please, share your themes with others !**
-* and more ...
-
-
 Screenshot
 -------------
-Current state as of version 2.0.3
+Current state as of version 2.4.0-alpha15
 ![Filemanager-2.0 V2.0.3 Screenshot](https://github.com/jlaustill/Filemanager-2.0/blob/master/images/v2_0_3.png?raw=true)
-
-Original Filemanager
-![Filemanager Screenshot](http://i57.tinypic.com/35cqw74.png)
-
 
 Documentation
 -------------
 
-Filemanager is highly documented on the [wiki pages](https://github.com/simogeo/Filemanager/wiki). API, see below.
+Filemanager is highly documented on the [wiki pages](https://github.com/jlaustill/fm2/wiki).
 
 
 Installation and Setup
@@ -90,19 +49,20 @@ Installation and Setup
 
 **Preamble**
 
-Since many changes have been done recently, only a nodejs api is available. Previous connectors will NOT work, promise 100%.  I will be standardizing the api to JSON API 1.0 standards, and working with other developers to bring at least asp.net and php on board.  
+Since many changes have been done recently, only a Node.js api is available. Previous connectors will NOT work, promise 100%.  I have standardized the api to JSON API 1.0 standards. I hope to work with other developers to bring at least asp.net and php on board.  
 
-To use other connectors, please download v0.8 version from https://github.com/simogeo/Filemanager/archive/v0.8.zip
+To use other connectors, please download v0.8 version from the original filemanager  https://github.com/simogeo/Filemanager/archive/v0.8.zip
 (PHP, ASHX, ASP, CFM, lasso, PL and JSP connectors are available)
 
 ---
 
-**(1)** Check out a copy of the FileManager from the repository using Git :
+Install fm2 with bower
 
-git clone http://github.com/jlaustill/Filemanager-2.0.git
+```
+bower install fm2#2.4.0-alpha15
+```
 
-
-You can place the FileManager anywhere within your web serving root directory.
+It will install into bower_components/fm2 by default unless you have bower configured to install elsewhere.
 
 **(2)** Make a copy of the default configuration file ("filemanager.config.default.json" located in the scripts directory), removing the '.default' from the end of the filename, and edit the options according to the following wiki page : https://github.com/simogeo/Filemanager/wiki/Filemanager-configuration-file
    Having a look on configuration cases study may also be helpful to you : https://github.com/simogeo/Filemanager/wiki/Specify-user-folder%2C-configuration-cases
@@ -154,5 +114,3 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
- 
