@@ -64,8 +64,9 @@ bower install fm2#2.4.0-alpha15
 
 It will install into bower_components/fm2 by default unless you have bower configured to install elsewhere.
 
-**(2)** Make a copy of the default configuration file ("filemanager.config.default.json" located in the scripts directory), removing the '.default' from the end of the filename, and edit the options according to the following wiki page : https://github.com/simogeo/Filemanager/wiki/Filemanager-configuration-file
-   Having a look on configuration cases study may also be helpful to you : https://github.com/simogeo/Filemanager/wiki/Specify-user-folder%2C-configuration-cases
+**(2)** Make a copy of the default configuration file ("fm2.ui.config.default.json" located in the dist/config directory), removing the '.default' from the end of the filename, and edit the options according to the following wiki page : https://github.com/jlaustill/fm2/wiki/Filemanager-configuration-file
+
+> I have not testeg FCKEditor, please give me feedback if you do
 
 **(3a)** If you are integrating the FileManager with FCKEditor, open your fckconfig.js file and find the lines which specify what file browser to use for images, links, etc. Look toward the bottom of the file. You will need to change lines such as this:
 
@@ -81,6 +82,8 @@ FCKConfig.ImageBrowser = true ;
 FCKConfig.ImageBrowserURL = '[Path to Filemanager]/index.html' ;
 ```
 
+> I have not tested CKEditor, please give me feedback if you do
+
 **(3b)** If you are integrating the FileManager with CKEditor 3.x or higher, simply set the URL when you configure your instance, like so:
 
 ```javascript
@@ -90,7 +93,7 @@ CKEDITOR.replace('instancename', {
 });
 ```
 
-If you want to use the **modal dialog mode** (instead of pop-up), please refer to [the dedicated wiki page](https://github.com/simogeo/Filemanager/wiki/How-to-open-the-Filemanager-from-CKEditor-in-a-modal-window-%3F).
+If you want to use the **modal dialog mode** (instead of pop-up), please refer to [the dedicated wiki page](https://github.com/jlaustill/fm2/wiki/How-to-open-the-Filemanager-from-CKEditor-in-a-modal-window-%3F).
 
 **(3c)** If you are integrating the FileManager with TinyMCE (>= 3.0), you should:
 
@@ -98,7 +101,7 @@ Create a Javascript callback function that will open the FileManager index.html 
 Add a line like: "file_browser_callback : 'name_of_callback_function'" in the tinyMCE.init command
 See http://www.tinymce.com/wiki.php/TinyMCE3x:How-to_implement_a_custom_file_browser for more details.
 
-See also the dedicated wiki page, with TinyMCE 4 sample : https://github.com/simogeo/Filemanager/wiki/How-to-use-the-Filemanager-with-tinyMCE--3-or-4-%3F
+See also the dedicated wiki page, with TinyMCE 4 sample : https://github.com/jlaustill/Filemanager/wiki/How-to-use-the-Filemanager-with-tinyMCE--3-or-4-%3F
 
 
 
